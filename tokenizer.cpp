@@ -1,7 +1,3 @@
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 #include "tokenizer.h"
 
 std::string tokenizer::parse_input() {

@@ -17,5 +17,10 @@ int main(int argc, char* argv[]) {
   string were_we_successful = " ";
   were_we_successful = tester.parse_input();
   cout << were_we_successful << endl;
+  token test1;
+  token test2("howdy");
+  test1 = test2;
+  cout << test1 << endl;
+  cout << test2 << endl;
   return 0;
 }
