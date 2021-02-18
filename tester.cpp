@@ -2,8 +2,7 @@
 #include <iostream>
 
 
-#include "tokenizer.cpp"
-#include "token.cpp"
+#include "token.h"
 
 using namespace std;
 
