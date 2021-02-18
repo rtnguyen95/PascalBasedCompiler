@@ -1,4 +1,5 @@
 #include "tokenizer.h"
+#include "lexicalscanner.h"
 
 std::string tokenizer::parse_input() {
   std::ifstream input_file_stream(filename_, std::ios::in);
@@ -24,5 +25,27 @@ std::string tokenizer::parse_input() {
   //- a problem from the book - rate*time we need to realize * ends rate but also re-read *
   //   as multiply
 
-  return parser_.str();
+  LexicalScanner scanner(parser_);
+  ostringstream output;
+
+  Record record = {"", "", true, ""};
+  output << "TOKENS        Lexemes" << endl << endl;
+  while (!scanner.isFinished() && record.accepted) {
+          record = scanner.lexer();
+          if (record.lexeme.length()) {
+            cout << record << endl;  
+            output << record << endl;
+          }
+  }
+
+  cout << endl << " State Transitions: " << endl;
+  for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s) {
+      cout  << s->toString();
+
+      if (s->next_input == 0)
+        cout << endl;
+  }
+  cout << endl;
+
+  return output.str();
 }
