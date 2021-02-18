@@ -6,3 +6,10 @@ run with:
 ./tester.o test.txt
 tester needs a command-line argument of the filename, or it will complain.
 tester.cpp also demonstrates the use of token, a separate class from tokenizer.
+
+
+# Build
+./build.sh
+
+# Run
+./test.sh
