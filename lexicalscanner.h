@@ -49,12 +49,12 @@ ostream & operator << (ostream & stream, Record record) {
 
 class LexicalScanner {
 private:
-    stringstream & w;
+    istream & w;
 public: 
 
     list<State> stateTransitions;
 
-    LexicalScanner(stringstream & input) : w(input) {
+    LexicalScanner(istream & input) : w(input) {
         
     }
 
@@ -179,7 +179,6 @@ public:
         Record record;
         bool reachedEnd = false;
 
-        char ch;
         while (!reachedEnd) {
             char ch = w.get();
             stateTransitions.push_back({state, ch});
