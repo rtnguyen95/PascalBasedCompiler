@@ -185,7 +185,11 @@ public:
             stateTransitions.push_back({state, ch});
 
             int col = char_to_col(ch);
-            state = ntable[state-1][col];
+            if (col != INVALID) {
+                state = ntable[state-1][col];
+            } else {
+                state = 0; // invalid state?
+            }
 
             switch (state) {
                 case 2: // inside an identifier or keyword
@@ -239,6 +243,10 @@ public:
                     break;
                 case 1:
                     // this will eat whitespace
+                    break;
+                default:                     
+                    cout << "invalid character encountered: "<< ch <<" Stopping" << endl; 
+                    reachedEnd = true;
                     break;
             }
 
