@@ -87,9 +87,10 @@ protected:
         {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float
         {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 9 end comment - dead state
         //sep
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, backup
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, no backup - may not need this one
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, no backup - may not need this one - dead state
         //operator
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, //end operator, single operators only
 
