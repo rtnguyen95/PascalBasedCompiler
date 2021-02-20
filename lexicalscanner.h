@@ -86,8 +86,7 @@ protected:
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer
         {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float
-        {8, 8, 8, 8, 8, 8, 9, 8, 8}, // 8 in comment
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 9 end comment
+        {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
         //sep
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, backup
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, no backup - may not need this one
@@ -220,13 +219,8 @@ public:
                     reachedEnd = true;
                     break;
                 case 8: // in a comment
-                    //currentLexeme += ch;
                     break;
                 case 9: // at the end of a comment
-                    // comments should be ignored
-                    //record.token = "comment";
-                    //record.lexeme = currentLexeme + ch;
-                    //reachedEnd = true;
                     break;
                 case 10:
                     record.token = "SEPARATOR";
