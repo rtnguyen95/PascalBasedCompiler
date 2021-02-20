@@ -79,7 +79,7 @@ protected:
 
     const int ntable[13][9] = {
        //a, d, _, $, .,  , !, {}, +=
-        {2, 4, 1, 1, 6, 1, 8, 10, 12}, // 1 starting state
+        {2, 4, 1, 1, 10, 1, 8, 10, 12}, // 1 starting state
         {2, 2, 2, 2, 3, 3, 3, 3, 3}, // 2 in identifier
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier
         {5, 4, 5, 5, 6, 5, 5, 5, 5}, // 4 in integer
