@@ -1,4 +1,4 @@
-//Numbers FSM
+#pragma once
 #include <stdlib.h>
 #include <string>
 #include <iostream>
@@ -8,12 +8,12 @@
 
 using namespace std;
 
-string toString(char ch) {
+inline string toString(char ch) {
     switch(ch) {
         case '\n': return "\\n";
         case ' ': return "[space]";
         default: 
-            return string({ ch, 0});
+            return string(1, ch);
     }
 }
 
@@ -39,7 +39,7 @@ struct Record {
     string errorMessage;
 };
 
-ostream & operator << (ostream & stream, Record record) {
+inline ostream & operator << (ostream & stream, Record record) {
     stream.width(11);
     stream << left << record.token << " = " << record.lexeme;
     if (!record.accepted)
