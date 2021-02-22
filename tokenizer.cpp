@@ -1,11 +1,11 @@
 #include "tokenizer.h"
 #include "lexicalscanner.h"
 
-std::string tokenizer::parse_input() {
+list<Record> tokenizer::parse_input() {
   std::ifstream input_file_stream(filename_, std::ios::in);
   if (!input_file_stream.is_open()) {
     std::cerr << "No such file.\n";
-    return "NaN";
+    return list<Record>();
   }
   parser_ << input_file_stream.rdbuf();
   // TODO: here is where we need to parse this stringstream "parser"
@@ -29,12 +29,13 @@ std::string tokenizer::parse_input() {
   ostringstream output;
 
   Record record = {"", "", true, ""};
+  list<Record> records;
   output << "TOKENS        Lexemes" << endl << endl;
   while (!scanner.isFinished() && record.accepted) {
           record = scanner.lexer();
           if (record.lexeme.length()) {
             cout << record << endl;  
-            output << record << endl;
+            records.push_back(record);
           }
   }
 
@@ -47,5 +48,5 @@ std::string tokenizer::parse_input() {
   }
   cout << endl;
 
-  return output.str();
+  return records;
 }

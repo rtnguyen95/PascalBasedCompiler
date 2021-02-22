@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include "lexicalscanner.h"
 
 class tokenizer {
 private:
@@ -13,5 +14,5 @@ public:
   tokenizer(std::string filename) {
     filename_ = filename;
   }
-  std::string parse_input();
+  list<Record> parse_input();
 };
