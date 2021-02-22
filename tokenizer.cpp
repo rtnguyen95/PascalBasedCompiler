@@ -1,5 +1,6 @@
 #include "tokenizer.h"
 #include "lexicalscanner.h"
+#include <filesystem>
 
 list<Record> tokenizer::parse_input() {
   std::ifstream input_file_stream(filename_, std::ios::in);
@@ -39,13 +40,17 @@ list<Record> tokenizer::parse_input() {
           }
   }
 
-  cout << endl << " State Transitions: " << endl;
+  stringstream states;
+  states << endl << " State Transitions: " << endl;
   for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s) {
-      cout  << s->toString();
+      states << s->toString();
 
       if (s->next_input == 0)
-        cout << endl;
+        states << endl;
   }
+  ofstream states_file(std::filesystem::path(filename_).stem().string() + "-states.txt");
+  states_file << states.str();
+
   cout << endl;
 
   return records;
