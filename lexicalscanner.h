@@ -213,7 +213,7 @@ public:
                     record.lexeme = currentLexeme;
                     reachedEnd = true;
                     break;
-                case 10:
+                case 10: // operators
                     record.token = "OPERATOR";
                     currentLexeme += ch;
                     record.lexeme = currentLexeme;
