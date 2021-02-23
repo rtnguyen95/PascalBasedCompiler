@@ -8,8 +8,11 @@
 
 using namespace std;
 
-inline string toString(char ch) {
-    switch(ch) {
+//Function Description
+inline string toString(char ch)
+{
+    switch(ch)
+    {
         case '\n': return "\\n";
         case ' ': return "[space]";
         default: 
@@ -17,29 +20,41 @@ inline string toString(char ch) {
     }
 }
 
-struct State {
+//struct description
+struct State
+{
     int state;
     char next_input;
     bool accepted;
 
-    string toString() {
+    string toString()
+    {
         string result = string("(") + to_string(state) + ")";
-        if (next_input != 0) 
+        if (next_input != 0)
+        {
             result += " --" + ::toString(next_input) + "--> ";
-        else result.append(" ----> ").append(accepted ? "accepted" : "not accepted").append("; ");
+        }
+        else
+        {
+            result.append(" ----> ").append(accepted ? "accepted" : "not accepted").append("; ");
+        }
 
         return result;
     }
 };
 
-struct Record {
+//Description
+struct Record
+{
     string token;
     string lexeme;
     bool accepted;
     string errorMessage;
 };
 
-inline ostream & operator << (ostream & stream, Record record) {
+//Description
+inline ostream & operator << (ostream & stream, Record record)
+{
     stream.width(11);
     stream << left << record.token << " = " << record.lexeme;
     if (!record.accepted)
@@ -47,9 +62,11 @@ inline ostream & operator << (ostream & stream, Record record) {
     return stream;
 }
 
-class LexicalScanner {
+class LexicalScanner
+{
 private:
     istream & w;
+    
 public: 
 
     list<State> stateTransitions;
@@ -84,20 +101,25 @@ protected:
 
     vector<int> backup {3, 5, 7};
 
-    enum {
-        ALPHA,
-        DIGIT,
-        UNDERSCORE,
-        DOLLAR_SIGN,
-        DECIMAL_PT,
-        WHITE_SPACE,
-        COMMENT_MARKER,
-        SEPARATOR,
-        OPERATOR,
+    //enumeration for the columns of the state table (starts at index 0)
+    enum
+    {
+        ALPHA,              //col 0
+        DIGIT,              //col 1
+        UNDERSCORE,         //col 2
+        DOLLAR_SIGN,        //col 3
+        DECIMAL_PT,         //col 4
+        WHITE_SPACE,        //col 5
+        COMMENT_MARKER,     //col 6
+        SEPARATOR,          //col 7
+        OPERATOR,           //col 8
         INVALID = 100
     };
 
-    int char_to_col(char ch) {
+    //The function char_to_col accepts a character and returns an int representing the column number of the character ch in the DFSM table
+    int char_to_col(char ch)
+    {
+        //
         if (isdigit(ch))
             return DIGIT;
         if (ch == '.')
@@ -119,7 +141,8 @@ protected:
         return INVALID; //any invalid character
     }
 
-    const vector<string> keywords = {
+    //a vector holding all the keywords the analyzer recognizes
+    const vector<string> keywords ={
         "int", "float", "bool", 
         "True", "False",
         "if", "else", "then", "endif", "endelse", 
@@ -130,22 +153,29 @@ protected:
         "and", "or", "not"
     };
 
-    const vector<char> separators = {
+    //a vector holding all the separators that the analyzer recognizes
+    const vector<char> separators ={
         '(', ')', '{', '}', '[', ']', ',', '.', ':', ';'
     };
 
-    const vector<char> operators = {
+    //a vector holding all the operators that the analyzer recognizes
+    const vector<char> operators ={
         '*', '+', '-', '=', '/', '<', '>', '%'
     };
 
+    //function that accepts a string and checks to see if the string is in the list of keywords that the analyzer recognizes
+    //Returns a boolean value - true if the string is a keyword, false if otherwise
     bool isKeyword(string & str) {
         return find(keywords.begin(), keywords.end(), str) != keywords.end();
     }
 
+    //Function that accepts a character and checks to see if the character is in the list of separators that the analyzer recognizes
+    //Returns a boolean value - true if the character is a separator, false if otherwise
     bool isSeparator(char ch) {
         return find(separators.begin(), separators.end(), ch) != separators.end();
     }
 
+    
     bool isOperator(char ch) {
         return find(operators.begin(), operators.end(), ch) != operators.end();
     }
