@@ -86,16 +86,16 @@ protected:
 
     const int ntable[10][9] = {
        //a, d, _, $, .,  , !, {}, +=
-        {2, 4, 1, 1, 9, 1, 8, 9, 10}, // 1 starting state
-        {2, 2, 2, 2, 3, 3, 3, 3, 3}, // 2 in identifier
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
-        {5, 4, 5, 5, 6, 5, 5, 5, 5}, // 4 in integer
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer (final state)
-        {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
-        {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 9 separator (final state)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //10 end operator, single operators only (final state)
+        {2, 4, 1, 1, 9, 1, 8, 9, 10},   // 1 starting state
+        {2, 2, 2, 2, 3, 3, 3, 3, 3},    // 2 in identifier
+        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 3 end identifier (final state)
+        {5, 4, 5, 5, 6, 5, 5, 5, 5},    // 4 in integer
+        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 5 end integer (final state)
+        {7, 6, 7, 7, 7, 7, 7, 7, 7},    // 6 in float
+        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 7 end float (final state)
+        {8, 8, 8, 8, 8, 8, 1, 8, 8},    // 8 in comment
+        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 9 separator (final state)
+        {1, 1, 1, 1, 1, 1, 1, 1, 1},     //10 end operator, single operators only (final state)
 
     };
 
@@ -119,26 +119,35 @@ protected:
     //The function char_to_col accepts a character and returns an int representing the column number of the character ch in the DFSM table
     int char_to_col(char ch)
     {
-        //
+        //check to see if the character is a digit and if true return the column number for digit
         if (isdigit(ch))
             return DIGIT;
+        //check to see if the character is a . and if true return the column number for decimal
         if (ch == '.')
             return DECIMAL_PT;
+        //checks to see if the character is a space OR if the end of the file has been reached and if true returns the column number for space
         if (isspace(ch) || ch == EOF)
             return WHITE_SPACE;
+        //checks to see if the character is an alphabetical character and if true returns the column number for alphabet
         if (isalpha(ch))
             return ALPHA;
+        //checks to see if the character is an underscore and if true returns the column number for underscore
         if (ch == '_')
             return UNDERSCORE;
+        //checks to see if the character is a dollar sign and if true returns the column number for dollar sign
         if (ch == '$')
             return DOLLAR_SIGN;
+        //checks to see if the character is an explanation point (exclamation point denotes the beginning and end of a comment) and if true returns the column number for comment maker
         if (ch == '!')
             return COMMENT_MARKER;
+        //checks to see if the character is in the list of seperators recognized by the analyzer and if true return the column number for seperator
         if (isSeparator(ch))
             return SEPARATOR;
+        //checks to see if the character is in the list of operators recognized by the analyzer and if true return the column number for operator
         if (isOperator(ch))
             return OPERATOR;
-        return INVALID; //any invalid character
+        //if the character does not match any of the cases above the character is invalid, and the function returns an int for an invalid character
+        return INVALID;
     }
 
     //a vector holding all the keywords the analyzer recognizes
@@ -175,18 +184,22 @@ protected:
         return find(separators.begin(), separators.end(), ch) != separators.end();
     }
 
-    
+    //Function that accepts a character and checks to see if the character is in the list of operators that the analyzer recognizes
+    //Returns a boolean value - true if the character is an operator, false if otherwise
     bool isOperator(char ch) {
         return find(operators.begin(), operators.end(), ch) != operators.end();
     }
 
+    //Function description
     bool isBackupState(int state) {
         return find(backup.begin(), backup.end(), state) != backup.end();
     }
 
+    //Function description
     bool inF(int state) {
         return find(F.begin(), F.end(), state) != F.end();
     }
+    
 public:
 
     Record lexer() {
