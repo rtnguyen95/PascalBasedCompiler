@@ -8,37 +8,50 @@
 
 using namespace std;
 
-//Function Description
+//Function to string: accepts a character variable ch and returns a string
+//??
 inline string toString(char ch)
 {
     switch(ch)
     {
+        //if ch is a linebreak, returns "\\n"
         case '\n': return "\\n";
+        //if ch is a space, returns "[space"
         case ' ': return "[space]";
-        default: 
+        //else returns ??
+        default:
             return string(1, ch);
     }
 }
 
-//struct description
+//struct to hold information for each state transition that the FSM processes
+//each State object holds an int representing the current state, a char representing the next input, and a bool that returns true if the state is accepted, false if otherwise
 struct State
 {
-    int state;
-    char next_input;
-    bool accepted;
-
+    //variables
+    int state; //represents the current state
+    char next_input; //char that holds the next input to be anaylzed by the scanner
+    bool accepted; //returns true if the state is accepted, false if otherwise
+    
+    //Function definition
     string toString()
     {
+        //create a string variable result that holds ?? and initialize it to "(state)" where state is the int variable that represents the current state
         string result = string("(") + to_string(state) + ")";
+        
+        //if the following character is not blank?
         if (next_input != 0)
         {
+            //?
             result += " --" + ::toString(next_input) + "--> ";
         }
         else
         {
+            //?
             result.append(" ----> ").append(accepted ? "accepted" : "not accepted").append("; ");
         }
 
+        //return the string result to the caller
         return result;
     }
 };
