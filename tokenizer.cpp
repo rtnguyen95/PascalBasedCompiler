@@ -30,13 +30,13 @@ list<Record> tokenizer::parse_input() {
   ostringstream output;
 
   Record record = {"", "", true, ""};
-  list<Record> records;
+  list<Record> recordsList;
   output << "TOKENS        Lexemes" << endl << endl;
   while (!scanner.isFinished() && record.accepted) {
           record = scanner.lexer();
           if (record.lexeme.length()) {
             cout << record << endl;  
-            records.push_back(record);
+            recordsList.push_back(record);
           }
   }
 
@@ -53,5 +53,5 @@ list<Record> tokenizer::parse_input() {
 
   cout << endl;
 
-  return records;
+  return recordsList;
 }
