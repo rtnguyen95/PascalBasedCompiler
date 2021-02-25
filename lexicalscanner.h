@@ -269,13 +269,14 @@ public:
         //while loop that processes until a final state is reached
         while (!reachedFinal)
         {
-            char currChar = w.get(); //variable to hold the current character in the input stream being processed by the FSM. initialized to the first character from the input stream
+            char currChar = w.get(); //create a variable to hold the current character in the input stream being processed by the FSM and initialize to the first character from the input stream
             
             stateTransitions.push_back({state, currChar}); //add the initial state and the first char to the list of state transitions
 
-            int col = char_to_col(currChar);
+            int col = char_to_col(currChar); //create a variable to hold the column corresponding to the current character and initialize to the column of the first character
             
-            if (col != INVALID) {
+            if (col != INVALID)
+            {
                 state = ntable[state-1][col];
             } else {
                 state = 0; // invalid state?
