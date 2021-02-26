@@ -28,18 +28,21 @@ list<Record> tokenizer::parse_input() {
 
   LexicalScanner scanner(parser_);
   ostringstream output;
-
+  ofstream result_code;
+  result_code.open ("output.txt");
+  result_code <<  "TOKENS        Lexemes" << endl << endl;
   Record record = {"", "", true, ""};
   list<Record> records;
   output << "TOKENS        Lexemes" << endl << endl;
   while (!scanner.isFinished() && record.accepted) {
           record = scanner.lexer();
           if (record.lexeme.length()) {
-            cout << record << endl;  
+            cout << record << endl;
+            result_code << record << endl;
             records.push_back(record);
           }
   }
-
+  result_code.close();
   stringstream states;
   states << endl << " State Transitions: " << endl;
   for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s) {
