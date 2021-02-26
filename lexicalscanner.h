@@ -1,4 +1,4 @@
-#pragma once
+//Numbers FSM
 #include <stdlib.h>
 #include <string>
 #include <iostream>
@@ -8,12 +8,12 @@
 
 using namespace std;
 
-inline string toString(char ch) {
+string toString(char ch) {
     switch(ch) {
         case '\n': return "\\n";
         case ' ': return "[space]";
         default: 
-            return string(1, ch);
+            return string({ ch, 0});
     }
 }
 
@@ -39,7 +39,7 @@ struct Record {
     string errorMessage;
 };
 
-inline ostream & operator << (ostream & stream, Record record) {
+ostream & operator << (ostream & stream, Record record) {
     stream.width(11);
     stream << left << record.token << " = " << record.lexeme;
     if (!record.accepted)
@@ -65,24 +65,38 @@ public:
 protected:
     int q0 = 1;                 // initial state
 
-    vector<int> F {3, 5, 7, 9, 10}; // final states
+    vector<int> F {3, 5, 7, 9, 10, 11, 12}; // final states
 
-    const int ntable[10][9] = {
+    // Define the FSM
+    // N       | digit |   .   |space  | invalid
+    // -----------------------------------------
+    // start  0|   1   |   3   |   2   |   5
+    // digit  1|   1   |   3   |   2   |   5
+    // space  2|   4   |   5   |   2   |   5
+    // float  3|   4   |   5   |   2   |   5
+    // float  4|   4   |   3   |   2   |   5
+    //!valid  5|   5   |   5   |   2   |   5
+
+    const int ntable[13][9] = {
        //a, d, _, $, .,  , !, {}, +=
-        {2, 4, 1, 1, 9, 1, 8, 9, 10}, // 1 starting state
+        {2, 4, 1, 1, 11, 1, 8, 10, 12}, // 1 starting state
         {2, 2, 2, 2, 3, 3, 3, 3, 3}, // 2 in identifier
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier
         {5, 4, 5, 5, 6, 5, 5, 5, 5}, // 4 in integer
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer (final state)
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer
         {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float
         {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 9 separator (final state)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //10 end operator, single operators only (final state)
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 9 end comment - dead state
+        //sep
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, backup
+        {10, 6, 10, 10, 10, 10, 10, 10, 10}, // 11 separator, no backup - may not need this one - dead state
+        //operator
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //end operator, single operators only
 
     };
 
-    vector<int> backup {3, 5, 7};
+    vector<int> backup {3, 5, 7, 9};
 
     enum {
         ALPHA,
@@ -131,7 +145,7 @@ protected:
     };
 
     const vector<char> separators = {
-        '(', ')', '{', '}', '[', ']', ',', '.', ':', ';'
+        '(', ')', '{', '}', '[', ']', ',', ':', ';'
     };
 
     const vector<char> operators = {
@@ -207,13 +221,19 @@ public:
                     break;
                 case 8: // in a comment
                     break;
-                case 9: // separator
+                case 9: // at the end of a comment
+                    break;
+                case 10:
                     record.token = "SEPARATOR";
                     currentLexeme += ch;
                     record.lexeme = currentLexeme;
                     reachedEnd = true;
                     break;
-                case 10: // operators
+                case 11:
+                    currentLexeme += ch;
+                    //w.unget();
+                    break;
+                case 12:
                     record.token = "OPERATOR";
                     currentLexeme += ch;
                     record.lexeme = currentLexeme;
