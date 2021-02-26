@@ -235,7 +235,7 @@ protected:
 
     //function that accepts a string and checks to see if the string is in the list of keywords that the analyzer recognizes
     //Returns a boolean value - true if the string is a keyword, false if otherwise
-    bool isKeyword(string & str) {
+    bool isKeyword(const string & str) {
         return find(keywords.begin(), keywords.end(), str) != keywords.end();
     }
 
@@ -263,6 +263,8 @@ protected:
         return find(FinalStates.begin(), FinalStates.end(), state) != FinalStates.end();
     }
 
+    void processIdentifierState(string & currentLexeme, char ch);
+    void processEndIdentiferState(const string & currentLexeme, Record & record);
 public:
 
     //Function to be called for each lexeme to be processed. Returns Record, which holds the token, lexeme, and a boolean flag representing whether the token has been accepted
@@ -292,22 +294,12 @@ public:
             {
                 // inside an identifier or keyword
                 case 2:
-                    currentLexeme += currChar; //append the current character to the lexeme string
+                    processIdentifierState(currentLexeme, currChar);
                     break;
-
-
+                    
                 // end of an identifer or keyword - Final State
                 case 3:
-                    record.lexeme = currentLexeme; //save the final lexeme string in record
-                    //check to see if the lexeme is a keyword - save the token as keyword if true, identifier if otherwise
-                    if (isKeyword(currentLexeme))
-                    {
-                        record.token = "KEYWORD";
-                    }
-                    else
-                    {
-                        record.token = "IDENTIFIER";
-                    }
+                    processEndIdentiferState(currentLexeme, record);
                     reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
 
