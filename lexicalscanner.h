@@ -23,8 +23,9 @@ inline string toString(char ch)
     }
 }
 
-//struct to hold information for each token that the FSM processes
-//each State object holds an int representing the current state, a char representing the next input, and a bool that returns true if the state is accepted, false if otherwise
+// struct to hold information for each token that the FSM processes
+// each State object holds an int representing the current state, 
+// a char representing the next input, and a bool that returns true if the state is accepted, false if otherwise
 struct State
 {
     //===Variable Declaration=====
@@ -43,10 +44,11 @@ struct State
      */
     string toString()
     {
-        //create a string variable result that holds ?? and initialize it to "(state)" where state is the int variable that represents the initial state
+        //create a string variable result that holds inforation on this state transition.
+        // and initialize it to "(state)" where state is the int variable that represents the state
         string result = string("(") + to_string(state) + ")";
         
-        //if the following character is not blank?
+        //if the following character is not blank, which signals the final state
         if (next_input != 0)
         {
             //append "--next_input-->" to result
@@ -70,10 +72,12 @@ struct Record
     string token; //string variable to hold what token the input is (keyword, identifier, etc.)
     string lexeme;  //string variable to hold the raw input
     bool accepted; //boolean variable that returns true if the input has been accepted, false if otherwise
-    string errorMessage; //string for outputting an error message if the lexeme is not accepted??
+    string errorMessage; //string for outputting an error message if the lexeme is not accepted
 };
 
-
+//
+// outputs the string representation of a record to an output stream
+//
 inline ostream & operator << (ostream & stream, Record record){
     stream.width(11);
     stream << left << record.token << " = " << record.lexeme;
@@ -94,12 +98,15 @@ public:
     list<State> stateTransitions; //list of State objects that holds the state transitions a tokens undergo in the FSM
 
     
-    //?
+    //
+    // This constructor takes a inputstream that will be used to scan for tokens
+    //
     LexicalScanner(istream & input) : w(input) {
         
     }
 
-    //Function isFinished accepts no arguments and returns a bool - true if the end of file has been reached, false if otherwise
+    //Function isFinished accepts no arguments and returns a bool
+    // returns true if the end of file has been reached, false if otherwise
     //Checks to see if the end of the file has been reached
     bool isFinished()
     {
@@ -271,7 +278,7 @@ public:
         {
             char currChar = w.get(); //create a variable to hold the current character in the input stream being processed by the FSM and initialize to the first character from the input stream
             
-            stateTransitions.push_back({state, currChar}); //add the initial state and the first char to the list of state transitions
+            stateTransitions.push_back({state, currChar}); //add the current state and the current char to the list of state transitions
 
             int col = char_to_col(currChar); //create a variable to hold the column corresponding to the current character and initialize to the column of the first character
             
@@ -382,13 +389,14 @@ public:
                     break;
             }
 
-            //?
-            if(isBackupState(state) && !isspace(currChar))
+            // If the current state requires that the current input be processed again for the next token
+            // then rewind the inputstream by one character
+            if(isBackupState(state))
                 w.unget();
 
-            //?
+            // if the end of file has been reached, then stop the while loop
             if (currChar == EOF)
-                break;
+                break; // trigger the end of the while loop.  Setting reachedFinal = true is not sufficent
         }
 
         //check to see if the state is in a final state and write the result to the record

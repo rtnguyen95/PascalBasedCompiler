@@ -9,7 +9,7 @@ class tokenizer
 {
 private:
   std::string filename_; //holds the name of the input file
-  std::stringstream parser_; //holds the contents of the input file?
+  std::stringstream parser_; //holds the contents of the input file that will be parsed
     
 public:
   ~tokenizer() { } //default destructor

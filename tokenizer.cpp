@@ -47,7 +47,7 @@ list<Record> tokenizer::parse_input()
   //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
   while (!scanner.isFinished() && record.accepted) {
           record = scanner.lexer();       //scan the next string in the input with the lexer and store the result in record
-          if (record.lexeme.length())     //?
+          if (record.lexeme.length())     //the lexeme is blank when there is blank space at the end of a file
           {   
             cout << record << endl;  //output the record of the lexeme scanned to the console
             result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
