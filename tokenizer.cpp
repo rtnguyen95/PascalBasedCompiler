@@ -33,31 +33,32 @@ list<Record> tokenizer::parse_input()
   //- a problem from the book - rate*time we need to realize * ends rate but also re-read *
   //   as multiply
 
-  LexicalScanner scanner(parser_); //pass the input file stream to the lexical scanner
-  ostringstream output; //create a output string stream for the lexemes and tokens
-
-  Record record = {"", "", true, ""}; //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank. this variable is used to temporarily hold the data of the current lexeme being processed 
-  list<Record> recordsList; //create a list of Record objects to hold the list of all the tokens and lexemes processed
+  LexicalScanner scanner(parser_);  //pass the input file stream to the lexical scanner
+  ostringstream output;             //create a output string stream for the lexemes and tokens
+  ofstream result_code;
+  result_code.open ("output.txt");
+  result_code <<  "TOKENS        Lexemes" << endl << endl;   //write the header to the output file
+  //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank. 
+  //this variable is used to temporarily hold the data of the current lexeme being processed  
+  Record record = {"", "", true, ""}; 
+  list<Record> records;
+  output << "TOKENS        Lexemes" << endl << endl;
     
-  output << "TOKENS        Lexemes" << endl << endl; //write the header to the output file
-    
-    //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
-  while (!scanner.isFinished() && record.accepted)
-  {
-          record = scanner.lexer(); //scan the next string in the input with the lexer and store the result in record
-          if (record.lexeme.length()) //??
-          {
+  //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
+  while (!scanner.isFinished() && record.accepted) {
+          record = scanner.lexer();       //scan the next string in the input with the lexer and store the result in record
+          if (record.lexeme.length())     //?
+          {   
             cout << record << endl;  //output the record of the lexeme scanned to the console
-            recordsList.push_back(record); //add the record of the lexeme scanned to the end of recordsList
+            result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
+            records.push_back(record);
           }
   }
-
-  stringstream states; //create an output string stream for the state transitions for each lexeme processed
-  states << endl << " State Transitions: " << endl; //write the header to states
-    
+  result_code.close();
+  stringstream states;  //create an output string stream for the state transitions for each lexeme processed
+  states << endl << " State Transitions: " << endl;
     //write all the state transitions processed by the lexer to states
-  for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s)
-    {
+  for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s) {
       states << s->toString();
 
       if (s->next_input == 0) //include a linebreak between the state transitions of new lexemes

@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
   }
   string input_file_stream = argv[1];
   tokenizer tester(input_file_stream);
-  string were_we_successful = " ";
+
   list<Record> records = tester.parse_input();
 
   if (argc > 2) {

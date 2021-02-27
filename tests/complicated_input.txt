@@ -1,0 +1,73 @@
+!
+	Here is a multiline comment
+!
+
+! Solve the quadratic formula !
+
+float a;
+float b;
+float c;
+float all[3];
+float not_used[3:6]; ! what is the : used for (cannot use a question mark) !
+! ask the user for the inputs !
+
+for (int i = 0; i < 3; i = i + 1)
+	STDinput x;
+	f[i] = x;
+
+	if (i == 0) then
+		a = x;
+	else if (i == 1) then
+		b = x;
+	else 
+		c = x;
+	endelse
+endfor
+
+! determine how many roots !
+float before_square_root$ = -b * 4 * a * c
+bool one_root
+bool two_roots
+bool no_roots
+
+if (before_square_root$ < 0) then
+	STDoutput ! there are no real roots !
+	one_root = False
+	two_roots = False
+	no_roots = True
+endif
+
+if (before_square_root$ = 0) then
+	STDoutput ! there is one root !
+	one_root = True
+	two_root = False
+	no_roots = False
+endif
+
+if (before_square_root$ > 0) {
+	STDoutput ! there are two roots !
+	one_root = False
+	two_roots = True
+	no_roots = False
+}
+
+! convert floats to ints !
+
+int a$ = a;
+int b$ = b;
+int c$ = c;
+
+int modulus = a % b + b % c;
+
+
+
+! lets start an infinite loop !
+float total = 0
+while (not one_root or two_roots)
+	do 
+		total = total + a + b + c
+	enddo (two_roots and no_roots)
+endwhile
+
+! lets make a function call, and use the comma !
+send_email(a, b, c)

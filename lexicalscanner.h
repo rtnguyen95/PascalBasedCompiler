@@ -110,24 +110,26 @@ protected:
     
     const int q0 = 1; //variable representing the initial state
 
-    const vector<int> FinalStates {3, 5, 7, 9, 10}; //vector of ints holding all the final states of the FSM
+    vector<int> F {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state
-    const int ntable[10][9] =
-    {  //0  1  2  3  4  5  6  7  8
+    const int ntable[12][9] = {
        //a, d, _, $, .,  , !, {}, +=
-        {2, 4, 1, 1, 9, 1, 8, 9, 10},   // 1 starting state
-        {2, 2, 2, 2, 3, 3, 3, 3, 3},    // 2 in identifier
-        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 3 end identifier (final state)
-        {5, 4, 5, 5, 6, 5, 5, 5, 5},    // 4 in integer
-        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 5 end integer (final state)
-        {7, 6, 7, 7, 7, 7, 7, 7, 7},    // 6 in float
-        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 7 end float (final state)
-        {8, 8, 8, 8, 8, 8, 1, 8, 8},    // 8 in comment
-        {1, 1, 1, 1, 1, 1, 1, 1, 1},    // 9 separator (final state)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1},     //10 end operator, single operators only (final state)
-
+        {2, 4, 1, 1, 9, 1, 8, 10, 12}, // 1 starting state
+        {2, 2, 2, 2, 3, 3, 3, 3, 3}, // 2 in identifier
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
+        {5, 4, 5, 5, 6, 5, 5, 5, 5}, // 4 in integer
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer (final state)
+        {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
+        {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
+        {11, 6, 11, 11, 11, 11, 11, 11, 11}, // 9 .
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, no backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //12 end operator, single operators only
+    };
+      
         /*
          Column Symbolic Representations
          0      'a'  = alpha
@@ -140,13 +142,11 @@ protected:
          7      '{}' = seperators
          8      '+=' = operators
          */
-    };
 
-    const vector<int> backup {3, 5, 7}; //vector of ints holding the backup states
-
+    vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
+      
     //enumeration for the columns of the state table (starts at index 0)
-    enum
-    {
+    enum {
         ALPHA,              //col 0
         DIGIT,              //col 1
         UNDERSCORE,         //col 2
@@ -337,18 +337,32 @@ public:
                 //in a comment - no processing
                 case 8:
                     break;
-                    
-                //found seperator - Final state
-                case 9:
+                
+                //found .
+                case 9: 
+                    // found a decimal point, the next character deterimines
+                    // if it is a separator or floating point number    
+                    currentLexeme += ch;
+                    break;
+
+                //found separator - Final state
+                case 10: // separator
                     //set the final data in the record and set the boolean flag for reaching a final state as true
                     record.token = "SEPARATOR";
                     currentLexeme += currChar;
                     record.lexeme = currentLexeme;
                     reachedFinal = true;
                     break;
-                    
+
+                // end separator (such as .) 
+                case 11: // separator was found in the previous state
+                    record.token = "SEPARATOR";
+                    record.lexeme = currentLexeme;
+                    reachedEnd = true;
+                    break;
+
                 //found operator - final state
-                case 10:
+                case 12: // operators
                     //set the final data in the record and set the boolean flag for reaching a final state as true
                     record.token = "OPERATOR";
                     currentLexeme += currChar;
