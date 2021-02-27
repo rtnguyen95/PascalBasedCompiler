@@ -4,15 +4,22 @@
 #include <iostream>
 #include "lexicalscanner.h"
 
-class tokenizer {
+//The tokenizer class is used to parse input
+class tokenizer
+{
 private:
-  std::string filename_;
-  std::stringstream parser_;
+  std::string filename_; //holds the name of the input file
+  std::stringstream parser_; //holds the contents of the input file?
+    
 public:
-  ~tokenizer() { }
-  tokenizer() {filename_ = " ";}
+  ~tokenizer() { } //default destructor
+    
+  tokenizer() {filename_ = " ";} //default constructor - sets fileame to blank
+    
+//overloaded constructor - accepts a single argument string representing the input file name
   tokenizer(std::string filename) {
     filename_ = filename;
   }
-  list<Record> parse_input();
+    
+  list<Record> parse_input(); //function for parsing the input that takes no arguments and returns a list of Record objects
 };

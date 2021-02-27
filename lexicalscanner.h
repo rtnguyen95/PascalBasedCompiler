@@ -275,75 +275,114 @@ public:
 
             int col = char_to_col(currChar); //create a variable to hold the column corresponding to the current character and initialize to the column of the first character
             
+            //if the character is valid, get the next state from the state table
             if (col != INVALID)
             {
-                state = ntable[state-1][col];
-            } else {
-                state = 0; // invalid state?
+                state = ntable[state-1][col]; //the index of the row is state-1, since the initial state has been represented as 1 instead of 0 in the program
+            }
+            else
+            {
+                state = 0; // invalid state
             }
 
-            switch (state) {
-                case 2: // inside an identifier or keyword
-                    currentLexeme += currChar;
+            //switch statement that executes based on which state the FSM has entered
+            switch (state)
+            {
+                // inside an identifier or keyword
+                case 2:
+                    currentLexeme += currChar; //append the current character to the lexeme string
                     break;
-                case 3: // end of an identifer or keyword
-                    record.lexeme = currentLexeme;
-                    if (isKeyword(currentLexeme)) {
+                    
+                    
+                // end of an identifer or keyword - Final State
+                case 3:
+                    record.lexeme = currentLexeme; //save the final lexeme string in record
+                    //check to see if the lexeme is a keyword - save the token as keyword if true, identifier if otherwise
+                    if (isKeyword(currentLexeme))
+                    {
                         record.token = "KEYWORD";
-                    } else {
+                    }
+                    else
+                    {
                         record.token = "IDENTIFIER";
                     }
-                    reachedFinal = true;
+                    reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
-                case 4: // inside an integer
-                    currentLexeme += currChar;
+                    
+                // inside an integer
+                case 4:
+                    currentLexeme += currChar; //append the current character to the lexeme string
                     break;
-                case 5: // at the end of an integer
-                    record.token = "INTEGER";
-                    record.lexeme = currentLexeme;
-                    reachedFinal = true;
+                
+                // at the end of an integer - Final State
+                case 5:
+                    record.token = "INTEGER"; //set the record token as integer
+                    record.lexeme = currentLexeme; //save the final lexeme in record
+                    reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
-                case 6: // inside a float
-                    currentLexeme += currChar;
+                    
+                // inside a float
+                case 6:
+                    currentLexeme += currChar; //append the current character to the lexeme string
                     break;
-                case 7: // at the end of a float
+                    
+                // at the end of a float - Final State
+                case 7:
+                    //set the final data in the record and set the boolean flag for reaching a final state as true
                     record.token = "FLOAT";
                     record.lexeme = currentLexeme;
                     reachedFinal = true;
                     break;
-                case 8: // in a comment
+                
+                //in a comment - no processing
+                case 8:
                     break;
-                case 9: // separator
+                    
+                //found seperator - Final state
+                case 9:
+                    //set the final data in the record and set the boolean flag for reaching a final state as true
                     record.token = "SEPARATOR";
                     currentLexeme += currChar;
                     record.lexeme = currentLexeme;
                     reachedFinal = true;
                     break;
+                    
+                //found operator - final state
                 case 10:
+                    //set the final data in the record and set the boolean flag for reaching a final state as true
                     record.token = "OPERATOR";
                     currentLexeme += currChar;
                     record.lexeme = currentLexeme;
                     reachedFinal = true;
                     break;
+                    
+                //eats whitespace
                 case 1:
-                    // this will eat whitespace
                     break;
-                default:                     
-                    cout << "invalid character encountered: "<< currChar <<" Stopping" << endl;
+                    
+                //invalid character - any character not recognized by the FSM
+                default:
+                    //output to the user that an invalid character has been encountered and stop the processing
+                    cout << "Invalid character encountered: "<< currChar <<" Stopping" << endl;
                     reachedFinal = true;
                     break;
             }
 
+            //?
             if(isBackupState(state) && !isspace(currChar))
                 w.unget();
 
+            //?
             if (currChar == EOF)
                 break;
         }
 
+        //check to see if the state is in a final state and write the result to the record
         record.accepted = inFinal(state);
+        //add the state and whether it was accepted to the list of state transitions
         stateTransitions.push_back({state, 0, record.accepted});
 
+        //return the record to the caller 
         return record;
     }
 };

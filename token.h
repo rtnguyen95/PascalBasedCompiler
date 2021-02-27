@@ -1,14 +1,17 @@
 #pragma once
 #include <iostream>
-class token {
+
+class token
+{
 private:
   std::string lexemme_;
+    
 public:
   ~token() { }
   token() {
     lexemme_ = " ";
   }
-  token(std::string lexemme) {
+  token(std::string lexemme){
     lexemme_ = lexemme;
   }
   auto write(std::ostream& out) const -> std::ostream& {
