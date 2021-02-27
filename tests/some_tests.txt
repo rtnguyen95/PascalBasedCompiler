@@ -1,0 +1,55 @@
+! Practice Example !
+
+int countEights(int num1$)
+{
+    if (num1$ < 8 ) return 0
+    endif
+    
+    int digit = num1$ % 10;   	   ! 18 %10 = 8 !
+    num1$ = num1$ / 10;            ! 18 /10 = 1 !
+    
+    if (digit < 8 or digit > 8)    		   ! 8 == 8     !
+    {
+        if (num1$ % 10 == 8) 	   ! 1 %10 = 1  !
+        
+            return 2 + countEights(num1$)
+	endif
+        
+        else 
+        
+            return 1 + countEights(num1$)
+        endelse
+    }
+    return countEights(num1$);
+}
+
+int main()
+{
+    cout << countEights(8) << endl;
+    cout << countEights(818) << endl;
+    cout << countEights(8818) << endl;
+}
+
+
+
+
+
+! Practice Example 2 !
+
+int main()
+{  
+   float rate = 3.0f;
+   float initial_balance = 20000.0f;
+   double = initial_balance;
+   int year = 0;
+
+   while (balance < 2 * initial_balance)  
+      balance = balance *  (.25);                ! (1 + rate / 100) !
+      year++;
+   endwhile
+
+   std::cout << year << std::endl;
+
+   return 0;
+}
+
