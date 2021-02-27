@@ -65,11 +65,11 @@ public:
 protected:
     int q0 = 1;                 // initial state
 
-    vector<int> F {3, 5, 7, 9, 10}; // final states
+    vector<int> F {3, 5, 7, 10, 11, 12}; // final states
 
-    const int ntable[10][9] = {
+    const int ntable[12][9] = {
        //a, d, _, $, .,  , !, {}, +=
-        {2, 4, 1, 1, 9, 1, 8, 9, 10}, // 1 starting state
+        {2, 4, 1, 1, 9, 1, 8, 10, 12}, // 1 starting state
         {2, 2, 2, 2, 3, 3, 3, 3, 3}, // 2 in identifier
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
         {5, 4, 5, 5, 6, 5, 5, 5, 5}, // 4 in integer
@@ -77,12 +77,14 @@ protected:
         {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
         {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 9 separator (final state)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //10 end operator, single operators only (final state)
+        {11, 6, 11, 11, 11, 11, 11, 11, 11}, // 9 .
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, no backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //12 end operator, single operators only
 
     };
 
-    vector<int> backup {3, 5, 7};
+    vector<int> backup {3, 5, 7, 11};
 
     enum {
         ALPHA,
@@ -207,13 +209,23 @@ public:
                     break;
                 case 8: // in a comment
                     break;
-                case 9: // separator
+                case 9: 
+                    // found a decimal point, the next character deterimines
+                    // if it is a separator or floating point number    
+                    currentLexeme += ch;
+                    break;
+                case 10: // separator
                     record.token = "SEPARATOR";
                     currentLexeme += ch;
                     record.lexeme = currentLexeme;
                     reachedEnd = true;
                     break;
-                case 10: // operators
+                case 11: // separator was found in the previous state
+                    record.token = "SEPARATOR";
+                    record.lexeme = currentLexeme;
+                    reachedEnd = true;
+                    break;                    
+                case 12: // operators
                     record.token = "OPERATOR";
                     currentLexeme += ch;
                     record.lexeme = currentLexeme;
