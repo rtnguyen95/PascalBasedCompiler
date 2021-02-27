@@ -110,7 +110,7 @@ protected:
     
     const int q0 = 1; //variable representing the initial state
 
-    vector<int> F {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
+    vector<int> FinalStates {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state
@@ -342,7 +342,7 @@ public:
                 case 9: 
                     // found a decimal point, the next character deterimines
                     // if it is a separator or floating point number    
-                    currentLexeme += ch;
+                    currentLexeme += currChar;
                     break;
 
                 //found separator - Final state
@@ -358,7 +358,7 @@ public:
                 case 11: // separator was found in the previous state
                     record.token = "SEPARATOR";
                     record.lexeme = currentLexeme;
-                    reachedEnd = true;
+                    reachedFinal = true;
                     break;
 
                 //found operator - final state

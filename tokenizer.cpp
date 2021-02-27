@@ -71,5 +71,5 @@ list<Record> tokenizer::parse_input()
 
   cout << endl;
 
-  return recordsList; //return the token and lexeme list to the caller 
+  return records; //return the token and lexeme list to the caller 
 }

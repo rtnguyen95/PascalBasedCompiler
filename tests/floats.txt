@@ -1,0 +1,5 @@
+float y = .1
+float z = 0.11
+float f = 1.
+float f = 1.0
+letter.uppercase
