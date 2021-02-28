@@ -182,6 +182,10 @@ protected:
         if (isspace(ch) || ch == EOF)
             return WHITE_SPACE;
 
+        //special case of # - for now, treat as WS and ignore
+        if (ch == '#')
+            return WHITE_SPACE;
+
         //checks to see if the character is an alphabetical character and if true returns the column number for alphabet
         if (isalpha(ch))
             return ALPHA;

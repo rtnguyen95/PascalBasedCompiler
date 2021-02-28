@@ -71,5 +71,7 @@ endwhile
 attachedto# not attached #
 #=
 #state1 # =
+attached#to
+stopped`here
 ! lets make a function call, and use the comma !
 send_email(a, b, c)
