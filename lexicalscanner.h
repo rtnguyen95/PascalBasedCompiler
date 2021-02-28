@@ -24,7 +24,7 @@ inline string toString(char ch)
 }
 
 // struct to hold information for each token that the FSM processes
-// each State object holds an int representing the current state, 
+// each State object holds an int representing the current state,
 // a char representing the next input, and a bool that returns true if the state is accepted, false if otherwise
 struct State
 {
@@ -32,7 +32,7 @@ struct State
     int state; //represents the current state
     char next_input; //char that holds the next input to be anaylzed by the scanner
     bool accepted; //returns true if the state is accepted, false if otherwise
-    
+
     /*
      Returns a string representation of a state and either the next input or the accepted state if it is the last state in a list of state transitions.
      If the state was 1 and the next_input is w then toString returns (1) --w-->
@@ -47,7 +47,7 @@ struct State
         //create a string variable result that holds inforation on this state transition.
         // and initialize it to "(state)" where state is the int variable that represents the state
         string result = string("(") + to_string(state) + ")";
-        
+
         //if the following character is not blank, which signals the final state
         if (next_input != 0)
         {
@@ -92,17 +92,17 @@ class LexicalScanner
 {
 private:
     istream & w; //input stream
-    
-public: 
+
+public:
 
     list<State> stateTransitions; //list of State objects that holds the state transitions a tokens undergo in the FSM
 
-    
+
     //
     // This constructor takes a inputstream that will be used to scan for tokens
     //
     LexicalScanner(istream & input) : w(input) {
-        
+
     }
 
     //Function isFinished accepts no arguments and returns a bool
@@ -114,7 +114,7 @@ public:
     }
 
 protected:
-    
+
     const int q0 = 1; //variable representing the initial state
 
     vector<int> FinalStates {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
@@ -136,7 +136,7 @@ protected:
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, backup
         {1, 1, 1, 1, 1, 1, 1, 1, 1}, //12 end operator, single operators only
     };
-      
+
         /*
          Column Symbolic Representations
          0      'a'  = alpha
@@ -151,7 +151,7 @@ protected:
          */
 
     vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
-      
+
     //enumeration for the columns of the state table (starts at index 0)
     enum {
         ALPHA,              //col 0
@@ -166,57 +166,57 @@ protected:
         INVALID = 100
     };
 
-    
+
     //The function char_to_col accepts a character and returns an int representing the column number of the character ch in the FSM table
     int char_to_col(char ch)
     {
         //check to see if the character is a digit and if true return the column number for digit
         if (isdigit(ch))
             return DIGIT;
-        
+
         //check to see if the character is a . and if true return the column number for decimal
         if (ch == '.')
             return DECIMAL_PT;
-        
+
         //checks to see if the character is a space OR if the end of the file has been reached and if true returns the column number for space
         if (isspace(ch) || ch == EOF)
             return WHITE_SPACE;
-        
+
         //checks to see if the character is an alphabetical character and if true returns the column number for alphabet
         if (isalpha(ch))
             return ALPHA;
-        
+
         //checks to see if the character is an underscore and if true returns the column number for underscore
         if (ch == '_')
             return UNDERSCORE;
-        
+
         //checks to see if the character is a dollar sign and if true returns the column number for dollar sign
         if (ch == '$')
             return DOLLAR_SIGN;
-        
+
         //checks to see if the character is an explanation point (exclamation point denotes the beginning and end of a comment) and if true returns the column number for comment maker
         if (ch == '!')
             return COMMENT_MARKER;
-        
+
         //checks to see if the character is in the list of seperators recognized by the analyzer and if true return the column number for seperator
         if (isSeparator(ch))
             return SEPARATOR;
-        
+
         //checks to see if the character is in the list of operators recognized by the analyzer and if true return the column number for operator
         if (isOperator(ch))
             return OPERATOR;
-        
+
         //if the character does not match any of the cases above the character is invalid, and the function returns an int for an invalid character
         return INVALID;
     }
 
     //a vector holding all the keywords the analyzer recognizes
     const vector<string> keywords ={
-        "int", "float", "bool", 
+        "int", "float", "bool",
         "True", "False",
-        "if", "else", "then", "endif", "endelse", 
-        "while", "whileend", 
-        "do", "enddo", 
+        "if", "else", "then", "endif", "endelse",
+        "while", "whileend",
+        "do", "enddo",
         "for", "endfor",
         "STDinput", "STDoutput",
         "and", "or", "not"
@@ -261,7 +261,7 @@ protected:
     bool inFinal(int state) {
         return find(FinalStates.begin(), FinalStates.end(), state) != FinalStates.end();
     }
-    
+
 public:
 
     //Function to be called for each lexeme to be processed. Returns Record, which holds the token, lexeme, and a boolean flag representing whether the token has been accepted
@@ -277,11 +277,11 @@ public:
         while (!reachedFinal)
         {
             char currChar = w.get(); //create a variable to hold the current character in the input stream being processed by the FSM and initialize to the first character from the input stream
-            
+
             stateTransitions.push_back({state, currChar}); //add the current state and the current char to the list of state transitions
 
             int col = char_to_col(currChar); //create a variable to hold the column corresponding to the current character and initialize to the column of the first character
-            
+
             //if the character is valid, get the next state from the state table
             if (col != INVALID)
             {
@@ -289,7 +289,7 @@ public:
             }
             else
             {
-                state = 0; // invalid state
+                state = state;
             }
 
             //switch statement that executes based on which state the FSM has entered
@@ -299,8 +299,8 @@ public:
                 case 2:
                     currentLexeme += currChar; //append the current character to the lexeme string
                     break;
-                    
-                    
+
+
                 // end of an identifer or keyword - Final State
                 case 3:
                     record.lexeme = currentLexeme; //save the final lexeme string in record
@@ -315,24 +315,24 @@ public:
                     }
                     reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
-                    
+
                 // inside an integer
                 case 4:
                     currentLexeme += currChar; //append the current character to the lexeme string
                     break;
-                
+
                 // at the end of an integer - Final State
                 case 5:
                     record.token = "INTEGER"; //set the record token as integer
                     record.lexeme = currentLexeme; //save the final lexeme in record
                     reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
-                    
+
                 // inside a float
                 case 6:
                     currentLexeme += currChar; //append the current character to the lexeme string
                     break;
-                    
+
                 // at the end of a float - Final State
                 case 7:
                     //set the final data in the record and set the boolean flag for reaching a final state as true
@@ -340,15 +340,15 @@ public:
                     record.lexeme = currentLexeme;
                     reachedFinal = true;
                     break;
-                
+
                 //in a comment - no processing
                 case 8:
                     break;
-                
+
                 //found .
-                case 9: 
+                case 9:
                     // found a decimal point, the next character deterimines
-                    // if it is a separator or floating point number    
+                    // if it is a separator or floating point number
                     currentLexeme += currChar;
                     break;
 
@@ -361,7 +361,7 @@ public:
                     reachedFinal = true;
                     break;
 
-                // end separator (such as .) 
+                // end separator (such as .)
                 case 11: // separator was found in the previous state
                     record.token = "SEPARATOR";
                     record.lexeme = currentLexeme;
@@ -376,11 +376,11 @@ public:
                     record.lexeme = currentLexeme;
                     reachedFinal = true;
                     break;
-                    
+
                 //eats whitespace
                 case 1:
                     break;
-                    
+
                 //invalid character - any character not recognized by the FSM
                 default:
                     //output to the user that an invalid character has been encountered and stop the processing
@@ -404,7 +404,7 @@ public:
         //add the state and whether it was accepted to the list of state transitions
         stateTransitions.push_back({state, 0, record.accepted});
 
-        //return the record to the caller 
+        //return the record to the caller
         return record;
     }
 };
