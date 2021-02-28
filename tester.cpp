@@ -17,9 +17,12 @@ int main(int argc, char* argv[]) {
   }
   string input_file_stream = argv[1];
   tokenizer tester(input_file_stream);
-
-  list<Record> records = tester.parse_input();
-
+  string dot = ".";
+  string file_handle = input_file_stream.substr(0, input_file_stream.find(dot));
+  string extension = "_output.txt";
+  file_handle = file_handle + extension;
+  list<Record> records = tester.parse_input(file_handle);
+  // output locatin is passed to parse_input
   if (argc > 2) {
     string expected_output_file = argv[2];
 
