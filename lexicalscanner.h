@@ -287,11 +287,7 @@ public:
             {
                 state = ntable[state-1][col]; //the index of the row is state-1, since the initial state has been represented as 1 instead of 0 in the program
             }
-            else
-            {
-                state = state;
-            }
-
+            // else state = state
             //switch statement that executes based on which state the FSM has entered
             switch (state)
             {
