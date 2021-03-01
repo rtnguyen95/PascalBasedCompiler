@@ -1,5 +1,19 @@
 !
 	Here is a multiline comment
+
+	This is what we would have done in C++
+
+	#include <istream>
+
+	int main() {
+		float a;
+		float b;
+		float c;
+		float all = new float[3];
+		float not_used[3][6];
+		cout >> "Please enter three numbers for the quadratic equation";
+		cin << a << b << c;
+	}
 !
 
 ! Solve the quadratic formula !
