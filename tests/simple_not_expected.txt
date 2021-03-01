@@ -1,0 +1,12 @@
+TOKENS        Lexemes
+
+KEYWORD     = while
+SEPARATOR   = (
+IDENTIFIER  = fahr
+OPERATOR    = <
+IDENTIFIER  = upper
+SEPARATOR   = )
+IDENTIFIER  = a
+OPERATOR    = =
+FLOAT       = 24.00
+KEYWORD     = whileend
