@@ -311,6 +311,10 @@ public:
             //switch statement that executes based on which state the FSM has entered
             switch (state)
             {
+                //eats whitespace
+                case 1:
+                    reachedFinal = processStartState(currentLexeme, currChar, record);
+                    break;
                 // inside an identifier or keyword
                 case 2:
                     reachedFinal = processIdentifierOrKeywordState(currentLexeme, currChar, record);
@@ -325,30 +329,22 @@ public:
                 // inside an integer
                 case 4:
                     reachedFinal = processIntegerState(currentLexeme, currChar, record);
-                    //currentLexeme += currChar; //append the current character to the lexeme string
                     break;
 
                 // at the end of an integer - Final State
                 case 5:
                     reachedFinal = processEndIntegerState(currentLexeme, currChar, record);
-                    //record.token = "INTEGER"; //set the record token as integer
-                    //record.lexeme = currentLexeme; //save the final lexeme in record
-                    //reachedFinal = true; //set the boolean flag for reaching a final state as true
-                    break;
+                     break;
 
                 // inside a float
                 case 6:
                     reachedFinal = processFloatState(currentLexeme, currChar, record);
-    //                currentLexeme += currChar; //append the current character to the lexeme string
                     break;
 
                 // at the end of a float - Final State
                 case 7:
                     reachedFinal = processEndFloatState(currentLexeme, currChar, record);
-                    //set the final data in the record and set the boolean flag for reaching a final state as true
-                    //record.token = "FLOAT";
-                    //record.lexeme = currentLexeme;
-                    //reachedFinal = true;
+
                     break;
 
                 //in a comment - no processing
@@ -361,43 +357,25 @@ public:
                     // found a decimal point, the next character deterimines
                     // if it is a separator or floating point number
                     reachedFinal = processDecimalPointState(currentLexeme, currChar, record);
-                    //currentLexeme += currChar;
                     break;
 
                 //found separator - Final state
                 case 10: // separator
                     reachedFinal = processSeparatorState(currentLexeme, currChar, record);
-                    //set the final data in the record and set the boolean flag for reaching a final state as true
-                    //record.token = "SEPARATOR";
-                    //currentLexeme += currChar;
-                    //record.lexeme = currentLexeme;
-                    //reachedFinal = true;
                     break;
 
                 // end separator (such as .)
                 case 11: // separator was found in the previous state
                     reachedFinal = processEndSeparatorState(currentLexeme, currChar, record);
-                    //record.token = "SEPARATOR";
-                    //record.lexeme = currentLexeme;
-                    //reachedFinal = true;
                     break;
 
                 //found operator - final state
                 case 12: // operators
-                    //set the final data in the record and set the boolean flag for reaching a final state as true
-                    //record.token = "OPERATOR";
-                    //currentLexeme += currChar;
-                    //record.lexeme = currentLexeme;
                     reachedFinal = processOperatorState(currentLexeme, currChar, record);
-                    //reachedFinal = true;
-                    break;
-
-                //eats whitespace
-                case 1:
-                    reachedFinal = processStartState(currentLexeme, currChar, record);
                     break;
 
                 //invalid character - any character not recognized by the FSM
+                //this should not occur
                 default:
                     //output to the user that an invalid character has been encountered and stop the processing
                     cout << "Invalid character encountered: "<< currChar <<" Stopping" << endl;
