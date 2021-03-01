@@ -2,3 +2,4 @@
 *.out
 .vscode
 *-states.txt
+*_output.txt
