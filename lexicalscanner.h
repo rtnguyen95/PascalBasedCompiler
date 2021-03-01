@@ -121,20 +121,20 @@ protected:
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state
-    const int ntable[12][9] = {
-       //a, d, _, $, .,  , !, {}, +=
-        {2, 4, 1, 1, 9, 1, 8, 10, 12}, // 1 starting state
-        {2, 2, 2, 2, 3, 3, 3, 3, 3}, // 2 in identifier
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
-        {5, 4, 5, 5, 6, 5, 5, 5, 5}, // 4 in integer
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer (final state)
-        {7, 6, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
-        {8, 8, 8, 8, 8, 8, 1, 8, 8}, // 8 in comment
-        {11, 6, 11, 11, 11, 11, 11, 11, 11}, // 9 .
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, no backup
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, backup
-        {1, 1, 1, 1, 1, 1, 1, 1, 1}, //12 end operator, single operators only
+    const int ntable[12][10] = {
+       //a, d, _, $, .,  , !, {}, +=, other
+        {2, 4, 1, 1, 9, 1, 8, 10, 12, 1}, // 1 starting state
+        {2, 2, 2, 2, 3, 3, 3, 3, 3, 3}, // 2 in identifier
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
+        {5, 4, 5, 5, 6, 5, 5, 5, 5, 5}, // 4 in integer
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer (final state)
+        {7, 6, 7, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
+        {8, 8, 8, 8, 8, 8, 1, 8, 8, 8}, // 8 in comment
+        {11, 6, 11, 11, 11, 11, 11, 11, 11, 11}, // 9 .
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, no backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //12 end operator, single operators only
     };
 
         /*
@@ -163,7 +163,7 @@ protected:
         COMMENT_MARKER,     //col 6
         SEPARATOR,          //col 7
         OPERATOR,           //col 8
-        INVALID = 100
+        OTHER               //col 9
     };
 
 
@@ -174,7 +174,7 @@ protected:
         if (isdigit(ch))
             return DIGIT;
 
-        //check to see if the character is a . and if true return the column number for decimal
+        //check to see if the character is a . and if true return the column number for decimal point
         if (ch == '.')
             return DECIMAL_PT;
 
@@ -182,9 +182,6 @@ protected:
         if (isspace(ch) || ch == EOF)
             return WHITE_SPACE;
 
-        //special case of # - for now, treat as WS and ignore
-        if (ch == '#')
-            return WHITE_SPACE;
 
         //checks to see if the character is an alphabetical character and if true returns the column number for alphabet
         if (isalpha(ch))
@@ -211,7 +208,7 @@ protected:
             return OPERATOR;
 
         //if the character does not match any of the cases above the character is invalid, and the function returns an int for an invalid character
-        return INVALID;
+        return OTHER;
     }
 
     //a vector holding all the keywords the analyzer recognizes
@@ -286,11 +283,9 @@ public:
 
             int col = char_to_col(currChar); //create a variable to hold the column corresponding to the current character and initialize to the column of the first character
 
-            //if the character is valid, get the next state from the state table
-            if (col != INVALID)
-            {
-                state = ntable[state-1][col]; //the index of the row is state-1, since the initial state has been represented as 1 instead of 0 in the program
-            }
+            //get the next state from the ntable
+            state = ntable[state-1][col]; //the index of the row is state-1, since the initial state has been represented as 1 instead of 0 in the program
+            
             // else state = state
             //switch statement that executes based on which state the FSM has entered
             switch (state)
