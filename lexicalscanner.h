@@ -263,8 +263,27 @@ protected:
         return find(FinalStates.begin(), FinalStates.end(), state) != FinalStates.end();
     }
 
-    void processIdentifierState(string & currentLexeme, char ch);
-    void processEndIdentiferState(const string & currentLexeme, Record & record);
+    bool processStartState(string & currentLexeme, char currChar, Record & record);
+
+    bool processIdentifierOrKeywordState(string & currentLexeme, char currChar, Record & record);
+    bool processEndIdentiferOrKeywordState(string & currentLexeme, char currChar, Record & record);
+
+    bool processIntegerState(string & currentLexeme, char currChar, Record & record);
+    bool processEndIntegerState(string & currentLexeme, char currChar, Record & record);
+
+    bool processFloatState(string & currentLexeme, char currChar, Record & record);
+    bool processEndFloatState(string & currentLexeme, char currChar, Record & record);
+
+    bool processCommentState(string & currentLexeme, char currChar, Record & record);
+
+    bool processDecimalPointState(string & currentLexeme, char currChar, Record & record);
+
+    bool processSeparatorState(string & currentLexeme, char currChar, Record & record);
+    
+    bool processEndSeparatorState(string & currentLexeme, char currChar, Record & record);
+
+    bool processOperatorState(string & currentLexeme, char currChar, Record & record);
+
 public:
 
     //Function to be called for each lexeme to be processed. Returns Record, which holds the token, lexeme, and a boolean flag representing whether the token has been accepted
@@ -294,78 +313,88 @@ public:
             {
                 // inside an identifier or keyword
                 case 2:
-                    processIdentifierState(currentLexeme, currChar);
+                    reachedFinal = processIdentifierOrKeywordState(currentLexeme, currChar, record);
                     break;
                     
                 // end of an identifer or keyword - Final State
                 case 3:
-                    processEndIdentiferState(currentLexeme, record);
-                    reachedFinal = true; //set the boolean flag for reaching a final state as true
+                    reachedFinal = processEndIdentiferOrKeywordState(currentLexeme, currChar, record);
+                    //reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
 
                 // inside an integer
                 case 4:
-                    currentLexeme += currChar; //append the current character to the lexeme string
+                    reachedFinal = processIntegerState(currentLexeme, currChar, record);
+                    //currentLexeme += currChar; //append the current character to the lexeme string
                     break;
 
                 // at the end of an integer - Final State
                 case 5:
-                    record.token = "INTEGER"; //set the record token as integer
-                    record.lexeme = currentLexeme; //save the final lexeme in record
-                    reachedFinal = true; //set the boolean flag for reaching a final state as true
+                    reachedFinal = processEndIntegerState(currentLexeme, currChar, record);
+                    //record.token = "INTEGER"; //set the record token as integer
+                    //record.lexeme = currentLexeme; //save the final lexeme in record
+                    //reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
 
                 // inside a float
                 case 6:
-                    currentLexeme += currChar; //append the current character to the lexeme string
+                    reachedFinal = processFloatState(currentLexeme, currChar, record);
+    //                currentLexeme += currChar; //append the current character to the lexeme string
                     break;
 
                 // at the end of a float - Final State
                 case 7:
+                    reachedFinal = processEndFloatState(currentLexeme, currChar, record);
                     //set the final data in the record and set the boolean flag for reaching a final state as true
-                    record.token = "FLOAT";
-                    record.lexeme = currentLexeme;
-                    reachedFinal = true;
+                    //record.token = "FLOAT";
+                    //record.lexeme = currentLexeme;
+                    //reachedFinal = true;
                     break;
 
                 //in a comment - no processing
                 case 8:
+                    reachedFinal = processCommentState(currentLexeme, currChar, record);
                     break;
 
                 //found .
                 case 9:
                     // found a decimal point, the next character deterimines
                     // if it is a separator or floating point number
-                    currentLexeme += currChar;
+                    reachedFinal = processDecimalPointState(currentLexeme, currChar, record);
+                    //currentLexeme += currChar;
                     break;
 
                 //found separator - Final state
                 case 10: // separator
+                    reachedFinal = processSeparatorState(currentLexeme, currChar, record);
                     //set the final data in the record and set the boolean flag for reaching a final state as true
-                    record.token = "SEPARATOR";
-                    currentLexeme += currChar;
-                    record.lexeme = currentLexeme;
-                    reachedFinal = true;
+                    //record.token = "SEPARATOR";
+                    //currentLexeme += currChar;
+                    //record.lexeme = currentLexeme;
+                    //reachedFinal = true;
                     break;
 
                 // end separator (such as .)
                 case 11: // separator was found in the previous state
-                    record.token = "SEPARATOR";
-                    record.lexeme = currentLexeme;
-                    reachedFinal = true;
+                    reachedFinal = processEndSeparatorState(currentLexeme, currChar, record);
+                    //record.token = "SEPARATOR";
+                    //record.lexeme = currentLexeme;
+                    //reachedFinal = true;
                     break;
 
                 //found operator - final state
                 case 12: // operators
                     //set the final data in the record and set the boolean flag for reaching a final state as true
-                    record.token = "OPERATOR";
-                    currentLexeme += currChar;
-                    record.lexeme = currentLexeme;
-                    reachedFinal = true;
+                    //record.token = "OPERATOR";
+                    //currentLexeme += currChar;
+                    //record.lexeme = currentLexeme;
+                    reachedFinal = processOperatorState(currentLexeme, currChar, record);
+                    //reachedFinal = true;
                     break;
 
                 //eats whitespace
                 case 1:
+                    reachedFinal = processStartState(currentLexeme, currChar, record);
                     break;
 
                 //invalid character - any character not recognized by the FSM
