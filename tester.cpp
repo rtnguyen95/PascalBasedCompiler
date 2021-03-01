@@ -3,7 +3,6 @@
 
 #include "lexicalscanner.h"
 #include "tokenizer.h"
-#include "token.h"
 #include "tokenizer_checker.h"
 
 using namespace std;
