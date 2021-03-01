@@ -1,0 +1,21 @@
+TOKENS        Lexemes
+
+KEYWORD     = float
+IDENTIFIER  = y
+OPERATOR    = =
+FLOAT       = .1
+KEYWORD     = float
+IDENTIFIER  = z
+OPERATOR    = =
+FLOAT       = 0.11
+KEYWORD     = float
+IDENTIFIER  = f
+OPERATOR    = =
+FLOAT       = 1.
+KEYWORD     = float
+IDENTIFIER  = f
+OPERATOR    = =
+FLOAT       = 1.0
+IDENTIFIER  = letter
+SEPARATOR   = .
+IDENTIFIER  = uppercase
