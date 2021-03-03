@@ -123,18 +123,18 @@ protected:
     //column represents the input character, row represents the state
     const int ntable[12][10] = {
        //a, d, _, $, .,  , !, {}, +=, other
-        {2, 4, 1, 1, 9, 1, 8, 10, 12, 1}, // 1 starting state
-        {2, 2, 2, 2, 3, 3, 3, 3, 3, 3}, // 2 in identifier
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 3 end identifier (final state)
-        {5, 4, 5, 5, 6, 5, 5, 5, 5, 5}, // 4 in integer
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 5 end integer (final state)
-        {7, 6, 7, 7, 7, 7, 7, 7, 7, 7}, // 6 in float
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 7 end float (final state)
-        {8, 8, 8, 8, 8, 8, 1, 8, 8, 8}, // 8 in comment
-        {11, 6, 11, 11, 11, 11, 11, 11, 11, 11}, // 9 .
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 10 separator, no backup
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // 11 separator, backup
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, //12 end operator, single operators only
+        {2, 4, 1, 1, 9, 1, 8, 10, 12, 1},               // 1  starting state
+        {2, 2, 2, 2, 3, 3, 3, 3, 3, 3},                 // 2  in identifier
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 3  end identifier (final state)
+        {5, 4, 5, 5, 6, 5, 5, 5, 5, 5},                 // 4  in integer
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 5  end integer (final state)
+        {7, 6, 7, 7, 7, 7, 7, 7, 7, 7},                 // 6  in float
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 7  end float (final state)
+        {8, 8, 8, 8, 8, 8, 1, 8, 8, 8},                 // 8  in comment
+        {11, 6, 11, 11, 11, 11, 11, 11, 11, 11},        // 9  Found a . (decimal point or separator)
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 10 separator, no backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 11 separator, backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 12 found operator (single operators only, no compounds) 
     };
 
         /*
@@ -146,8 +146,9 @@ protected:
          4      '.'  = decimal pt
          5      ' '  = space
          6      '!'  = exclamation point - comment maker
-         7      '{}' = seperators
+         7      '{}' = separators
          8      '+=' = operators
+         9      other=  any other character not part of any other rule such as (#, \, “)
          */
 
     vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
