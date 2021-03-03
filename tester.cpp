@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
 
   cout << "Tokenizer" << endl << endl;
   if (argc < 2) {
-    cerr << "tester.out <input-file-name> [expected-output-file-name]" << endl << endl;
+    cerr << "tokenizer <input-file-name> [expected-output-file-name]" << endl << endl;
     cerr << "Please provide an input file name and optional expected output file. Exiting.\n";
     exit(1);
   }
