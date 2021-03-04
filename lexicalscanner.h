@@ -34,12 +34,16 @@ struct State
     bool accepted; //returns true if the state is accepted, false if otherwise
 
     /*
-     Returns a string representation of a state and either the next input or the accepted state if it is the last state in a list of state transitions.
+     toString() returns a string representation of the state transitions an input undergoes.
+     
+     Each time a state transition is completed the input and its accompanying state appends to a string. When the input processing is complete the string "accepted" / "not accepted" is appended to denote if the FSM ended in a final state.
+     
+     Examples:
      If the state was 1 and the next_input is w then toString returns (1) --w-->
 
      if the state was 3 and there is no next input (next_input is 0), then it will use the accepted value and return (3) ----> accepted;
 
-     If a list of states were printed out it might look like this:
+     toString() for w= while
      (1) --w--> (2) --h--> (2) --i--> (2) --l--> (2) --e--> (2) --[space]--> (3) ----> accepted;
      */
     string toString()
@@ -132,7 +136,7 @@ protected:
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 7  end float (final state)
         {8, 8, 8, 8, 8, 8, 1, 8, 8, 8},                 // 8  in comment
         {11, 6, 11, 11, 11, 11, 11, 11, 11, 11},        // 9  Found a . (decimal point or separator)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 10 separator, no backup
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 10 separator, no backup * see note
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 11 separator, backup
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 12 found operator (single operators only, no compounds) 
     };
@@ -150,6 +154,18 @@ protected:
          8      '+=' = operators
          9      other=  any other character not part of any other rule such as (#, \, “)
          */
+    
+    
+    /*
+     Note on backups:
+     Backups are used when different tokens are not separated by a space. an input character is read that is not part of the current lexeme triggers the current lexeme to be complete. The input must go back one character to reread the start of the next lexeme.
+     
+     Example:
+     consider that this is the string being read: "int x;"
+    1. int will be read and then the space triggers that the token has ended.
+    2. x will be read and the ; triggers that the token has ended, but the lexer needs to backup by 1 character so that ; will be read the next time the lexer is called.
+    3. ; is read and then the operations are complete.
+     */
 
     vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
 
@@ -263,6 +279,8 @@ protected:
     bool inFinal(int state) {
         return find(FinalStates.begin(), FinalStates.end(), state) != FinalStates.end();
     }
+    
+    //==Function definitions for handling each state ==
 
     bool processStartState(string & currentLexeme, char currChar, Record & record);
 
@@ -365,7 +383,7 @@ public:
                     reachedFinal = processSeparatorState(currentLexeme, currChar, record);
                     break;
 
-                // end separator (such as .)
+                // end separator (such as .) - Final State
                 case 11: // separator was found in the previous state
                     reachedFinal = processEndSeparatorState(currentLexeme, currChar, record);
                     break;

@@ -4,8 +4,8 @@
 #include <iostream>
 #include "lexicalscanner.h"
 
-//class to test FSM
-//compares the tokens and lexemes produced by the FSM to the expected results. 
+//This class is used to check the results of the lexical analyzer against a file of the expected output. It is used to test that the lexical analyzer is working as expected.
+
 class tokenizer_checker
 {
 private:

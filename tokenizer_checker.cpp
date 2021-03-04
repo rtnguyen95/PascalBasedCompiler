@@ -1,5 +1,13 @@
 #include "tokenizer_checker.h"
 
+
+/*
+ check_output accepts a list of Record objects representing the lexemes and tokens found by the lexical analyzer. It compares records to a given file containing the expected output of the lexer.
+ 
+ If differences are found then the line number and character of the difference is reported to the console.
+ 
+ This feature allows for quick verification that changes to the code didn’t unintentionally modify the lexer. If there was a breaking change, then the state transition output file can be inspected to see which state transition was incorrect.
+ */
 int tokenizer_checker::check_output(list<Record> records) {
 
   stringstream actual_output;
