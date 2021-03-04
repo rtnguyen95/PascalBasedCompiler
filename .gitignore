@@ -3,3 +3,5 @@
 .vscode
 *-states.txt
 *_output.txt
+tokenizer
+.DS_Store
