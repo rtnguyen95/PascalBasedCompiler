@@ -121,7 +121,7 @@ protected:
 
     const int q0 = 1; //variable representing the initial state
 
-    vector<int> FinalStates {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
+    const vector<int> FinalStates {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state
@@ -167,7 +167,7 @@ protected:
     3. ; is read and then the operations are complete.
      */
 
-    vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
+    const vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
 
     //enumeration for the columns of the state table (starts at index 0)
     enum {
