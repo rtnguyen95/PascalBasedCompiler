@@ -15,6 +15,10 @@
  */
 bool LexicalScanner::processStartState(string & currentLexeme, char currChar, Record & recordr) {
     // do nothing on the start state
+    if (currChar == '\n') {
+        line++;
+        linePosition = 0; // reset the character position in the line
+    }
     return false; // this is not a final state
 }
 

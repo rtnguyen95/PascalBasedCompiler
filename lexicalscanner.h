@@ -404,8 +404,11 @@ public:
 
             // If the current state requires that the current input be processed again for the next token
             // then rewind the inputstream by one character
-            if(isBackupState(state))
+            if(isBackupState(state)) {
                 w.unget();
+            } else {
+                linePosition++;
+            }
 
             // if the end of file has been reached, then stop the while loop
             if (currChar == EOF)
