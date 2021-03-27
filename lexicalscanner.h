@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include "errorhandler.h"
 
 using namespace std;
 
@@ -96,7 +97,8 @@ class LexicalScanner
 {
 private:
     istream & w; //input stream
-
+    string filename;
+    ErrorHandler & errorHandler;
 public:
 
     list<State> stateTransitions; //list of State objects that holds the state transitions a tokens undergo in the FSM
@@ -105,7 +107,8 @@ public:
     //
     // This constructor takes a inputstream that will be used to scan for tokens
     //
-    LexicalScanner(istream & input) : w(input) {
+    LexicalScanner(istream & input, string filename, ErrorHandler & errorHandler): 
+        w(input), filename(filename), errorHandler(errorHandler) {
 
     }
 
@@ -121,24 +124,26 @@ protected:
 
     const int q0 = 1; //variable representing the initial state
 
-    const vector<int> FinalStates {3, 5, 7, 10, 11, 12}; //vector of ints holding all the final states of the FSM
+    const vector<int> FinalStates {3, 5, 7, 10, 11, 12, 14}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state
-    const int ntable[12][10] = {
+    const int ntable[14][10] = {
        //a, d, _, $, .,  , !, {}, +=, other
-        {2, 4, 1, 1, 9, 1, 8, 10, 12, 1},               // 1  starting state
-        {2, 2, 2, 2, 3, 3, 3, 3, 3, 3},                 // 2  in identifier
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 3  end identifier (final state)
-        {5, 4, 5, 5, 6, 5, 5, 5, 5, 5},                 // 4  in integer
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 5  end integer (final state)
-        {7, 6, 7, 7, 7, 7, 7, 7, 7, 7},                 // 6  in float
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 7  end float (final state)
-        {8, 8, 8, 8, 8, 8, 1, 8, 8, 8},                 // 8  in comment
-        {11, 6, 11, 11, 11, 11, 11, 11, 11, 11},        // 9  Found a . (decimal point or separator)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 10 separator, no backup * see note
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 11 separator, backup
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},                 // 12 found operator (single operators only, no compounds) 
+        {2,  4,  13, 13, 9,  1,  8,  10, 12, 13},               // 1  starting state
+        {2,  2,  2,  2,  3,  3,  3,  3,  3,  3},                 // 2  in identifier
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 3  end identifier (final state)
+        {5,  4,  5,  5,  6,  5,  5,  5,  5,  5},                 // 4  in integer
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 5  end integer (final state)
+        {7,  6,  7,  7,  7,  7,  7,  7,  7,  7},                 // 6  in float
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 7  end float (final state)
+        {8,  8,  8,  8,  8,  8,  1,  8,  8,  8},                 // 8  in comment
+        {11, 6,  11, 11, 11, 11, 11, 11, 11, 11},        // 9  Found a . (decimal point or separator)
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},         // 10 separator, no backup * see note
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 11 separator, backup
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 12 found operator (single operators only, no compounds) 
+        {13, 13, 13, 13, 13, 13, 14, 14, 14, 13},           // 13 Error state
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1}             // 14 error state end
     };
 
         /*
@@ -167,7 +172,7 @@ protected:
     3. ; is read and then the operations are complete.
      */
 
-    const vector<int> backup {3, 5, 7, 11}; //vector of ints holding the backup states
+    const vector<int> backup {3, 5, 7, 11, 14}; //vector of ints holding the backup states
 
     //enumeration for the columns of the state table (starts at index 0)
     enum {
@@ -303,16 +308,24 @@ protected:
 
     bool processOperatorState(string & currentLexeme, char currChar, Record & record);
 
+    bool processErrorState(string & currentLexeme, char currChar, Record & record);
+    bool processEndErrorState(string & currentLexeme, char currChar, Record & record);
+    
+    int line = 1;
+    int linePosition = 1;
 public:
 
     //Function to be called for each lexeme to be processed. Returns Record, which holds the token, lexeme, and a boolean flag representing whether the token has been accepted
     Record lexer()
     {
+
         //Variable Declarations
         int state = q0;     //variable to hold the current state during FSM traversal. initalized to qO, the initial state
         string currentLexeme; //variable to hold the lexeme as it is processed one character at a time
         Record record; //Record object to hold information about the lexeme being processed
         bool reachedFinal = false; //variable that returns true when we get to a state that is a final state, false if otherwise
+
+        bool hasError = false;
 
         //while loop that processes until a final state is reached
         while (!reachedFinal)
@@ -393,6 +406,12 @@ public:
                     reachedFinal = processOperatorState(currentLexeme, currChar, record);
                     break;
 
+                case 13: 
+                    reachedFinal = processErrorState(currentLexeme, currChar, record);
+                    break;
+                case 14: 
+                    reachedFinal = processEndErrorState(currentLexeme, currChar, record);
+                    break;
                 //invalid character - any character not recognized by the FSM
                 //this should not occur
                 default:

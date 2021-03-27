@@ -1,5 +1,5 @@
 #include "lexicalscanner.h"
-
+#include "errorhandler.h"
 /**
  * processes the start state state. 
  * 
@@ -221,5 +221,54 @@ bool LexicalScanner::processOperatorState(string & currentLexeme, char currChar,
     //set the final data in the record and set the boolean flag for reaching a final state as true
     record.token = "OPERATOR";
     record.lexeme = currentLexeme + string(1, currChar);
+    return true; // this is a final state
+}
+
+/**
+ * processes the error state
+ * 
+ * sets the record to the appropriate token and lexeme
+ * 
+ * @param currentLexeme is normally blank and is not used
+ * @param currChar contains the operator
+ * @param record will be set for this token
+ * 
+ * @return always returns true, since this is a final state
+ * 
+ */
+bool LexicalScanner::processErrorState(string & currentLexeme, char currChar, Record & record) {
+    //set the final data in the record and set the boolean flag for reaching a final state as true
+    //cout << ":" << line << " - error with " << string(1, currChar) << endl;
+    currentLexeme += currChar;
+    return false; // this is a final state
+}
+
+/**
+ * processes the error state
+ * 
+ * sets the record to the appropriate token and lexeme
+ * 
+ * @param currentLexeme is normally blank and is not used
+ * @param currChar contains the operator
+ * @param record will be set for this token
+ * 
+ * @return always returns true, since this is a final state
+ * 
+ */
+bool LexicalScanner::processEndErrorState(string & currentLexeme, char currChar, Record & record) {
+    //set the final data in the record and set the boolean flag for reaching a final state as true
+    string message;
+    if (currentLexeme[0] == '$' || currentLexeme[0] == '_') {
+        message.append(string(1, currentLexeme[0]).append(" is only allowed inside of an identifier: ").append(currentLexeme));
+    } else {
+        message.append(string(1, currentLexeme[0])).append (" is not an allowed character: ").append(currentLexeme);
+    }
+    record.accepted = false;
+    record.errorMessage = message ;
+    record.lexeme = currentLexeme;
+    record.token = "ERROR";
+    error currentError = {filename, line, linePosition - (int)currentLexeme.length(), message, lexical_error};
+    errorHandler.addError(currentError);
+    cout << currentError.toString() << endl;
     return true; // this is a final state
 }
