@@ -52,7 +52,8 @@ bool LexicalScanner::processIdentifierOrKeywordState(string & currentLexeme, cha
  * @return always returns true, since this is a final state
  */
 bool LexicalScanner::processEndIdentiferOrKeywordState(string & currentLexeme, char currChar, Record & record) {
-    record.lexeme = currentLexeme; //save the final lexeme string in record
+    record.set("", currentLexeme, true, filename, line, linePosition);
+
     //check to see if the lexeme is a keyword - save the token as keyword if true, identifier if otherwise
     if (isKeyword(currentLexeme))
     {
@@ -61,7 +62,7 @@ bool LexicalScanner::processEndIdentiferOrKeywordState(string & currentLexeme, c
     else
     {
         record.token = "IDENTIFIER";
-    }
+    }    
     return true; // this is a final state
 }
 
@@ -94,8 +95,7 @@ bool LexicalScanner::processIntegerState(string & currentLexeme, char currChar, 
  * @return always returns true, since this is a final state
  */
 bool LexicalScanner::processEndIntegerState(string & currentLexeme, char currChar, Record & record) {
-    record.token = "INTEGER";       //set the record token as integer
-    record.lexeme = currentLexeme;  //save the final lexeme in record
+    record.set("INTEGER", currentLexeme, true, filename, line, linePosition);
     return true; // this is a final state
 }
 
@@ -128,8 +128,7 @@ bool LexicalScanner::processFloatState(string & currentLexeme, char currChar, Re
  * @return always returns true, since this is a final state
  */
 bool LexicalScanner::processEndFloatState(string & currentLexeme, char currChar, Record & record) {
-    record.token = "FLOAT";       //set the record token as integer
-    record.lexeme = currentLexeme;  //save the final lexeme in record
+    record.set("FLOAT", currentLexeme, true, filename, line, linePosition);
     return true; // this is a final state
 }
 
@@ -182,8 +181,7 @@ bool LexicalScanner::processDecimalPointState(string & currentLexeme, char currC
  */
 bool LexicalScanner::processSeparatorState(string & currentLexeme, char currChar, Record & record) {
     //set the final data in the record and set the boolean flag for reaching a final state as true
-    record.token = "SEPARATOR";
-    record.lexeme = currentLexeme + string(1, currChar);
+    record.set("SEPARATOR", currentLexeme + string(1, currChar), true, filename, line, linePosition);
     return true; // this is a final state
 }
 
@@ -200,8 +198,7 @@ bool LexicalScanner::processSeparatorState(string & currentLexeme, char currChar
  */
 bool LexicalScanner::processEndSeparatorState(string & currentLexeme, char currChar, Record & record) {
     //set the final data in the record and set the boolean flag for reaching a final state as true
-    record.token = "SEPARATOR";
-    record.lexeme = currentLexeme;
+    record.set("SEPARATOR", currentLexeme, true, filename, line, linePosition);
     return true; // this is a final state
 }
 
@@ -219,8 +216,7 @@ bool LexicalScanner::processEndSeparatorState(string & currentLexeme, char currC
  */
 bool LexicalScanner::processOperatorState(string & currentLexeme, char currChar, Record & record) {
     //set the final data in the record and set the boolean flag for reaching a final state as true
-    record.token = "OPERATOR";
-    record.lexeme = currentLexeme + string(1, currChar);
+    record.set("OPERATOR", currentLexeme + string(1, currChar), true, filename, line, linePosition);
     return true; // this is a final state
 }
 
@@ -229,28 +225,26 @@ bool LexicalScanner::processOperatorState(string & currentLexeme, char currChar,
  * 
  * sets the record to the appropriate token and lexeme
  * 
- * @param currentLexeme is normally blank and is not used
- * @param currChar contains the operator
+ * @param currentLexeme contains the current lexeme
+ * @param currChar contains the current character
  * @param record will be set for this token
  * 
  * @return always returns true, since this is a final state
  * 
  */
 bool LexicalScanner::processErrorState(string & currentLexeme, char currChar, Record & record) {
-    //set the final data in the record and set the boolean flag for reaching a final state as true
-    //cout << ":" << line << " - error with " << string(1, currChar) << endl;
     currentLexeme += currChar;
     return false; // this is a final state
 }
 
 /**
- * processes the error state
+ * processes the end error state
  * 
  * sets the record to the appropriate token and lexeme
  * 
- * @param currentLexeme is normally blank and is not used
- * @param currChar contains the operator
- * @param record will be set for this token
+ * @param currentLexeme is the invalid lexeme
+ * @param currChar contains the current character, but is not used
+ * @param record will be set for this invalid token
  * 
  * @return always returns true, since this is a final state
  * 
@@ -263,10 +257,8 @@ bool LexicalScanner::processEndErrorState(string & currentLexeme, char currChar,
     } else {
         message.append(string(1, currentLexeme[0])).append (" is not an allowed character: ").append(currentLexeme);
     }
-    record.accepted = false;
-    record.errorMessage = message ;
-    record.lexeme = currentLexeme;
-    record.token = "ERROR";
+
+    record.set("ERROR", currentLexeme, false, filename, line, linePosition, message);
     error currentError = {filename, line, linePosition - (int)currentLexeme.length(), message, lexical_error};
     errorHandler.addError(currentError);
     cout << currentError.toString() << endl;

@@ -77,7 +77,29 @@ struct Record
     string token; //string variable to hold what token the input is (keyword, identifier, etc.)
     string lexeme;  //string variable to hold the raw input
     bool accepted; //boolean variable that returns true if the input has been accepted, false if otherwise
+    const string * filename;
+    int line;
+    int linePosition;
     string errorMessage; //string for outputting an error message if the lexeme is not accepted
+
+    Record() : token(""), lexeme(""), accepted(false), filename(NULL), line(1), linePosition(0), errorMessage("") {
+        
+    }
+
+    Record(const string & token, const string & lexeme, bool accepted, const string & filename, int line, int linePosition, string errorMessage = "") 
+    : token(token), lexeme(lexeme), accepted(accepted), filename(&filename), line(line), linePosition(linePosition), errorMessage(errorMessage) {
+
+    }
+
+    void set(const string & token, const string & lexeme, bool accepted, const string & filename, int line, int linePosition, string errorMessage = "") {
+        this->token = token;
+        this->lexeme = lexeme;
+        this->accepted = accepted;
+        this->filename = &filename;
+        this->line = line;
+        this->linePosition = linePosition;
+        this->errorMessage = errorMessage;
+    }
 };
 
 //
@@ -97,7 +119,7 @@ class LexicalScanner
 {
 private:
     istream & w; //input stream
-    string filename;
+    const string & filename;
     ErrorHandler & errorHandler;
 public:
 
@@ -107,7 +129,7 @@ public:
     //
     // This constructor takes a inputstream that will be used to scan for tokens
     //
-    LexicalScanner(istream & input, string filename, ErrorHandler & errorHandler): 
+    LexicalScanner(istream & input, const string & filename, ErrorHandler & errorHandler): 
         w(input), filename(filename), errorHandler(errorHandler) {
 
     }

@@ -41,7 +41,7 @@ list<Record> tokenizer::parse_input(string output_file_name)
   result_code <<  "TOKENS        Lexemes" << endl << endl;   //write the header to the output file
   //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank.
   //this variable is used to temporarily hold the data of the current lexeme being processed
-  Record record = {"", "", true, ""};
+  Record record = {"", "", true, filename_, 1, 0, ""};
   list<Record> records;
   output << "TOKENS        Lexemes" << endl << endl;
 
