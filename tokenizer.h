@@ -3,13 +3,14 @@
 #include <fstream>
 #include <iostream>
 #include "lexicalscanner.h"
-
+#include "errorhandler.h"
 //The tokenizer class is used to parse input
 class tokenizer
 {
 private:
   std::string filename_; //holds the name of the input file
   std::stringstream parser_; //holds the contents of the input file that will be parsed
+  ErrorHandler errorHandler;
 
 public:
   ~tokenizer() { } //default destructor
@@ -23,4 +24,8 @@ public:
 
   list<Record> parse_input(string output_file_name);// paramter = output location
    //function for parsing the input that takes no arguments and returns a list of Record objects
+
+   const ErrorHandler & getErrorHandler() {
+     return errorHandler;
+   }
 };

@@ -40,5 +40,9 @@ int main(int argc, char* argv[]) {
       cout << "The output of the lexer matches the expected output" << endl << endl;
     else cout << "The output of the lexer does not match the expected output" << endl << endl;
   }
+
+  if (tester.getErrorHandler().hasErrors()) {
+    cout << tester.getErrorHandler().toString();
+  }
   return 0;
 }

@@ -34,7 +34,7 @@ list<Record> tokenizer::parse_input(string output_file_name)
   //- a problem from the book - rate*time we need to realize * ends rate but also re-read *
   //   as multiply
 
-  LexicalScanner scanner(parser_);  //pass the input file stream to the lexical scanner
+  LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
   ostringstream output;             //create a output string stream for the lexemes and tokens
   ofstream result_code;
   result_code.open (output_file_name);
