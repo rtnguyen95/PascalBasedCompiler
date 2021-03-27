@@ -81,11 +81,7 @@ while (not one_root or two_roots)
 	do 
 		total = total + a + b + c
 	enddo (two_roots and no_roots)
-endwhile
-attachedto# not attached #
-#=
-#state1 # =
-attached#to
-stopped`here
+whileend
+
 ! lets make a function call, and use the comma !
 send_email(a, b, c)
