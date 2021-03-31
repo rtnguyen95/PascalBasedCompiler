@@ -8,12 +8,12 @@
  
  This feature allows for quick verification that changes to the code didn’t unintentionally modify the lexer. If there was a breaking change, then the state transition output file can be inspected to see which state transition was incorrect.
  */
-int tokenizer_checker::check_output(list<Record> records) {
+int tokenizer_checker::check_output(vector<Record> records) {
 
   stringstream actual_output;
 
   actual_output << "TOKENS        Lexemes" << endl << endl;
-  for (list<Record>::iterator it = records.begin(); it != records.end(); ++it) {
+  for (vector<Record>::iterator it = records.begin(); it != records.end(); ++it) {
     if (it->lexeme.length()) {
         actual_output << *it << endl;
     }

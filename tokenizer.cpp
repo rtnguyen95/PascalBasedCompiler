@@ -1,10 +1,11 @@
 #include "tokenizer.h"
 #include "lexicalscanner.h"
+#include "topdownsyntaxanalyzer.h"
 #include <filesystem>
 
 //function definition for parsing the input that takes no arguments and returns a list of Record objects
 // paramter = output location
-list<Record> tokenizer::parse_input(string output_file_name)
+vector<Record> tokenizer::parse_input(string output_file_name)
 {
   std::ifstream input_file_stream(filename_, std::ios::in); //declare an ifstream object for reading the input file
 
@@ -12,7 +13,7 @@ list<Record> tokenizer::parse_input(string output_file_name)
   if (!input_file_stream.is_open())
   {
     std::cerr << "No such file.\n";
-    return list<Record>();
+    return vector<Record>();
   }
 
   parser_ << input_file_stream.rdbuf(); //write the contents of the input file stream to the stringstream parser
@@ -35,6 +36,14 @@ list<Record> tokenizer::parse_input(string output_file_name)
   //   as multiply
 
   LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
+
+  // now do the syntax analysis phase
+  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner);
+
+  ParseTree* parseTree = syntaxAnalyzer.createParseTree();
+
+  delete parseTree;
+
   ostringstream output;             //create a output string stream for the lexemes and tokens
   ofstream result_code;
   result_code.open (output_file_name);
@@ -42,11 +51,16 @@ list<Record> tokenizer::parse_input(string output_file_name)
   //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank.
   //this variable is used to temporarily hold the data of the current lexeme being processed
   Record record = {"", "", true, filename_, 1, 0, ""};
-  list<Record> records;
+  vector<Record> records = syntaxAnalyzer.getTokenList();
   output << "TOKENS        Lexemes" << endl << endl;
+  for (vector<Record>::iterator it = records.begin();
+       it != records.end(); ++it) {
+    result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
+  }
+
 
   //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
-  while (!scanner.isFinished() && record.accepted) {
+  /*while (!scanner.isFinished() && record.accepted) {
           record = scanner.lexer();       //scan the next string in the input with the lexer and store the result in record
           if (record.lexeme.length())     //the lexeme is blank when there is blank space at the end of a file
           {
@@ -54,7 +68,7 @@ list<Record> tokenizer::parse_input(string output_file_name)
             result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
             records.push_back(record);
           }
-  }
+  }*/
   result_code.close();
   stringstream states;  //create an output string stream for the state transitions for each lexeme processed
   states << endl << " State Transitions: " << endl;
@@ -72,5 +86,6 @@ list<Record> tokenizer::parse_input(string output_file_name)
 
   cout << endl;
 
+  //records.push_back(Record("ENDOFFILE", "$", true, filename_, 1000, 0));
   return records; //return the token and lexeme list to the caller
 }

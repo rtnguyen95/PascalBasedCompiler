@@ -4,6 +4,7 @@
 #include "lexicalscanner.h"
 #include "tokenizer.h"
 #include "tokenizer_checker.h"
+#include "topdownsyntaxanalyzer.h"
 
 using namespace std;
 
@@ -25,7 +26,8 @@ int main(int argc, char* argv[]) {
   file_handle = file_handle + extension;
   cout << "Outputing results to the screen and to this file: " << file_handle << endl << endl;
 
-  list<Record> records = tester.parse_input(file_handle);
+  vector<Record> records = tester.parse_input(file_handle);
+
   // output locatin is passed to parse_input
   if (argc > 2) {
     cout << "comparing results to expected file: " << argv[2] << endl << endl;
@@ -43,6 +45,8 @@ int main(int argc, char* argv[]) {
 
   if (tester.getErrorHandler().hasErrors()) {
     cout << tester.getErrorHandler().toString();
+    return 1;
   }
+
   return 0;
 }

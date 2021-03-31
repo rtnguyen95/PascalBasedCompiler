@@ -25,3 +25,8 @@ the else statement was removed in the beginning of our FSM loop (before the swit
 * Add other console output to list what files are being used or created
 * Move the change log from README.md to this file.
 * Delete unused token.h/c files
+
+# changes 3/27
+* add line number tracking
+* add error state and error logging
+* add line number info to Records
