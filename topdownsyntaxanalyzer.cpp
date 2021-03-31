@@ -29,19 +29,20 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     currentLexeme = it;
     //  
     if(isAssignment()) {
-        print(" <Statement> -> <Assign>");  
+        print("<Statement> -> <Assign>");  
         return true;
     }
 
     return false;
 }
 
-bool TopDownSyntaxAnalyzer::isDeclaration(/*list<Record> & statement*/) {
-    //list<Record>::iterator it = statement.begin();
+bool TopDownSyntaxAnalyzer::isDeclaration() {
+
     Record * record = getNextToken();
     Record * type = record;
     if (record == nullptr) 
         return false;
+    print("<Declaration> -> <Type><ID>");
     
     if (isType(*record)) {
         Record * record = getNextToken();
@@ -54,10 +55,10 @@ bool TopDownSyntaxAnalyzer::isDeclaration(/*list<Record> & statement*/) {
             if (record == nullptr) 
                 return false;
             if (record->lexeme == ";") {
-                cout << *type << endl;
-                cout << *id << endl;
-                cout << *record << endl;
-                cout << " D -> <type><id>" << endl;
+                //cout << *type << endl;
+                //cout << *id << endl;
+                //cout << *record << endl;
+                print("<Declaration> -> <Type><ID>");
                 return true;
             }
         } else {
@@ -78,7 +79,7 @@ bool TopDownSyntaxAnalyzer::isTerm(list<Record> & statement, list<Record>::itera
     }*/
     return false;
 }
-
+/*
 bool TopDownSyntaxAnalyzer::isFactor(list<Record> & statement, list<Record>::iterator & it) {
     
     if (it->token == "SEPARATOR" && it->lexeme == "(") {
@@ -102,14 +103,14 @@ bool TopDownSyntaxAnalyzer::isFactor(list<Record> & statement, list<Record>::ite
             return false;
         }
     } else if (isId(*it)) {
-        cout << "<Factor> -> <ID>" << endl;
+        print("<Factor> -> <ID>");
         return true;
     } else if (isNumber(*it)) {
-        cout << "<Factor> -> <Num>" << endl;
+        print("<Factor> -> <Num>");
         return true;
     }
     return false;
-}
+}*/
 
 bool TopDownSyntaxAnalyzer::isQ(){
     Record * record = getNextToken();
@@ -120,13 +121,14 @@ bool TopDownSyntaxAnalyzer::isQ(){
         if (isT()) {
             if (isQ()) {
                 //cout << " Q -> +TQ" << endl;
-                print("ExpressionPrime -> +<Term><ExpressionPrime>");
+                print("<ExpressionPrime> -> +<Term><ExpressionPrime>");
                 return true;
             }
         } 
     } else if (record->lexeme == ")" || record->lexeme == ";") {
         backup();
         //cout << " Q -> epsilon" << endl;
+        print("<ExpressionPrime> -> epsilon");
         return true;
     }
     return false;
@@ -137,7 +139,7 @@ bool TopDownSyntaxAnalyzer::isT() {
     if (isF()) {
         if (isR()) {
             //cout << " T -> FR" << endl;
-            print(" <Term> -> <Factor><TermPrime>");
+            print("<Term> -> <Factor><TermPrime>");
             return true;
         }
     }
@@ -160,7 +162,7 @@ bool TopDownSyntaxAnalyzer::isR() {
         }
     } else if (record->lexeme == "+" || record->lexeme == ")" || record->lexeme == ";") {
         //cout << *record << endl;
-        //cout << " R -> epsilon" << endl;
+        print("<TermPrime> -> epsilon");
         backup();
         return true;
     }
@@ -175,7 +177,7 @@ bool TopDownSyntaxAnalyzer::isF() {
     if (isId(*record)) {
         //cout << *record << endl;
         //cout << " F -> id" << endl;
-        print(" <Factor> -> <Identifier>");
+        print("<Factor> -> <Identifier>");
         return true;
     } else {
         //print(" <Factor> -> (<Expression>)");
@@ -187,7 +189,7 @@ bool TopDownSyntaxAnalyzer::isF() {
                 
                 if (record->lexeme == ")") {
                     //cout << " F -> (E)" << endl;
-                    print(" <Factor> -> (<Expression>)");
+                    print("<Factor> -> (<Expression>)");
                     return true;
                 }
             }
@@ -210,7 +212,7 @@ bool TopDownSyntaxAnalyzer::isE() {
                 backup();
 */
             //cout << " E -> TQ" << endl;
-            print(" <Expression> -> <Term><ExpressionPrime>");
+            print("<Expression> -> <Term><ExpressionPrime>");
             return true;
         }
     }
@@ -236,7 +238,7 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
                     backup();
 
                 //cout << " <Assign> -> <ID> = <Expression>;" << endl;
-                print(" <Assign> -> <ID> = <Expression>");
+                print("<Assign> -> <ID> = <Expression>");
                 return true;
             }
         }

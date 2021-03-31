@@ -87,7 +87,7 @@ public:
 
     void print(const string & rule) {
         if (printProduction) {
-            cout << rule << endl;
+            cout << "     " << rule << endl;
         }
     }
 
