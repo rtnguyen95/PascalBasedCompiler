@@ -19,13 +19,6 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         else cout << "processing statement with failure" << endl;
     }
 
-    /*list<Record> statement = getNextStatement();
-    while (!statement.empty()) {
-        cout << "parsing " << *statement.begin() << endl;
-        isStatement(statement);
-        statement = getNextStatement();
-    }*/
-
     parseTree->printNodes(true);
 
     return parseTree;
@@ -84,50 +77,6 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
     }
     return false;
 }
-
-bool TopDownSyntaxAnalyzer::isExpression(list<Record> & statement) {
-    return false;
-}
-
-bool TopDownSyntaxAnalyzer::isTerm(list<Record> & statement, list<Record>::iterator & it) {
-    /*list<Record>::iterator = statement.find()
-    if (isFactor(statement, it)) {
-        if (isR)
-    }*/
-    return false;
-}
-/*
-bool TopDownSyntaxAnalyzer::isFactor(list<Record> & statement, list<Record>::iterator & it) {
-    
-    if (it->token == "SEPARATOR" && it->lexeme == "(") {
-        // advance to )
-        list<Record>::iterator itTemp = it;
-        list<Record> expression;
-        bool foundRightParenthesis = false;
-        while (itTemp != statement.end()) {
-            if (itTemp->lexeme == ")") {
-                foundRightParenthesis = true;
-            } else {
-                expression.push_back(*itTemp);
-                itTemp++;
-            }
-        }
-        if (foundRightParenthesis) {
-            it = ++itTemp;
-            cout << "<Factor> -> (<Expression>)" << endl;
-            return true;
-        } else {
-            return false;
-        }
-    } else if (isId(*it)) {
-        print("<Factor> -> <ID>");
-        return true;
-    } else if (isNumber(*it)) {
-        print("<Factor> -> <Num>");
-        return true;
-    }
-    return false;
-}*/
 
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
     Node * parent = currentNode;

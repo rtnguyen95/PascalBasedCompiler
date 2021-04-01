@@ -16,12 +16,7 @@ public:
     bool isIdentifier();
     bool isStatement();
     
-    bool isDeclaration(/*list<Record> & statement*/);
-
-
-    bool isExpression(list<Record> & statement);
-    bool isTerm(list<Record> & statement, list<Record>::iterator & it);
-    bool isFactor(list<Record> & statement, list<Record>::iterator & it);
+    bool isDeclaration();
 
 
     bool isQ();
