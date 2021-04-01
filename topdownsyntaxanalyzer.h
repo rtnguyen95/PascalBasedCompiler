@@ -12,6 +12,7 @@ public:
 
     virtual ParseTree * createParseTree();
 
+    bool isIdentifier();
     bool isStatement();
     
     bool isDeclaration(/*list<Record> & statement*/);

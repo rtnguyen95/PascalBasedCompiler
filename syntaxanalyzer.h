@@ -97,8 +97,6 @@ public:
     bool isId(const Record & lexeme);
     bool isNumber(const Record & lexeme);
 
-    bool isIdentifier();
-
     vector<Record> & getTokenList() {
         return lexemes;
     }

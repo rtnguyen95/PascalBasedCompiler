@@ -216,6 +216,17 @@ bool TopDownSyntaxAnalyzer::isE() {
             return true;
         }
     }
+/**
+ * Determines if the next token is an identifier
+ */
+bool TopDownSyntaxAnalyzer::isIdentifier() {
+    Record * record = getNextToken();
+    if (record == nullptr) 
+        return false;
+    if(isId(*record)) {
+        currentNode->add(new Node(*record));
+        return true;
+    }
     return false;
 }
 
