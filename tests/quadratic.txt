@@ -21,6 +21,8 @@
 float a;
 float b;
 float c;
+a = a / b;
+c = 2.34;
 float all[3];
 float not_used[3:6]; ! what is the : used for (cannot use a question mark) !
 ! ask the user for the inputs !

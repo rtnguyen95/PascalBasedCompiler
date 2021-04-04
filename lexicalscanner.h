@@ -149,9 +149,9 @@ protected:
     const vector<int> FinalStates {3, 5, 7, 10, 11, 12, 14}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
-    //column represents the input character, row represents the state
+    //column represents the input character, row represents the state 
     const int ntable[14][10] = {
-       //a, d, _, $, .,  , !, {}, +=, other
+       //a,  d,  _,  $,  .,   ,  !,  {}, +=, other
         {2,  4,  13, 13, 9,  1,  8,  10, 12, 13},               // 1  starting state
         {2,  2,  2,  2,  3,  3,  3,  3,  3,  3},                 // 2  in identifier
         {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 3  end identifier (final state)

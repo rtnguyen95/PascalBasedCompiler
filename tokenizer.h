@@ -22,7 +22,7 @@ public:
     filename_ = filename;
   }
 
-  list<Record> parse_input(string output_file_name);// paramter = output location
+  vector<Record> parse_input(string output_file_name);// paramter = output location
    //function for parsing the input that takes no arguments and returns a list of Record objects
 
    const ErrorHandler & getErrorHandler() {

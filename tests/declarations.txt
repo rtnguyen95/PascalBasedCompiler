@@ -1,0 +1,13 @@
+!int i;
+float f;
+bool isCreated;
+int apples;
+float cost;!
+
+!cost = i * cost;
+k = f + i;
+j = f * i;
+m = a + b * c;
+n = a * b + c;!
+a = b + c;
+a = b * c;

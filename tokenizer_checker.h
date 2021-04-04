@@ -21,5 +21,5 @@ public:
     }
   }
 
-  int check_output(list<Record> records);
+  int check_output(vector<Record> records);
 };
