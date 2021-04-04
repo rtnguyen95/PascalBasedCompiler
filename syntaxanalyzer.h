@@ -32,7 +32,7 @@ public:
                 Record & token = lexemes[currentLexeme++];
                 return &token;
             }
-            return NULL;
+            return NULL; // maybe this should throw an exception instead?
         }
     }
 
