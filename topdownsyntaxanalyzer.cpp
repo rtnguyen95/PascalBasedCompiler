@@ -19,24 +19,33 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         else cout << "processing statement with failure" << endl;
     }
 
-    parseTree->printNodes(true);
-
+    cout << "-------Parse Tree Code------------------" << endl;
+    parseTree->printNodes(false);
+    cout << "-------Parse Tree Rules------------------" << endl;
+    parseTree->printRules();
+    cout << "-------Parse Tree -----------------------" << endl;
+    parseTree->printTree();
     return parseTree;
 }
 
 bool TopDownSyntaxAnalyzer::isStatement() {
     int it = currentLexeme;
     Node * currentNode = parseTree->getRoot();
-    if(isDeclaration())
+    Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration>");
+    if(isDeclaration()) {
+        finishNonTerminal(parent);
         return true;
+    }
 
     currentLexeme = it;
     //  
     if(isAssignment()) {
-        print("<Statement> -> <Assign>");  
+        //print("<Statement> -> <Assign>");  
+        finishNonTerminal(parent);
         return true;
     }
 
+    cancelNonTerminal(parent);
     return false;
 }
 
@@ -98,7 +107,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
     Record * record = getNextToken();
     if (record == nullptr) 
         return false;
-    Node * parent = startNonTerminal("ExpressionPrime");
+    Node * parent = startNonTerminal("<ExpressionPrime> -> +<Term><ExpressionPrime> | -<Term><ExpressionPrime> | epsilon"/*, *record*/);
 
     if (record->lexeme == "+") {
         currentNode->add(new Node(*record));
@@ -134,7 +143,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
 
 bool TopDownSyntaxAnalyzer::isT() {
     //print(" <Term> -> <Factor><TermPrime>");
-    Node * parent = startNonTerminal("Term");
+    Node * parent = startNonTerminal("<Term> -> <Factor><TermPrime>");
     if (isF()) {
         if (isR()) {
             //cout << " T -> FR" << endl;
@@ -152,7 +161,7 @@ bool TopDownSyntaxAnalyzer::isR() {
     if (record == nullptr) 
         return false;
 
-    Node * parent = startNonTerminal("TermPrime");
+    Node * parent = startNonTerminal("<TermPrime> -> *<Factor><TermPrime> | /<Factor><TermPrime> | epsilon");
 
     if (record->lexeme == "*") {
         currentNode->add(new Node(*record));
@@ -189,7 +198,7 @@ bool TopDownSyntaxAnalyzer::isF() {
     Record * record = getNextToken();
     if (record == nullptr) 
         return false;
-    Node * parent = startNonTerminal("Factor");
+    Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID>");
     //print(" <Factor> -> <Identifier>");
     if (isId(*record)) {
         //cout << *record << endl;
@@ -224,7 +233,7 @@ bool TopDownSyntaxAnalyzer::isF() {
 bool TopDownSyntaxAnalyzer::isE() {
     //print(" <Expression> -> <Term><ExpressionPrime>");
     //cout << *currentLexeme << endl;
-    Node * parent = startNonTerminal("Expression");
+    Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime>");
     if (isT()) {
         if (isQ()) {
             /*Record * record = getNextToken();
@@ -253,7 +262,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier() {
     if (record == nullptr) 
         return false;
     if(isId(*record)) {
-        currentNode->add(new Node(*record));
+        currentNode->add(new Node(record));
         return true;
     }
     return false;
@@ -262,8 +271,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier() {
 bool TopDownSyntaxAnalyzer::isAssignment() {
     //cout << *currentLexeme << endl;
     //print(" <Assign> -> <ID> = <Expression>");
-    Node * parent = currentNode;
-    currentNode = new Node("Assignment");
+    Node * parent = startNonTerminal("<Assign> -> <ID> = <Expression>");
     if (isIdentifier()) {
         Record * record = getNextToken();
         if (record == nullptr) 
@@ -281,12 +289,13 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
                     backup();
 
                 //cout << " <Assign> -> <ID> = <Expression>;" << endl;
-                print("<Assign> -> <ID> = <Expression>");
-                parent->add(currentNode);
-                currentNode = parent;
+                //print("<Assign> -> <ID> = <Expression>");
+                currentNode->add(new Node(*record));
+                finishNonTerminal(parent);
                 return true;
             }
         }
     }
+    cancelNonTerminal(parent);
     return false;
 }
