@@ -15,9 +15,10 @@ public:
 
     bool isIdentifier();
     bool isStatement();
-    
+
     bool isDeclaration();
 
+    bool isTypeTopDown();
 
     bool isQ();
     bool isT();

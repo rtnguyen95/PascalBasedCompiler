@@ -38,9 +38,9 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     }
 
     currentLexeme = it;
-    //  
+    //
     if(isAssignment()) {
-        //print("<Statement> -> <Assign>");  
+        //print("<Statement> -> <Assign>");
         finishNonTerminal(parent);
         return true;
     }
@@ -51,40 +51,96 @@ bool TopDownSyntaxAnalyzer::isStatement() {
 
 bool TopDownSyntaxAnalyzer::isDeclaration() {
 
+    // Record * record = getNextToken();
+    // if (record == nullptr)
+    //     return false;
     Record * record = getNextToken();
-    if (record == nullptr) 
-        return false;
-    Record type = *record;
-    print("<Declaration> -> <Type><ID>");
-    
+    if (record == nullptr) {return false;}
+    Node * declarationNode = new Node("Declaration");
+    Node * parent = startNonTerminal("Type");
     if (isType(*record)) {
-        Record * record = getNextToken();
+      print("<Declaration> -> <Type><ID>");
+      print("<Type> -> float | int | bool");
+      currentNode->add(new Node(*record));
+      finishNonTerminal(parent);
+      declarationNode->add(parent);
+      Record type = *record;
 
-        if (record == nullptr) 
-            return false;
-        Record id = *record;
-        if (isId(*record)) {
-            Record * record = getNextToken();
-            if (record == nullptr) 
-                return false;
-            if (record->lexeme == ";") {
-                //cout << *type << endl;
-                //cout << *id << endl;
-                //cout << *record << endl;
-                Node * declarationNode = new Node("Declaration");
-                currentNode->add(declarationNode);
-
-                declarationNode->add(new Node(type));
-                declarationNode->add(new Node(id));
-                declarationNode->add(new Node(*record));
-                print("<Declaration> -> <Type><ID>");
-                return true;
-            }
-        } else {
-
+      Record * record = getNextToken();
+      if (record == nullptr) {return false;}
+      Node * parent = startNonTerminal("ID");
+      if(isId(*record)) {
+          currentNode->add(new Node(record));
+          finishNonTerminal(parent);
+          declarationNode->add(parent);
+          Record id = *record;
+          Record * record = getNextToken();
+        if (record == nullptr)
+          return false;
+        if (record->lexeme == ";") {
+            //cout << *type << endl;
+            //cout << *id << endl;
+            //cout << *record << endl;
+            // Node * declarationNode = new Node("Declaration");
+            // currentNode->add(declarationNode);
+            //
+            // declarationNode->add(new Node(type));
+            // declarationNode->add(new Node(id));
+            // declarationNode->add(new Node(*record));
+          print("<Declaration> -> <Type><ID>");
+          return true;
         }
+        else {return false;}
+      }
+      else {
+        cancelNonTerminal(parent);
+        return false;
+      }
     }
+    cancelNonTerminal(parent);
     return false;
+
+    // if (isTypeTopDown()) {
+    //     Record * record = getNextToken();
+    //     Record type = *record;
+    //     print("<Declaration> -> <Type><ID>");
+    //     print("<Type> -> float | int | bool");
+    //     if (record == nullptr)
+    //         return false;
+    //     Record id = *record;
+    //     if (isId(*record)) {
+    //         Record * record = getNextToken();
+    //         if (record == nullptr)
+    //             return false;
+    //         if (record->lexeme == ";") {
+    //             //cout << *type << endl;
+    //             //cout << *id << endl;
+    //             //cout << *record << endl;
+    //             // Node * declarationNode = new Node("Declaration");
+    //             // currentNode->add(declarationNode);
+    //             //
+    //             // declarationNode->add(new Node(type));
+    //             // declarationNode->add(new Node(id));
+    //             // declarationNode->add(new Node(*record));
+    //             print("<Declaration> -> <Type><ID>");
+    //             return true;
+    //         }
+    //     } else {
+    //
+    //     }
+    // }
+    // return false;
+}
+bool TopDownSyntaxAnalyzer::isTypeTopDown() {
+  Record * record = getNextToken();
+  Node * parent = startNonTerminal("Type");
+  if (isType(*record)) {
+    currentNode->add(new Node(*record));
+    finishNonTerminal(parent);
+    return true;
+  }
+  cancelNonTerminal(parent);
+  return false;
 }
 
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
@@ -105,7 +161,7 @@ void TopDownSyntaxAnalyzer::cancelNonTerminal(Node * parent) {
 
 bool TopDownSyntaxAnalyzer::isQ(){
     Record * record = getNextToken();
-    if (record == nullptr) 
+    if (record == nullptr)
         return false;
     Node * parent = startNonTerminal("<ExpressionPrime> -> +<Term><ExpressionPrime> | -<Term><ExpressionPrime> | epsilon"/*, *record*/);
 
@@ -118,7 +174,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
                 finishNonTerminal(parent);
                 return true;
             }
-        } 
+        }
     } else if (record->lexeme == "-") {
         currentNode->add(new Node(*record));
         if (isT()) {
@@ -128,14 +184,13 @@ bool TopDownSyntaxAnalyzer::isQ(){
                 finishNonTerminal(parent);
                 return true;
             }
-        } 
+        }
     } else if (record->lexeme == ")" || record->lexeme == ";") {
         backup();
         //cout << " Q -> epsilon" << endl;
         print("<ExpressionPrime> -> epsilon");
         finishNonTerminal(parent);
         return true;
-        
     }
     cancelNonTerminal(parent);
     return false;
@@ -158,7 +213,7 @@ bool TopDownSyntaxAnalyzer::isT() {
 
 bool TopDownSyntaxAnalyzer::isR() {
     Record * record = getNextToken();
-    if (record == nullptr) 
+    if (record == nullptr)
         return false;
 
     Node * parent = startNonTerminal("<TermPrime> -> *<Factor><TermPrime> | /<Factor><TermPrime> | epsilon");
@@ -196,7 +251,7 @@ bool TopDownSyntaxAnalyzer::isR() {
 
 bool TopDownSyntaxAnalyzer::isF() {
     Record * record = getNextToken();
-    if (record == nullptr) 
+    if (record == nullptr)
         return false;
     Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID>");
     //print(" <Factor> -> <Identifier>");
@@ -213,9 +268,9 @@ bool TopDownSyntaxAnalyzer::isF() {
             currentNode->add(new Node(*record));
             if (isE()) {
                 Record * record = getNextToken();
-                if (record == nullptr) 
+                if (record == nullptr)
                     return false;
-                
+
                 if (record->lexeme == ")") {
                     currentNode->add(new Node(*record));
                     //cout << " F -> (E)" << endl;
@@ -237,9 +292,9 @@ bool TopDownSyntaxAnalyzer::isE() {
     if (isT()) {
         if (isQ()) {
             /*Record * record = getNextToken();
-            if (record == nullptr) 
+            if (record == nullptr)
                 return false;
-            
+
             // the ; optionally ends a statement
             if (record->lexeme != ";")
                 backup();
@@ -259,7 +314,7 @@ bool TopDownSyntaxAnalyzer::isE() {
  */
 bool TopDownSyntaxAnalyzer::isIdentifier() {
     Record * record = getNextToken();
-    if (record == nullptr) 
+    if (record == nullptr)
         return false;
     if(isId(*record)) {
         currentNode->add(new Node(record));
@@ -274,14 +329,14 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
     Node * parent = startNonTerminal("<Assign> -> <ID> = <Expression>");
     if (isIdentifier()) {
         Record * record = getNextToken();
-        if (record == nullptr) 
+        if (record == nullptr)
             return false;
         //cout << * record << endl;
         if (record->lexeme == "=") {
             currentNode->add(new Node(*record));
             if(isE()) {
                 Record * record = getNextToken();
-                if (record == nullptr) 
+                if (record == nullptr)
                     return false;
                 cout << * record << endl;
                 // the ; optionally ends a statement
