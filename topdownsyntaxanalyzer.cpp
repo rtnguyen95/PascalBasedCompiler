@@ -50,90 +50,28 @@ bool TopDownSyntaxAnalyzer::isStatement() {
 }
 
 bool TopDownSyntaxAnalyzer::isDeclaration() {
-
-    // Record * record = getNextToken();
-    // if (record == nullptr)
-    //     return false;
-    Record * record = getNextToken();
-    if (record == nullptr) {return false;}
-    Node * declarationNode = new Node("Declaration");
-    Node * parent = startNonTerminal("Type");
-    if (isType(*record)) {
-      print("<Declaration> -> <Type><ID>");
-      print("<Type> -> float | int | bool");
-      currentNode->add(new Node(*record));
-      finishNonTerminal(parent);
-      declarationNode->add(parent);
-      Record type = *record;
-
-      Record * record = getNextToken();
-      if (record == nullptr) {return false;}
-      Node * parent = startNonTerminal("ID");
-      if(isId(*record)) {
-          currentNode->add(new Node(record));
-          finishNonTerminal(parent);
-          declarationNode->add(parent);
-          Record id = *record;
-          Record * record = getNextToken();
-        if (record == nullptr)
-          return false;
-        if (record->lexeme == ";") {
-            //cout << *type << endl;
-            //cout << *id << endl;
-            //cout << *record << endl;
-            // Node * declarationNode = new Node("Declaration");
-            // currentNode->add(declarationNode);
-            //
-            // declarationNode->add(new Node(type));
-            // declarationNode->add(new Node(id));
-            // declarationNode->add(new Node(*record));
-          print("<Declaration> -> <Type><ID>");
-          return true;
+    print("<Declaration> -> <Type><ID>");
+    print("<Type> -> float | int | bool");
+    print("<ID> -> identifier");
+    Node * declarationNode = startNonTerminal("<Declaration> -> <Type><ID>");
+    if (isTypeTopDown()) {
+        if (isIdentifier()) {
+            Record * record = getNextToken();
+            if (record == nullptr)
+                return false;
+            if (record->lexeme == ";") {
+                print("<Declaration> -> <Type><ID>");
+                finishNonTerminal(declarationNode);
+                return true; //success / processed
+            }
         }
-        else {return false;}
-      }
-      else {
-        cancelNonTerminal(parent);
-        return false;
-      }
     }
-    cancelNonTerminal(parent);
+    cancelNonTerminal(declarationNode);
     return false;
-
-    // if (isTypeTopDown()) {
-    //     Record * record = getNextToken();
-    //     Record type = *record;
-    //     print("<Declaration> -> <Type><ID>");
-    //     print("<Type> -> float | int | bool");
-    //     if (record == nullptr)
-    //         return false;
-    //     Record id = *record;
-    //     if (isId(*record)) {
-    //         Record * record = getNextToken();
-    //         if (record == nullptr)
-    //             return false;
-    //         if (record->lexeme == ";") {
-    //             //cout << *type << endl;
-    //             //cout << *id << endl;
-    //             //cout << *record << endl;
-    //             // Node * declarationNode = new Node("Declaration");
-    //             // currentNode->add(declarationNode);
-    //             //
-    //             // declarationNode->add(new Node(type));
-    //             // declarationNode->add(new Node(id));
-    //             // declarationNode->add(new Node(*record));
-    //             print("<Declaration> -> <Type><ID>");
-    //             return true;
-    //         }
-    //     } else {
-    //
-    //     }
-    // }
-    // return false;
 }
 bool TopDownSyntaxAnalyzer::isTypeTopDown() {
   Record * record = getNextToken();
-  Node * parent = startNonTerminal("Type");
+  Node * parent = startNonTerminal("<Type> -> float | int | bool");
   if (isType(*record)) {
     currentNode->add(new Node(*record));
     finishNonTerminal(parent);
@@ -141,6 +79,23 @@ bool TopDownSyntaxAnalyzer::isTypeTopDown() {
   }
   cancelNonTerminal(parent);
   return false;
+}
+
+/**
+ * Determines if the next token is an identifier   -- (Sean) changed this to match ^^ isTypeTopDown
+ */
+bool TopDownSyntaxAnalyzer::isIdentifier() {
+    Record * record = getNextToken();
+    Node * parent = startNonTerminal("<ID> -> identifier");
+    if (record == nullptr)
+        return false;
+    if(isId(*record)) {
+      currentNode->add(new Node(*record));
+      finishNonTerminal(parent);
+      return true;
+    }
+    cancelNonTerminal(parent);
+    return false;
 }
 
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
@@ -307,20 +262,6 @@ bool TopDownSyntaxAnalyzer::isE() {
         }
     }
     cancelNonTerminal(parent);
-    return false;
-}
-
-/**
- * Determines if the next token is an identifier
- */
-bool TopDownSyntaxAnalyzer::isIdentifier() {
-    Record * record = getNextToken();
-    if (record == nullptr)
-        return false;
-    if(isId(*record)) {
-        currentNode->add(new Node(record));
-        return true;
-    }
     return false;
 }
 
