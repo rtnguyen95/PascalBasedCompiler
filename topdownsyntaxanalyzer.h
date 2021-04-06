@@ -20,7 +20,7 @@ public:
     bool isTypeTopDown();
     bool isWhileTopDown();
     bool isIfTopDown();
-
+    bool isNumberTopDown();
     bool isQ();
     bool isT();
     bool isR();

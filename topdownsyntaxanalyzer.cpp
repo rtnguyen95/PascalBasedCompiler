@@ -50,6 +50,19 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     cancelNonTerminal(parent);
     return false;
 }
+bool TopDownSyntaxAnalyzer::isNumberTopDown() {
+  Record * record = getNextToken();
+  Node * parent = startNonTerminal("<NUM> -> number");
+  if (record == nullptr)
+    return false;
+  if (isNumber(*record)) {
+    currentNode->add(new Node(*record));
+    finishNonTerminal(parent);
+    return true;
+  }
+  cancelNonTerminal(parent);
+  return false;
+}
 bool TopDownSyntaxAnalyzer::isWhileTopDown() {
   print("<while statement> -> <WHILE>");
   Record * record = getNextToken();
@@ -239,17 +252,20 @@ bool TopDownSyntaxAnalyzer::isF() {
     Record * record = getNextToken();
     if (record == nullptr)
         return false;
-    Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID>");
+    Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID> | <NUM>");
     //print(" <Factor> -> <Identifier>");
-    if (isId(*record)) {
+    if (isIdentifier()) {
         //cout << *record << endl;
         //cout << " F -> id" << endl;
         print("<Factor> -> <Identifier>");
-        currentNode->add(new Node(*record));
         finishNonTerminal(parent);
         return true;
-    } else {
-        //print(" <Factor> -> (<Expression>)");
+    }
+    if (isNumberTopDown()) {
+      print("<Factor> -> <NUM>");
+      finishNonTerminal(parent);
+      return true;
+    }
         if (record->lexeme == "(") {
             currentNode->add(new Node(*record));
             if (isE()) {
@@ -266,7 +282,7 @@ bool TopDownSyntaxAnalyzer::isF() {
                 }
             }
         }
-    }
+
     cancelNonTerminal(parent);
     return false;
 }
