@@ -29,26 +29,55 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
 }
 
 bool TopDownSyntaxAnalyzer::isStatement() {
-    int it = currentLexeme;
     Node * currentNode = parseTree->getRoot();
     Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration>");
     if(isDeclaration()) {
         finishNonTerminal(parent);
         return true;
     }
-
-    currentLexeme = it;
-    //
     if(isAssignment()) {
-        //print("<Statement> -> <Assign>");
         finishNonTerminal(parent);
         return true;
     }
-
+    if(isWhileTopDown()) {
+        finishNonTerminal(parent);
+        return true;
+    }
+    if(isIfTopDown()) {
+        finishNonTerminal(parent);
+        return true;
+    }
     cancelNonTerminal(parent);
     return false;
 }
-
+bool TopDownSyntaxAnalyzer::isWhileTopDown() {
+  print("<while statement> -> <WHILE>");
+  Record * record = getNextToken();
+  Node * parent = startNonTerminal("<while statement> -> <WHILE>");
+  if (record == nullptr) {return false;}
+  if (isWhile(*record)) {
+    currentNode->add(new Node(*record));
+    // the rest of the rules for while go in here
+    finishNonTerminal(parent);
+    return true;
+  }
+  cancelNonTerminal(parent);
+  return false;
+}
+bool TopDownSyntaxAnalyzer::isIfTopDown() {
+  print("<if statement> -> <IF>");
+  Record * record = getNextToken();
+  Node * parent = startNonTerminal("<if statement> -> <IF>");
+  if (record == nullptr) {return false;}
+  if (isIf(*record)) {
+    currentNode->add(new Node(*record));
+    // the rest of the rules for while go in here
+    finishNonTerminal(parent);
+    return true;
+  }
+  cancelNonTerminal(parent);
+  return false;
+}
 bool TopDownSyntaxAnalyzer::isDeclaration() {
     print("<Declaration> -> <Type><ID>");
     print("<Type> -> float | int | bool");
@@ -72,6 +101,8 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
 bool TopDownSyntaxAnalyzer::isTypeTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<Type> -> float | int | bool");
+  if (record == nullptr)
+    return false;
   if (isType(*record)) {
     currentNode->add(new Node(*record));
     finishNonTerminal(parent);
@@ -87,8 +118,7 @@ bool TopDownSyntaxAnalyzer::isTypeTopDown() {
 bool TopDownSyntaxAnalyzer::isIdentifier() {
     Record * record = getNextToken();
     Node * parent = startNonTerminal("<ID> -> identifier");
-    if (record == nullptr)
-        return false;
+    if (record == nullptr) {return false;}
     if(isId(*record)) {
       currentNode->add(new Node(*record));
       finishNonTerminal(parent);

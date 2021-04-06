@@ -17,8 +17,9 @@ public:
     bool isStatement();
 
     bool isDeclaration();
-
     bool isTypeTopDown();
+    bool isWhileTopDown();
+    bool isIfTopDown();
 
     bool isQ();
     bool isT();

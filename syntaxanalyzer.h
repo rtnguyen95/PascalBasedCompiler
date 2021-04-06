@@ -25,7 +25,7 @@ public:
             return &token;
         } else {
             Record token = lexicalScanner.lexer();
-            
+
             if (!lexicalScanner.isFinished() && token.accepted && token.lexeme.length() > 0) {
                 cout << token << endl;
                 lexemes.push_back(token);
@@ -49,7 +49,8 @@ public:
     }
 
     virtual ParseTree * createParseTree() = 0;
-
+    bool isIf(const Record & lexeme);
+    bool isWhile(const Record & lexeme);
     bool isType(const Record & lexeme);
     bool isId(const Record & lexeme);
     bool isNumber(const Record & lexeme);
