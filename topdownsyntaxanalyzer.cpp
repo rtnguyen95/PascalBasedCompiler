@@ -47,6 +47,7 @@ bool TopDownSyntaxAnalyzer::isStatement() {
         finishNonTerminal(parent);
         return true;
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -60,6 +61,7 @@ bool TopDownSyntaxAnalyzer::isNumberTopDown() {
     finishNonTerminal(parent);
     return true;
   }
+  backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -74,6 +76,7 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
     finishNonTerminal(parent);
     return true;
   }
+  backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -88,6 +91,7 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
     finishNonTerminal(parent);
     return true;
   }
+  backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -108,6 +112,7 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
             }
         }
     }
+    backup();
     cancelNonTerminal(declarationNode);
     return false;
 }
@@ -121,6 +126,7 @@ bool TopDownSyntaxAnalyzer::isTypeTopDown() {
     finishNonTerminal(parent);
     return true;
   }
+  backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -137,6 +143,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier() {
       finishNonTerminal(parent);
       return true;
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -191,6 +198,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
         return true;
 
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -206,6 +214,7 @@ bool TopDownSyntaxAnalyzer::isT() {
             return true;
         }
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -244,6 +253,7 @@ bool TopDownSyntaxAnalyzer::isR() {
         finishNonTerminal(parent);
         return true;
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -282,7 +292,7 @@ bool TopDownSyntaxAnalyzer::isF() {
                 }
             }
         }
-
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -307,13 +317,14 @@ bool TopDownSyntaxAnalyzer::isE() {
             return true;
         }
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
 
 bool TopDownSyntaxAnalyzer::isAssignment() {
     //cout << *currentLexeme << endl;
-    //print(" <Assign> -> <ID> = <Expression>");
+    print(" <Assign> -> <ID> = <Expression>");
     Node * parent = startNonTerminal("<Assign> -> <ID> = <Expression>");
     if (isIdentifier()) {
         Record * record = getNextToken();
@@ -337,8 +348,9 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
                 finishNonTerminal(parent);
                 return true;
             }
-        }
+        }else {backup();}
     }
+    // see line 351
     cancelNonTerminal(parent);
     return false;
 }
