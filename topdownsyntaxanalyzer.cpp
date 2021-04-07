@@ -29,21 +29,24 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
 }
 
 bool TopDownSyntaxAnalyzer::isStatement() {
-    Node * currentNode = parseTree->getRoot();
     Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration>");
-    if(isDeclaration()) {
+    Record * nextToken = getNextToken();
+    if (nextToken == nullptr) return false;
+    backup();
+
+    if(isType(*nextToken) && isDeclaration()) {
         finishNonTerminal(parent);
         return true;
     }
-    if(isAssignment()) {
+    if(isId(*nextToken) && isAssignment()) {
         finishNonTerminal(parent);
         return true;
     }
-    if(isWhileTopDown()) {
+    if(isWhile(*nextToken) && isWhileTopDown()) {
         finishNonTerminal(parent);
         return true;
     }
-    if(isIfTopDown()) {
+    if(isIf(*nextToken) && isIfTopDown()) {
         finishNonTerminal(parent);
         return true;
     }
@@ -252,21 +255,22 @@ bool TopDownSyntaxAnalyzer::isF() {
     Record * record = getNextToken();
     if (record == nullptr)
         return false;
+    backup();
     Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID> | <NUM>");
     //print(" <Factor> -> <Identifier>");
-    if (isIdentifier()) {
+    if (isId(*record) && isIdentifier()) {
         //cout << *record << endl;
         //cout << " F -> id" << endl;
         print("<Factor> -> <Identifier>");
         finishNonTerminal(parent);
         return true;
     }
-    if (isNumberTopDown()) {
+    if (isNumber(*record) && isNumberTopDown()) {
       print("<Factor> -> <NUM>");
       finishNonTerminal(parent);
       return true;
     }
-        if (record->lexeme == "(") {
+    if (record->lexeme == "(") {
             currentNode->add(new Node(*record));
             if (isE()) {
                 Record * record = getNextToken();
@@ -281,7 +285,7 @@ bool TopDownSyntaxAnalyzer::isF() {
                     return true;
                 }
             }
-        }
+    }
 
     cancelNonTerminal(parent);
     return false;
