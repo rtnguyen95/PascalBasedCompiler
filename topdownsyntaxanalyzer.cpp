@@ -271,6 +271,7 @@ bool TopDownSyntaxAnalyzer::isF() {
       return true;
     }
     if (record->lexeme == "(") {
+            getNextToken();
             currentNode->add(new Node(*record));
             if (isE()) {
                 Record * record = getNextToken();
