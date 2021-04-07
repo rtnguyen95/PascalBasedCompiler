@@ -38,7 +38,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
 
   // now do the syntax analysis phase
-  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner);
+  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, errorHandler);
 
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 

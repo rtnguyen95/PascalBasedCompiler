@@ -273,7 +273,7 @@ protected:
     };
 
     //a vector holding all the operators that the analyzer recognizes
-    const vector<char> operators ={
+    const vector<char> operators = {
         '*', '+', '-', '=', '/', '<', '>', '%'
     };
 

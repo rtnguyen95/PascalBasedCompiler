@@ -7,7 +7,7 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     Node * currentNode;
     ParseTree * parseTree;
 public:
-    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner) : SyntaxAnalyzer(lexicalScanner) {
+    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, ErrorHandler & errorHandler) : SyntaxAnalyzer(lexicalScanner, errorHandler) {
 
     }
 
@@ -27,6 +27,8 @@ public:
     bool isF();
     bool isE();
     bool isAssignment();
+    bool conditional();
+    bool emptyStatement();
 
     Node * startNonTerminal(const string & name);
     void finishNonTerminal(Node * parent);

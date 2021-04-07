@@ -16,7 +16,17 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         hasErrors = !isStatement();
         if (!hasErrors)
             cout << "processed statement successfully" << endl;
-        else cout << "processing statement with failure" << endl;
+        else {
+            Record * token = getCurrentToken();
+            cout << "processing statement with failure" << endl;
+            string errorMessage = "";
+            if (token != nullptr) {
+                cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
+                cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
+                errorMessage.append("this rule ").append(currentProduction).append(" could not be met with ").append(token->lexeme);
+            }
+            errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
+        }
     }
 
     cout << "-------Parse Tree Code------------------" << endl;
@@ -33,6 +43,11 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     Record * nextToken = getNextToken();
     if (nextToken == nullptr) return false;
     backup();
+
+    if (nextToken->lexeme == ";" && emptyStatement()) {
+        finishNonTerminal(parent);
+        return true;
+    }
 
     if(isType(*nextToken) && isDeclaration()) {
         finishNonTerminal(parent);
@@ -67,15 +82,35 @@ bool TopDownSyntaxAnalyzer::isNumberTopDown() {
   return false;
 }
 bool TopDownSyntaxAnalyzer::isWhileTopDown() {
-  print("<while statement> -> <WHILE>");
+  print("<While> -> while (<Conditional) <Statement> whileend");
   Record * record = getNextToken();
-  Node * parent = startNonTerminal("<while statement> -> <WHILE>");
+  Node * parent = startNonTerminal("<While> -> while (<Conditional) <Statement> whileend");
   if (record == nullptr) {return false;}
   if (isWhile(*record)) {
     currentNode->add(new Node(*record));
     // the rest of the rules for while go in here
-    finishNonTerminal(parent);
-    return true;
+    Record * token = getNextToken();
+    if (token == nullptr) return false;
+    if (token->lexeme == "(") {
+        currentNode->add(new Node(token));
+        if (conditional()) {
+            Record * token = getNextToken();
+            if (token == nullptr) return false;
+            if (token->lexeme == ")") {
+                currentNode->add(new Node(token));
+                if(isStatement()) {
+                    Record * token = getNextToken();
+                    if (token == nullptr) return false;
+
+                    if (isEndWhile(*token)) {
+                        currentNode->add(new Node(token));
+                        finishNonTerminal(parent);
+                        return true;
+                    }
+                }
+            }
+        }
+    }
   }
   cancelNonTerminal(parent);
   return false;
@@ -146,6 +181,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier() {
 
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
     Node * parent = currentNode;
+    currentProduction = name;
     currentNode = new Node(name);
     return parent;
 }
@@ -186,7 +222,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
                 return true;
             }
         }
-    } else if (record->lexeme == ")" || record->lexeme == ";") {
+    } else if (record->lexeme == ">" || record->lexeme == ")" || record->lexeme == ";") {
         backup();
         //cout << " Q -> epsilon" << endl;
         print("<ExpressionPrime> -> epsilon");
@@ -240,7 +276,8 @@ bool TopDownSyntaxAnalyzer::isR() {
                 return true;
             }
         }
-    } else if (record->lexeme == "+" || record->lexeme == "-" || record->lexeme == ")" || record->lexeme == ";") {
+    } else if (record->lexeme == "+" || record->lexeme == "-" || record->lexeme == ")" ||
+        record->lexeme == ">" || record->lexeme == ";") {
         //cout << *record << endl;
         print("<TermPrime> -> epsilon");
         backup();
@@ -271,6 +308,7 @@ bool TopDownSyntaxAnalyzer::isF() {
       return true;
     }
     if (record->lexeme == "(") {
+            getNextToken();
             currentNode->add(new Node(*record));
             if (isE()) {
                 Record * record = getNextToken();
@@ -343,6 +381,41 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
             }
         }
     }
+    cancelNonTerminal(parent);
+    return false;
+}
+
+bool TopDownSyntaxAnalyzer::conditional() {
+    Node * parent = startNonTerminal("<Conditional> -> <Expression> > <Expression>");
+
+    if (isE()) {
+        Record * token = getNextToken();
+        if (token == nullptr) return false;
+        if (isOperator(*token, ">")) {
+            currentNode->add(new Node(token));
+            if (isE()) {
+                finishNonTerminal(parent);
+                return true;
+            }
+        }
+    }
+    cancelNonTerminal(parent);
+    return false;
+}
+
+bool TopDownSyntaxAnalyzer::emptyStatement() {
+    Node * parent = startNonTerminal("<Empty> -> epsilon");
+    Record * token = getNextToken();
+    if (token == nullptr) {
+        return false;
+    }
+
+    if (isSemiColon(*token)) {
+        currentNode->add(new Node(token));
+        finishNonTerminal(parent);
+        return true;
+    }
+
     cancelNonTerminal(parent);
     return false;
 }
