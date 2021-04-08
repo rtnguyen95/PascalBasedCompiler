@@ -55,7 +55,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   output << "TOKENS        Lexemes" << endl << endl;
   for (vector<Record>::iterator it = records.begin();
        it != records.end(); ++it) {
-    result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
+    result_code << *it << endl; //add the record of the lexeme scanned to the end of recordsList
   }
 
 

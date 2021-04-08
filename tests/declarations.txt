@@ -1,13 +1,14 @@
-!int i;
+int i;
 float f;
 bool isCreated;
 int apples;
-float cost;!
+float cost;
+float total;
+float tax;
+float shipping;
 
-!cost = i * cost;
-k = f + i;
-j = f * i;
-m = a + b * c;
-n = a * b + c;!
-a = b + c;
-a = b * c;
+total = apples * cost;
+tax = total * 0.0875;
+shipping = (total - 50) / 2;
+total = applies * cost + tax + shipping;
+apples = i;

@@ -105,6 +105,7 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
             if (record == nullptr)
                 return false;
             if (record->lexeme == ";") {
+                currentNode->add(new Node(record));
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(declarationNode);
                 return true; //success / processed
