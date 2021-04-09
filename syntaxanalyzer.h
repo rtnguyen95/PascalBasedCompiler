@@ -4,6 +4,8 @@
 #include <vector>
 #include "lexicalscanner.h"
 #include "parsetree.h"
+#include "symboltable.h"
+
 using namespace std;
 
 class SyntaxAnalyzer {
@@ -13,9 +15,11 @@ protected:
     int previousLexeme;
     bool printProduction = true;
     LexicalScanner & lexicalScanner;
+    SymbolTable & symbolTable;
 public:
 
-    SyntaxAnalyzer(LexicalScanner & lexicalScanner) : lexicalScanner(lexicalScanner), lexemes(), currentLexeme(0) {
+    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable) 
+    : lexicalScanner(lexicalScanner), symbolTable(symbolTable), lexemes(), currentLexeme(0) {
 
     }
 

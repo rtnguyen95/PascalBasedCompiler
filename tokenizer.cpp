@@ -38,7 +38,8 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
 
   // now do the syntax analysis phase
-  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner);
+  SymbolTable symbolTable;
+  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable);
 
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 
@@ -58,17 +59,11 @@ vector<Record> tokenizer::parse_input(string output_file_name)
     result_code << *it << endl; //add the record of the lexeme scanned to the end of recordsList
   }
 
+  // print the symbol table to a file
+  ofstream symbol_file(std::filesystem::path(filename_).stem().string() + "-symbols.txt");
+  symbol_file << symbolTable;
+  symbol_file.close();
 
-  //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
-  /*while (!scanner.isFinished() && record.accepted) {
-          record = scanner.lexer();       //scan the next string in the input with the lexer and store the result in record
-          if (record.lexeme.length())     //the lexeme is blank when there is blank space at the end of a file
-          {
-            cout << record << endl;  //output the record of the lexeme scanned to the console
-            result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
-            records.push_back(record);
-          }
-  }*/
   result_code.close();
   stringstream states;  //create an output string stream for the state transitions for each lexeme processed
   states << endl << " State Transitions: " << endl;
@@ -83,6 +78,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
     //create an output file called state.txt and write the contents of states to it
   ofstream states_file(std::filesystem::path(filename_).stem().string() + "-states.txt");
   states_file << states.str();
+  states_file.close();
 
   cout << endl;
 
