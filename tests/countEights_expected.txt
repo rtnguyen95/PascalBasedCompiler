@@ -178,3 +178,4 @@ IDENTIFIER  = return
 INTEGER     = 0
 SEPARATOR   = ;
 SEPARATOR   = }
+EOF         = $

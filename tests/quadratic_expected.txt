@@ -215,3 +215,4 @@ IDENTIFIER  = b
 SEPARATOR   = ,
 IDENTIFIER  = c
 SEPARATOR   = )
+EOF         = $
