@@ -108,29 +108,31 @@ protected:
 
     const int q0 = 1; //variable representing the initial state
 
-    const vector<int> FinalStates {3, 5, 7, 10, 11, 14, 15, 16, 17}; //vector of ints holding all the final states of the FSM
+    const vector<int> FinalStates {3, 5, 7, 10, 11, 14, 15, 16, 17, 18, 19}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state 
-    const int ntable[17][12] = {
-       //a,  d,  _,  $,  .,   ,  !,  {}, +*, =,  other, EOF
-        {2,  4,  13, 13, 9,  1,  8,  10, 12, 15, 13, 17},               // 1  starting state
-        {2,  2,  2,  2,  3,  3,  3,  3,  3,  3, 3, 3},                 // 2  in identifier
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},                 // 3  end identifier (final state)
-        {5,  4,  5,  5,  6,  5,  5,  5,  5,  5, 5, 5},                 // 4  in integer
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},                 // 5  end integer (final state)
-        {7,  6,  7,  7,  7,  7,  7,  7,  7,  7, 7, 7},                 // 6  in float
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},                 // 7  end float (final state)
-        {8,  8,  8,  8,  8,  8,  1,  8,  8,  8, 8, 14},                 // 8  in comment
-        {11, 6,  11, 11, 11, 11, 11, 11, 11, 11, 11, 11},        // 9  Found a . (decimal point or separator)
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},         // 10 separator, no backup * see note
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},                 // 11 separator, backup
-        {16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 16, 16},                 // 12 found operator (single operators only, no compounds) 
-        {13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 13, 14},           // 13 Error state
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},             // 14 error state end
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},   // 15 End Equals State (final)
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},  // 16 End operator state with backup
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 1, 1},  // 17 EndOfFile state without backup 
+    const int ntable[19][14] = {
+       //a,  d,  _,  $,  .,   ,  !,  {}, +*, =,  <,  >,  /\, EOF
+        {2,  4,  13, 13, 9,  1,  8,  10, 12, 12, 18, 19, 13, 17},  // 1  starting state
+        {2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3},   // 2  in identifier
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 3  end identifier (final state)
+        {5,  4,  5,  5,  6,  5,  5,  5,  5,  5,  5,  5,  5,  5},   // 4  in integer
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 5  end integer (final state)
+        {7,  6,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7},   // 6  in float
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 7  end float (final state)
+        {8,  8,  8,  8,  8,  8,  1,  8,  8,  8,  8,  8,  8,  14},  // 8  in comment
+        {11, 6,  11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11},  // 9  Found a . (decimal point or separator)
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   //10 separator, no backup * see note
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   //11 separator, backup
+        {16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 13, 13, 16, 16},   // 12 found operator (single operators only, no compounds) 
+        {13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 13, 14},           // 13 Error state
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},             // 14 error state end
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 15 End Equals State (final)
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},  // 16 End operator state with backup
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},  // 17 EndOfFile state without backup
+        {16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 16, 19, 16, 16},  // 18 < operator state with backup
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},  // 19 End <> state without backup
     };
 
         /*
@@ -173,8 +175,10 @@ protected:
         SEPARATOR,          //col 7
         OPERATOR,           //col 8
         EQUALS,             //col 9
-        OTHER,              //col 10
-        ENDOFFILE           //col 11
+        LESS_THAN,          //col 10
+        GREATER_THAN,       //col 11
+        OTHER,              //col 12
+        ENDOFFILE           //col 13
     };
 
 
@@ -216,6 +220,12 @@ protected:
         //checks to see if the character is in the list of seperators recognized by the analyzer and if true return the column number for seperator
         if (isSeparator(ch))
             return SEPARATOR;
+
+        if (ch == '<')
+            return LESS_THAN;
+        
+        if (ch == '>')
+            return GREATER_THAN;
 
         //checks to see if the character is in the list of operators recognized by the analyzer and if true return the column number for operator
         if (isOperator(ch))
@@ -310,6 +320,9 @@ protected:
     bool processEndErrorState(string & currentLexeme, char currChar, Record & record);
 
     bool processEndOfFileState(string & currentLexeme, char currChar, Record & record);
+    
+    bool processLessThanState(string & currentLexeme, char currChar, Record & record);
+    bool processEndInequalityState(string & currentLexeme, char currChar, Record & record);
     
     int line = 1;
     int linePosition = 1;
@@ -421,6 +434,12 @@ public:
                 case 17:
                     reachedFinal = processEndOfFileState(currentLexeme, currChar, record);
                     break;
+                case 18:
+                    reachedFinal = processLessThanState(currentLexeme, currChar, record);
+                    break;
+                case 19:
+                    reachedFinal = processEndInequalityState(currentLexeme, currChar, record);
+                    break;                    
                 //invalid character - any character not recognized by the FSM
                 //this should not occur
                 default:

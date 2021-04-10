@@ -45,8 +45,7 @@ SEPARATOR   = (
 IDENTIFIER  = num1$
 OPERATOR    = %
 INTEGER     = 10
-OPERATOR    = =
-OPERATOR    = =
+OPERATOR    = ==
 INTEGER     = 8
 SEPARATOR   = )
 IDENTIFIER  = return

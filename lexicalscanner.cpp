@@ -240,6 +240,43 @@ bool LexicalScanner::processEndOperatorState(string & currentLexeme, char currCh
 }
 
 /**
+ * processes the less than state <
+ * 
+ * sets the record to the appropriate token and lexeme
+ * 
+ * @param currentLexeme is normally blank and is not used
+ * @param currChar contains the operator
+ * @param record will be set for this token
+ * 
+ * @return always returns true, since this is a final state
+ * 
+ */
+bool LexicalScanner::processLessThanState(string & currentLexeme, char currChar, Record & record) {
+    //set the final data in the record and set the boolean flag for reaching a final state as true
+    currentLexeme += currChar;
+    return false; // this is a final state
+}
+
+/**
+ * processes the end inequality state <>
+ * 
+ * sets the record to the appropriate token and lexeme
+ * 
+ * @param currentLexeme is normally blank and is not used
+ * @param currChar contains the operator
+ * @param record will be set for this token
+ * 
+ * @return always returns true, since this is a final state
+ * 
+ */
+bool LexicalScanner::processEndInequalityState(string & currentLexeme, char currChar, Record & record) {
+    //set the final data in the record and set the boolean flag for reaching a final state as true
+    currentLexeme += currChar;
+    record.set("OPERATOR", currentLexeme, true, filename, line, linePosition);
+    return true; // this is a final state
+}
+
+/**
  * processes the end operator state
  * 
  * sets the record to the appropriate token and lexeme

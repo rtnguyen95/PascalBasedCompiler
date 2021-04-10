@@ -1,4 +1,4 @@
-!int i;
+int i;
 float f;
 bool isCreated;
 int apples;
@@ -12,20 +12,7 @@ tax = total * 0.0875;
 shipping = (total - 50) / 2;
 total = apples * cost + tax + shipping;
 apples = i;
-x = 8;!
-
-a = b > c;
-a = x * c;
-a=x*c;
-a+=x*c;
-x == a;
-x += a;
-x > a;
-x < a;
-x <= a;
-x-=a;
-x/=a;
-x%=a;
+x = 8;
 
 
 

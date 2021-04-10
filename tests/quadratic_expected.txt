@@ -53,8 +53,7 @@ SEPARATOR   = ;
 KEYWORD     = if
 SEPARATOR   = (
 IDENTIFIER  = i
-OPERATOR    = =
-OPERATOR    = =
+OPERATOR    = ==
 INTEGER     = 0
 SEPARATOR   = )
 KEYWORD     = then
@@ -66,8 +65,7 @@ KEYWORD     = else
 KEYWORD     = if
 SEPARATOR   = (
 IDENTIFIER  = i
-OPERATOR    = =
-OPERATOR    = =
+OPERATOR    = ==
 INTEGER     = 1
 SEPARATOR   = )
 KEYWORD     = then
