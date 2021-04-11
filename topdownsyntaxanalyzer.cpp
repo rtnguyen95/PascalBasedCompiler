@@ -88,7 +88,7 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
             return true;
           }else {backup();}
           currentNode->add(new Node(*record));
-        }else {backup();}
+        }
         currentNode->add(new Node(*record));
       }else {backup();}
       if (isOpenBracket(*record)) {//second variation { <StatementList> }
@@ -102,11 +102,11 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
             return true;
           }else {backup();}
           currentNode->add(new Node(*record));
-        }else {backup();}
+        }
         currentNode->add(new Node(*record));
       }else {backup();}
       currentNode->add(new Node(*record));
-    }else {backup();}
+    }
     currentNode->add(new Node(*record));
   }
   backup();
@@ -128,12 +128,12 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
           Record * record = getNextToken();
           if (isEndDo(*record) || isEndIf(*record)) {
             currentNode->add(new Node(*record));
-            print("<if statement> -> <IF> <Conditional> <Do|Then> <StatementList> <EndDo|EndIf>"");
+            print("<if statement> -> <IF> <Conditional> <Do|Then> <StatementList> <EndDo|EndIf>");
             finishNonTerminal(parent);
             return true;
           }else {backup();}
           currentNode->add(new Node(*record));
-        }else {backup();}
+        }
         currentNode->add(new Node(*record));
       }else {backup();}
       if (isOpenBracket(*record)) {//second variation { <StatementList> }
@@ -147,16 +147,77 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
             return true;
           }else {backup();}
           currentNode->add(new Node(*record));
-        }else {backup();}
+        }
         currentNode->add(new Node(*record));
       }else {backup();}
       currentNode->add(new Node(*record));
-    }else {backup();}
+    }
     currentNode->add(new Node(*record));
   }
   backup();
   cancelNonTerminal(parent);
   return false;
+}
+bool TopDownSyntaxAnalyzer::isStatementList() {
+  Node * parent = startNonTerminal("<StatementList> -> <Statement> <MoreStatements>");
+  if(isStatement()) {
+    if(isMoreStatements()){
+      print("<StatementList> -> <Statement> <MoreStatements>");
+      finishNonTerminal(parent);
+      return true;
+    }
+  }
+  backup();
+  cancelNonTerminal(parent);
+  return false;
+}
+bool TopDownSyntaxAnalyzer::isMoreStatements() {
+  Node * parent = startNonTerminal("<MoreStatements> -> ; <Statement> <MoreStatements> | epsilon");
+  Record * record = getNextToken();
+  if(isSemiColon(*record)) {
+    if (isStatement()) {
+      if(isMoreStatements()) {
+        print("<MoreStatements> -> ; <Statement> <MoreStatements>");
+        finishNonTerminal(parent);
+        return true;
+      }
+      // else {
+      //   Record * record = getNextToken();
+      //   if (isSemiColon(*record)) {
+      //     print("MoreStatements -> ; <Statement> <MoreStatements>");
+      //     currentNode->add(new Node(*record));
+      //     finishNonTerminal(parent);
+      //     return true;
+      //   }
+      //  else {backup();}
+      // }
+    }
+    print("<MoreStatements> -> epsilon");
+    currentNode->add(new Node(*record));
+    finishNonTerminal(parent);
+    return true; //just ; is accepted
+  }
+  backup();
+  cancelNonTerminal(parent);
+  return false;
+}
+bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
+    Node * parent = startNonTerminal("<Conditional> -> <Expression> <operator> <Expression>");
+    Record * record = getNextToken();
+    if (isE()) {
+        Record * token = getNextToken();
+        if (token == nullptr) return false;
+        if (isOperator(*token)) {
+            currentNode->add(new Node(token));
+            if (isE()) {
+                finishNonTerminal(parent);
+                return true;
+            }
+        }
+    }
+    backup();
+    cancelNonTerminal(parent);
+    return false;
 }
 bool TopDownSyntaxAnalyzer::isDeclaration() {
     print("<Declaration> -> <Type><ID>");

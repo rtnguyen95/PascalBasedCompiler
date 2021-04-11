@@ -63,7 +63,8 @@ public:
     bool isCloseBracket(const Record & lexeme);
     bool isElse(const Record & lexeme);
     bool isEndElse(const Record & lexeme);
-
+    bool isSemiColon(const Record & lexeme);
+    bool isOperator(const Record & lexeme);
 
     vector<Record> & getTokenList() {
         return lexemes;

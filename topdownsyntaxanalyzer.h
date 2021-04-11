@@ -27,7 +27,10 @@ public:
     bool isF();
     bool isE();
     bool isAssignment();
-
+    bool isConditionalTopDown();
+    bool isStatementList();
+    bool isMoreStatements();
+    
     Node * startNonTerminal(const string & name);
     void finishNonTerminal(Node * parent);
     void cancelNonTerminal(Node * parent);
