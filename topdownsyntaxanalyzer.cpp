@@ -227,15 +227,15 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
     Node * declarationNode = startNonTerminal("<Declaration> -> <Type><ID>");
     if (isTypeTopDown()) {
         if (isIdentifier()) {
-            Record * record = getNextToken();
-            if (record == nullptr)
-                return false;
-            if (record->lexeme == ";") {
+            // Record * record = getNextToken();
+            // if (record == nullptr)
+            //     return false;
+            // if (record->lexeme == ";") {
                 currentNode->add(new Node(record));
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(declarationNode);
                 return true; //success / processed
-            }
+            //}
         }
     }
     cancelNonTerminal(declarationNode);
@@ -455,17 +455,17 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
         if (record->lexeme == "=") {
             currentNode->add(new Node(*record));
             if(isE()) {
-                Record * record = getNextToken();
-                if (record == nullptr)
-                    return false;
-                cout << * record << endl;
-                // the ; optionally ends a statement
-                if (record->lexeme != ";")
-                    backup();
-
-                //cout << " <Assign> -> <ID> = <Expression>;" << endl;
-                //print("<Assign> -> <ID> = <Expression>");
-                currentNode->add(new Node(*record));
+                // Record * record = getNextToken();
+                // if (record == nullptr)
+                //     return false;
+                // cout << * record << endl;
+                // // the ; optionally ends a statement
+                // if (record->lexeme != ";")
+                //     backup();
+                //
+                // //cout << " <Assign> -> <ID> = <Expression>;" << endl;
+                // //print("<Assign> -> <ID> = <Expression>");
+                // currentNode->add(new Node(*record));
                 finishNonTerminal(parent);
                 return true;
             }
