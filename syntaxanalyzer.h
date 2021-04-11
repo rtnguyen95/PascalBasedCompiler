@@ -54,6 +54,16 @@ public:
     bool isType(const Record & lexeme);
     bool isId(const Record & lexeme);
     bool isNumber(const Record & lexeme);
+    bool isThen(const Record & lexeme);
+    bool isWhileEnd(const Record & lexeme);
+    bool isDo(const Record & lexeme);
+    bool isEndIf(const Record & lexeme);
+    bool isEndDo(const Record & lexeme);
+    bool isOpenBracket(const Record & lexeme);
+    bool isCloseBracket(const Record & lexeme);
+    bool isElse(const Record & lexeme);
+    bool isEndElse(const Record & lexeme);
+
 
     vector<Record> & getTokenList() {
         return lexemes;

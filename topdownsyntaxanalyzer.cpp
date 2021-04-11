@@ -50,6 +50,7 @@ bool TopDownSyntaxAnalyzer::isStatement() {
         finishNonTerminal(parent);
         return true;
     }
+    backup();
     cancelNonTerminal(parent);
     return false;
 }
@@ -67,30 +68,93 @@ bool TopDownSyntaxAnalyzer::isNumberTopDown() {
   return false;
 }
 bool TopDownSyntaxAnalyzer::isWhileTopDown() {
-  print("<while statement> -> <WHILE>");
+  print("<while statement> -> <WHILE>  <Conditional> <Do> <StatementList> <WhileEnd|EndDo> || <While> <Conditional> { <StatementList> }");
   Record * record = getNextToken();
-  Node * parent = startNonTerminal("<while statement> -> <WHILE>");
+  Node * parent = startNonTerminal("<while statement> -> <WHILE>  <Conditional> <Do> <StatementList> <WhileEnd|EndDo> || <While> <Conditional> { <StatementList> }");
   if (record == nullptr) {return false;}
   if (isWhile(*record)) {
+    /*make sure we do getnextToken in isConditionalTopDown function*/
+    if (isConditionalTopDown()) {
+      Record * record = getNextToken();
+      // we have verified while-conditional-...
+      if (isDo(*record)) { //first variation do-statements-enddo/whileend
+        //make sure we implement isStatementList using getNextToken
+        if (isStatementList()) {
+          Record * record = getNextToken();
+          if (isEndDo(*record) || isWhileEnd(*record)) {
+            currentNode->add(new Node(*record));
+            print("<while statement> -> <WHILE>  <Conditional> <Do> <StatementList> <WhileEnd|EndDo>");
+            finishNonTerminal(parent);
+            return true;
+          }else {backup();}
+          currentNode->add(new Node(*record));
+        }else {backup();}
+        currentNode->add(new Node(*record));
+      }else {backup();}
+      if (isOpenBracket(*record)) {//second variation { <StatementList> }
+        if(isStatementList()) {
+          Record * record = getNextToken();
+          if(isCloseBracket(*record)) {
+            currentNode->add(new Node(*record));
+            print("while statement -> <While> <Conditional> { <StatementList> }");
+            currentNode->add(new Node(*record));
+            finishNonTerminal(parent);
+            return true;
+          }else {backup();}
+          currentNode->add(new Node(*record));
+        }else {backup();}
+        currentNode->add(new Node(*record));
+      }else {backup();}
+      currentNode->add(new Node(*record));
+    }else {backup();}
     currentNode->add(new Node(*record));
-    // the rest of the rules for while go in here
-    finishNonTerminal(parent);
-    return true;
   }
+  backup();
   cancelNonTerminal(parent);
   return false;
 }
 bool TopDownSyntaxAnalyzer::isIfTopDown() {
-  print("<if statement> -> <IF>");
+  print("<if statement> -> <IF> <Conditional> <Do|Then> <StatementList> <EndDo|EndIf> || <IF> <Conditional> { <StatementList> }");
   Record * record = getNextToken();
-  Node * parent = startNonTerminal("<if statement> -> <IF>");
+  Node * parent = startNonTerminal("<if statement> -> <IF> <Conditional> <Do|Then> <StatementList> <EndDo|EndIf> || <IF> <Conditional> { <StatementList> }");
   if (record == nullptr) {return false;}
   if (isIf(*record)) {
+    if (isConditionalTopDown()) {
+      Record * record = getNextToken();
+      // we have verified if-conditional-...
+      if (isDo(*record)||isThen(*record)) { //first variation do/then-statements-enddo/endif
+        //make sure we implement isStatementList using getNextToken
+        if (isStatementList()) {
+          Record * record = getNextToken();
+          if (isEndDo(*record) || isEndIf(*record)) {
+            currentNode->add(new Node(*record));
+            print("<if statement> -> <IF> <Conditional> <Do|Then> <StatementList> <EndDo|EndIf>"");
+            finishNonTerminal(parent);
+            return true;
+          }else {backup();}
+          currentNode->add(new Node(*record));
+        }else {backup();}
+        currentNode->add(new Node(*record));
+      }else {backup();}
+      if (isOpenBracket(*record)) {//second variation { <StatementList> }
+        if(isStatementList()) {
+          Record * record = getNextToken();
+          if(isCloseBracket(*record)) {
+            currentNode->add(new Node(*record));
+            print("if statement -> <IF> <Conditional> { <StatementList> }");
+            currentNode->add(new Node(*record));
+            finishNonTerminal(parent);
+            return true;
+          }else {backup();}
+          currentNode->add(new Node(*record));
+        }else {backup();}
+        currentNode->add(new Node(*record));
+      }else {backup();}
+      currentNode->add(new Node(*record));
+    }else {backup();}
     currentNode->add(new Node(*record));
-    // the rest of the rules for while go in here
-    finishNonTerminal(parent);
-    return true;
   }
+  backup();
   cancelNonTerminal(parent);
   return false;
 }
