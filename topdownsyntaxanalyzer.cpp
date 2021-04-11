@@ -214,6 +214,7 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
                 return true;
             }
         }
+        else {backup();}
     }
     backup();
     cancelNonTerminal(parent);
