@@ -39,24 +39,11 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   // now do the syntax analysis phase
   SymbolTable symbolTable;
-  //TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable);
+  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable);
 
-  //ParseTree* parseTree = syntaxAnalyzer.createParseTree();
+  ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 
-  //delete parseTree;
-  Record record = {"", "", true, filename_, 0, 0, ""};
-  vector<Record> records;
-    //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
-  while (!scanner.isFinished() && record.accepted) {
-          record = scanner.lexer();       //scan the next string in the input with the lexer and store the result in record
-          if (record.lexeme.length())     //the lexeme is blank when there is blank space at the end of a file
-          {
-            cout << record << endl;  //output the record of the lexeme scanned to the console
-            //result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
-            records.push_back(record);
-          }
-  }
-
+  delete parseTree;
 
   ostringstream output;             //create a output string stream for the lexemes and tokens
   ofstream result_code;
@@ -64,8 +51,8 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   result_code <<  "TOKENS        Lexemes" << endl << endl;   //write the header to the output file
   //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank.
   //this variable is used to temporarily hold the data of the current lexeme being processed
-  //Record record = {"", "", true, filename_, 1, 0, ""};
-  //vector<Record> records = syntaxAnalyzer.getTokenList();
+  Record record = {"", "", true, filename_, 1, 0, ""};
+  vector<Record> records = syntaxAnalyzer.getTokenList();
   output << "TOKENS        Lexemes" << endl << endl;
   for (vector<Record>::iterator it = records.begin();
        it != records.end(); ++it) {
