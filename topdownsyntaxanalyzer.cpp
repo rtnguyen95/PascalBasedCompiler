@@ -73,11 +73,14 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
   Node * parent = startNonTerminal("<while statement> -> <WHILE>  <Conditional> <Do> <StatementList> <WhileEnd|EndDo> || <While> <Conditional> { <StatementList> }");
   if (record == nullptr) {return false;}
   if (isWhile(*record)) {
+    currentNode->add(new Node(*record));
+
     /*make sure we do getnextToken in isConditionalTopDown function*/
     if (isConditionalTopDown()) {
       Record * record = getNextToken();
       // we have verified while-conditional-...
       if (isDo(*record)) { //first variation do-statements-enddo/whileend
+        currentNode->add(new Node(*record));
         //make sure we implement isStatementList using getNextToken
         if (isStatementList()) {
           Record * record = getNextToken();
@@ -86,12 +89,12 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
             print("<while statement> -> <WHILE>  <Conditional> <Do> <StatementList> <WhileEnd|EndDo>");
             finishNonTerminal(parent);
             return true;
-          }else {backup();}
-          currentNode->add(new Node(*record));
+          }//else {backup();}
+          //currentNode->add(new Node(*record));
         }
-        currentNode->add(new Node(*record));
-      }else {backup();}
-      if (isOpenBracket(*record)) {//second variation { <StatementList> }
+       
+      }//else {backup();}
+      /*if (isOpenBracket(*record)) {//second variation { <StatementList> }
         if(isStatementList()) {
           Record * record = getNextToken();
           if(isCloseBracket(*record)) {
@@ -104,10 +107,9 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
           currentNode->add(new Node(*record));
         }
         currentNode->add(new Node(*record));
-      }else {backup();}
-      currentNode->add(new Node(*record));
+      }else {backup();}*/
+     //currentNode->add(new Node(*record));
     }
-    currentNode->add(new Node(*record));
   }
   backup();
   cancelNonTerminal(parent);
@@ -146,7 +148,7 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
             finishNonTerminal(parent);
             return true;
           }else {backup();}
-          currentNode->add(new Node(*record));
+          currentNode->add(new Node(*record)); // ERIC: this should not be here
         }
         currentNode->add(new Node(*record));
       }else {backup();}
@@ -192,10 +194,13 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
       //  else {backup();}
       // }
     }
-    print("<MoreStatements> -> epsilon");
-    currentNode->add(new Node(*record));
-    finishNonTerminal(parent);
-    return true; //just ; is accepted
+  } else if (record->lexeme == "whileend" || record->lexeme == "endif") {
+      //ERIC: the check the follow set to satisfy epsilon
+      print("<MoreStatements> -> epsilon");
+      backup();
+      //currentNode->add(new Node(*record)); // ERIC: this should be before if(isStatement())
+      finishNonTerminal(parent);
+      return true; //just ; is accepted
   }
   backup();
   cancelNonTerminal(parent);
@@ -203,7 +208,7 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
 }
 bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
     Node * parent = startNonTerminal("<Conditional> -> <Expression> <operator> <Expression>");
-    Record * record = getNextToken();
+    //Record * record = getNextToken();
     if (isE()) {
         Record * token = getNextToken();
         if (token == nullptr) return false;
@@ -366,7 +371,7 @@ bool TopDownSyntaxAnalyzer::isR() {
                 return true;
             }
         }
-    } else if (record->lexeme == "+" || record->lexeme == "-" || record->lexeme == ")" || record->lexeme == ";") {
+    } else if (record->lexeme == "whileend" || record->lexeme == "do" || record->lexeme == "<" || record->lexeme == "+" || record->lexeme == "-" || record->lexeme == ")" || record->lexeme == ";") {
         //cout << *record << endl;
         print("<TermPrime> -> epsilon");
         backup();
@@ -454,17 +459,17 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
         if (record->lexeme == "=") {
             currentNode->add(new Node(*record));
             if(isE()) {
-                Record * record = getNextToken();
-                if (record == nullptr)
-                    return false;
-                cout << * record << endl;
+                //Record * record = getNextToken();
+                //if (record == nullptr)
+                //    return false;
+                //cout << * record << endl;
                 // the ; optionally ends a statement
-                if (record->lexeme != ";")
-                    backup();
+                //if (record->lexeme != ";")
+                //    backup();
 
                 //cout << " <Assign> -> <ID> = <Expression>;" << endl;
                 //print("<Assign> -> <ID> = <Expression>");
-                currentNode->add(new Node(*record));
+                //currentNode->add(new Node(*record));
                 finishNonTerminal(parent);
                 return true;
             }
