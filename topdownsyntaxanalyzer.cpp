@@ -101,6 +101,7 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
     Node * declarationNode = startNonTerminal("<Declaration> -> <Type><ID>");
     if (isTypeTopDown()) {
         if (isIdentifier()) {
+            symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
             Record * record = getNextToken();
             if (record == nullptr)
                 return false;
