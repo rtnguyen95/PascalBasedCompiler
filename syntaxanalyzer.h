@@ -14,12 +14,14 @@ protected:
     int currentLexeme;
     int previousLexeme;
     bool printProduction = true;
+    string currentProduction = "";
     LexicalScanner & lexicalScanner;
+    ErrorHandler & errorHandler;
     SymbolTable & symbolTable;
 public:
 
-    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable) 
-    : lexicalScanner(lexicalScanner), symbolTable(symbolTable), lexemes(), currentLexeme(0) {
+    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    : lexicalScanner(lexicalScanner), symbolTable(symbolTable), lexemes(), currentLexeme(0), errorHandler(errorHandler) {
 
     }
 
@@ -37,6 +39,20 @@ public:
                 return &token;
             }
             return NULL; // maybe this should throw an exception instead?
+        }
+    }
+
+        Record * lookAhead() {
+        Record * token = getNextToken();
+        backup();
+        return token;
+    }
+
+    Record * getCurrentToken() {
+        if (currentLexeme > 0) {
+            return &lexemes[currentLexeme-1];
+        } else {
+            return nullptr;
         }
     }
 

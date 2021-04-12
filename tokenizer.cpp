@@ -39,7 +39,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   // now do the syntax analysis phase
   SymbolTable symbolTable;
-  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable);
+  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
 
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 

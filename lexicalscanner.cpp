@@ -334,7 +334,7 @@ bool LexicalScanner::processEndErrorState(string & currentLexeme, char currChar,
     }
 
     record.set("ERROR", currentLexeme, false, filename, line, linePosition, message);
-    error currentError = {filename, line, linePosition - (int)currentLexeme.length(), message, lexical_error};
+    Error currentError = {filename, line, linePosition - (int)currentLexeme.length(), message, lexical_error};
     errorHandler.addError(currentError);
     cout << currentError.toString() << endl;
     return true; // this is a final state

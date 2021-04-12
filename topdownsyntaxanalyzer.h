@@ -7,8 +7,8 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     Node * currentNode;
     ParseTree * parseTree;
 public:
-    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable) 
-    : SyntaxAnalyzer(lexicalScanner, symbolTable) {
+    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {
 
     }
 

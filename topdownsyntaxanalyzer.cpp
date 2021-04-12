@@ -16,7 +16,17 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         hasErrors = !isStatement();
         if (!hasErrors)
             cout << "processed statement successfully" << endl;
-        else cout << "processing statement with failure" << endl;
+                else {
+            Record * token = getCurrentToken();
+            cout << "processing statement with failure" << endl;
+            string errorMessage = "";
+            if (token != nullptr) {
+                cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
+                cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
+                errorMessage.append("this rule ").append(currentProduction).append(" could not be met with ").append(token->lexeme);
+            }
+            errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
+        }
     }
 
     cout << "-------Parse Tree Code------------------" << endl;
@@ -153,6 +163,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier(bool check) {
         } else {
             // report error here to the error handler
             // allow end of this function to cancel
+            errorHandler.addError(Error(*record, record->lexeme + " was not previously defined", syntax_error));
         }
     }
     cancelNonTerminal(parent);
