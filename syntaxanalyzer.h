@@ -30,7 +30,7 @@ public:
         } else {
             Record token = lexicalScanner.lexer();
 
-            if (!lexicalScanner.isFinished() && token.accepted && token.lexeme.length() > 0) {
+            if (token.accepted && token.lexeme.length() > 0) {
                 cout << token << endl;
                 lexemes.push_back(token);
                 Record & token = lexemes[currentLexeme++];

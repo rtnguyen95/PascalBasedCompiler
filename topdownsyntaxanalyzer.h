@@ -14,7 +14,8 @@ public:
 
     virtual ParseTree * createParseTree();
 
-    bool isIdentifier();
+    bool isIdentifier(bool check = false);
+    bool isIdentifierWithCheck();
     bool isStatement();
 
     bool isDeclaration();

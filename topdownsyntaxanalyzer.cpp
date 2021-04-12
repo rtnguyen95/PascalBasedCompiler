@@ -50,6 +50,14 @@ bool TopDownSyntaxAnalyzer::isStatement() {
         finishNonTerminal(parent);
         return true;
     }
+
+    // check for epsilon
+    if (nextToken->lexeme == "$") {
+        backup();
+        finishNonTerminal(parent);
+        return true;
+    }
+
     cancelNonTerminal(parent);
     return false;
 }
@@ -133,14 +141,19 @@ bool TopDownSyntaxAnalyzer::isTypeTopDown() {
 /**
  * Determines if the next token is an identifier   -- (Sean) changed this to match ^^ isTypeTopDown
  */
-bool TopDownSyntaxAnalyzer::isIdentifier() {
+bool TopDownSyntaxAnalyzer::isIdentifier(bool check) {
     Record * record = getNextToken();
     Node * parent = startNonTerminal("<ID> -> identifier");
     if (record == nullptr) {return false;}
     if(isId(*record)) {
-      currentNode->add(new Node(*record));
-      finishNonTerminal(parent);
-      return true;
+        if (!check || symbolTable.exists(record->lexeme)) {
+            currentNode->add(new Node(*record));
+            finishNonTerminal(parent);
+            return true;
+        } else {
+            // report error here to the error handler
+            // allow end of this function to cancel
+        }
     }
     cancelNonTerminal(parent);
     return false;
@@ -260,7 +273,7 @@ bool TopDownSyntaxAnalyzer::isF() {
     backup();
     Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID> | <NUM>");
     //print(" <Factor> -> <Identifier>");
-    if (isId(*record) && isIdentifier()) {
+    if (isId(*record) && isIdentifier(true)) {
         //cout << *record << endl;
         //cout << " F -> id" << endl;
         print("<Factor> -> <Identifier>");
@@ -322,7 +335,7 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
     //cout << *currentLexeme << endl;
     //print(" <Assign> -> <ID> = <Expression>");
     Node * parent = startNonTerminal("<Assign> -> <ID> = <Expression>");
-    if (isIdentifier()) {
+    if (isIdentifier(true)) {
         Record * record = getNextToken();
         if (record == nullptr)
             return false;
