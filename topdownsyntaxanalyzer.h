@@ -14,7 +14,8 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     set<string> termPrimeFollowSet;
 public:
     TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
-    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {        statementFollowSet = { ";", "$", "whileend", "enddo", "endif", "endfor", "endelse"};
+    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {        
+        statementFollowSet = { ";", "$", "whileend", "enddo", "endif", "endfor", "endelse"};
         expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do"};
         expressionFollowSet.insert(statementFollowSet.begin(), statementFollowSet.end());
         expressionPrimeFollowSet = expressionFollowSet;

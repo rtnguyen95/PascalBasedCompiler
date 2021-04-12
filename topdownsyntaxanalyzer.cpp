@@ -7,8 +7,24 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
 
     parseTree = new ParseTree();
 
-    bool hasErrors = false;
-    while(!hasErrors) {
+    currentNode = parseTree->getRoot(); // always add statements to the root node
+    bool result = isStatementList();
+    if (result)
+        cout << "processed program successfully" << endl;
+    else {
+        Record * token = getCurrentToken();
+        cout << "processing program with failure" << endl;
+        string errorMessage = "";
+        if (token != nullptr) {
+            cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
+            cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
+            errorMessage.append("this rule ").append(currentProduction).append(" could not be met with ").append(token->lexeme)
+              .append("\n").append(lastError);
+        }
+        errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
+    }
+
+    /*while(!hasErrors) {
         currentNode = parseTree->getRoot(); // always add statements to the root node
         if (lexicalScanner.isFinished())
             break;
@@ -16,7 +32,7 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         hasErrors = !isStatement();
         if (!hasErrors)
             cout << "processed statement successfully" << endl;
-                else {
+        else {
             Record * token = getCurrentToken();
             cout << "processing statement with failure" << endl;
             string errorMessage = "";
@@ -27,7 +43,7 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
             }
             errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
         }
-    }
+    }*/
 
     cout << "-------Parse Tree Code------------------" << endl;
     parseTree->printNodes(false);
@@ -62,8 +78,7 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     }
 
     // check for epsilon
-    if (nextToken->lexeme == "$") {
-        backup();
+    if (nextToken->lexeme == "$" || nextToken->lexeme == ";") {
         finishNonTerminal(parent);
         return true;
     }
@@ -110,6 +125,8 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
           //currentNode->add(new Node(*record));
         }
        
+      } else {
+        lastError = string("missing keyword 'do' after ").append(record->lexeme);
       }//else {backup();}
       /*if (isOpenBracket(*record)) {//second variation { <StatementList> }
         if(isStatementList()) {
@@ -186,7 +203,6 @@ bool TopDownSyntaxAnalyzer::isStatementList() {
       return true;
     }
   }
-  backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -194,6 +210,7 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
   Node * parent = startNonTerminal("<MoreStatements> -> ; <Statement> <MoreStatements> | epsilon");
   Record * record = getNextToken();
   if(isSemiColon(*record)) {
+    currentNode->add(new Node(*record));
     if (isStatement()) {
       if(isMoreStatements()) {
         print("<MoreStatements> -> ; <Statement> <MoreStatements>");
@@ -211,11 +228,10 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
       //  else {backup();}
       // }
     }
-  } else if (record->lexeme == "whileend" || record->lexeme == "endif") {
+  } else if (record->lexeme == "whileend" || record->lexeme == "endif" || record->lexeme == "$") {
       //ERIC: the check the follow set to satisfy epsilon
       print("<MoreStatements> -> epsilon");
       backup();
-      //currentNode->add(new Node(*record)); // ERIC: this should be before if(isStatement())
       finishNonTerminal(parent);
       return true; //just ; is accepted
   }
@@ -245,22 +261,22 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
     print("<Declaration> -> <Type><ID>");
     print("<Type> -> float | int | bool");
     print("<ID> -> identifier");
-    Node * declarationNode = startNonTerminal("<Declaration> -> <Type><ID>");
+    Node * parent = startNonTerminal("<Declaration> -> <Type><ID>");
     if (isTypeTopDown()) {
         if (isIdentifier()) {
             symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
-            Record * record = getNextToken();
+            /*Record * record = getNextToken();
             if (record == nullptr)
                 return false;
-            if (record->lexeme == ";") {
-                currentNode->add(new Node(record));
+            if (record->lexeme == ";") {*/
+                //currentNode->add(new Node(record));
                 print("<Declaration> -> <Type><ID>");
-                finishNonTerminal(declarationNode);
+                finishNonTerminal(parent);
                 return true; //success / processed
-            }
+            //}
         }
     }
-    cancelNonTerminal(declarationNode);
+    cancelNonTerminal(parent);
     return false;
 }
 bool TopDownSyntaxAnalyzer::isTypeTopDown() {
@@ -301,6 +317,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier(bool check) {
 
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
     Node * parent = currentNode;
+    currentProduction = name;
     currentNode = new Node(name);
     return parent;
 }

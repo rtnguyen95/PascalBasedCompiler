@@ -15,6 +15,7 @@ protected:
     int previousLexeme;
     bool printProduction = true;
     string currentProduction = "";
+    string lastError = "";
     LexicalScanner & lexicalScanner;
     ErrorHandler & errorHandler;
     SymbolTable & symbolTable;

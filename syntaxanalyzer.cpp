@@ -54,7 +54,7 @@ bool SyntaxAnalyzer::isEndElse(const Record & lexeme) {
     return lexeme.token == "KEYWORD" && lexeme.lexeme == "endelse";
 }
 bool SyntaxAnalyzer::isSemiColon(const Record & lexeme) {
-    return lexeme.token == "SEPERATOR" && lexeme.lexeme == ";";
+    return lexeme.token == "SEPARATOR" && lexeme.lexeme == ";";
 }
 bool SyntaxAnalyzer::isOperator(const Record & lexeme) {
     return lexeme.token == "OPERATOR";
