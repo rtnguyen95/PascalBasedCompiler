@@ -317,13 +317,13 @@ bool TopDownSyntaxAnalyzer::isQ(){
                 return true;
             }
         }
-    } else if (record->lexeme == ")" || record->lexeme == ";") {
+    //} else if (record->lexeme == "whileend" || record->lexeme == "do" || record->lexeme == "<" || record->lexeme == ")" || record->lexeme == ";") {
+    } else if(inFollowSet(expressionPrimeFollowSet, record->lexeme)) {
         backup();
         //cout << " Q -> epsilon" << endl;
         print("<ExpressionPrime> -> epsilon");
         finishNonTerminal(parent);
         return true;
-
     }
     cancelNonTerminal(parent);
     return false;
