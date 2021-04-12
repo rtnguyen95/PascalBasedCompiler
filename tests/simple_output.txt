@@ -10,3 +10,4 @@ IDENTIFIER  = a
 OPERATOR    = =
 FLOAT       = 23.00
 KEYWORD     = whileend
+EOF         = $

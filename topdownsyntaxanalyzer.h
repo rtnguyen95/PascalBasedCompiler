@@ -7,13 +7,15 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     Node * currentNode;
     ParseTree * parseTree;
 public:
-    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner) : SyntaxAnalyzer(lexicalScanner) {
+    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {
 
     }
 
     virtual ParseTree * createParseTree();
 
-    bool isIdentifier();
+    bool isIdentifier(bool check = false);
+    bool isIdentifierWithCheck();
     bool isStatement();
 
     bool isDeclaration();

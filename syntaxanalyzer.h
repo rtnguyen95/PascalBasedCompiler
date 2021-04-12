@@ -4,6 +4,8 @@
 #include <vector>
 #include "lexicalscanner.h"
 #include "parsetree.h"
+#include "symboltable.h"
+
 using namespace std;
 
 class SyntaxAnalyzer {
@@ -12,10 +14,14 @@ protected:
     int currentLexeme;
     int previousLexeme;
     bool printProduction = true;
+    string currentProduction = "";
     LexicalScanner & lexicalScanner;
+    ErrorHandler & errorHandler;
+    SymbolTable & symbolTable;
 public:
 
-    SyntaxAnalyzer(LexicalScanner & lexicalScanner) : lexicalScanner(lexicalScanner), lexemes(), currentLexeme(0) {
+    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    : lexicalScanner(lexicalScanner), symbolTable(symbolTable), lexemes(), currentLexeme(0), errorHandler(errorHandler) {
 
     }
 
@@ -26,13 +32,27 @@ public:
         } else {
             Record token = lexicalScanner.lexer();
 
-            if (!lexicalScanner.isFinished() && token.accepted && token.lexeme.length() > 0) {
+            if (token.accepted && token.lexeme.length() > 0) {
                 cout << token << endl;
                 lexemes.push_back(token);
                 Record & token = lexemes[currentLexeme++];
                 return &token;
             }
             return NULL; // maybe this should throw an exception instead?
+        }
+    }
+
+        Record * lookAhead() {
+        Record * token = getNextToken();
+        backup();
+        return token;
+    }
+
+    Record * getCurrentToken() {
+        if (currentLexeme > 0) {
+            return &lexemes[currentLexeme-1];
+        } else {
+            return nullptr;
         }
     }
 
