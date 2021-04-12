@@ -1,0 +1,19 @@
+a = b > c;
+a = x * c;
+a=x*c;
+a+=x*c;
+x == a;
+x += a;
+x > a;
+x < a;
+x <= a;
+x >= a;
+x-=a;
+x/=a;
+x%=a;
+a = x <> y;
+
+a *> n;
+a *< n;
+a ++ a;
+a = -a;

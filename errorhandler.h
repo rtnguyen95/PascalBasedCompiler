@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <list>
+#include "record.h"
 using namespace std;
 
 enum error_type {
@@ -8,12 +9,24 @@ enum error_type {
     syntax_error
 };
 
-struct error {
+struct Error {
     string file;
     int line;
     int position;
     string message;
     error_type type;
+
+    Error(const string & file, int line, int position, const string & message, error_type type)
+    : file(file), line(line), position(position), message(message), type(type) {
+
+    }
+
+
+    Error(Record & token, const string & message, error_type type): message(message), type(type) {
+        file = *token.filename;
+        line = token.line;
+        position = token.linePosition;
+    }
 
     string toString() const {
         string typeString;
@@ -27,10 +40,10 @@ struct error {
 };
 
 class ErrorHandler {
-    list<error> errors;
+    list<Error> errors;
 
 public:
-    void addError(const error & error) {
+    void addError(const Error & error) {
         errors.push_back(error);
     }
 
@@ -40,7 +53,7 @@ public:
 
     string toString() const {
         string result = "Errors:\n";
-        for(list<error>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
+        for(list<Error>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
             result.append(it->toString()).append("\n");
         }
         return result;

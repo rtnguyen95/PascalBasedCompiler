@@ -13,8 +13,8 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     set<string> expressionPrimeFollowSet;
     set<string> termPrimeFollowSet;
 public:
-    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner) : SyntaxAnalyzer(lexicalScanner) {
-        statementFollowSet = { ";", "$", "whileend", "enddo", "endif", "endfor", "endelse"};
+    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {        statementFollowSet = { ";", "$", "whileend", "enddo", "endif", "endfor", "endelse"};
         expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do"};
         expressionFollowSet.insert(statementFollowSet.begin(), statementFollowSet.end());
         expressionPrimeFollowSet = expressionFollowSet;
@@ -25,7 +25,8 @@ public:
 
     virtual ParseTree * createParseTree();
 
-    bool isIdentifier();
+    bool isIdentifier(bool check = false);
+    bool isIdentifierWithCheck();
     bool isStatement();
 
     bool isDeclaration();

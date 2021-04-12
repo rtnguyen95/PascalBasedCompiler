@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include "errorhandler.h"
+#include "record.h"
 
 using namespace std;
 
@@ -71,47 +72,7 @@ struct State
 //end struct State
 
 
-//struct Record to hold data for each input (lexeme) that is read
-struct Record
-{
-    string token; //string variable to hold what token the input is (keyword, identifier, etc.)
-    string lexeme;  //string variable to hold the raw input
-    bool accepted; //boolean variable that returns true if the input has been accepted, false if otherwise
-    const string * filename;
-    int line;
-    int linePosition;
-    string errorMessage; //string for outputting an error message if the lexeme is not accepted
 
-    Record() : token(""), lexeme(""), accepted(false), filename(NULL), line(1), linePosition(0), errorMessage("") {
-        
-    }
-
-    Record(const string & token, const string & lexeme, bool accepted, const string & filename, int line, int linePosition, string errorMessage = "") 
-    : token(token), lexeme(lexeme), accepted(accepted), filename(&filename), line(line), linePosition(linePosition), errorMessage(errorMessage) {
-
-    }
-
-    void set(const string & token, const string & lexeme, bool accepted, const string & filename, int line, int linePosition, string errorMessage = "") {
-        this->token = token;
-        this->lexeme = lexeme;
-        this->accepted = accepted;
-        this->filename = &filename;
-        this->line = line;
-        this->linePosition = linePosition;
-        this->errorMessage = errorMessage;
-    }
-};
-
-//
-// outputs the string representation of a record to an output stream
-//
-inline ostream & operator << (ostream & stream, Record record){
-    stream.width(11);
-    stream << left << record.token << " = " << record.lexeme;
-    if (!record.accepted)
-        stream << record.errorMessage;
-    return stream;
-}
 
 
 //Class LexicalScanner represents the finite state machine (FSM) that sorts input (lexemes) into tokens
@@ -121,6 +82,7 @@ private:
     istream & w; //input stream
     const string & filename;
     ErrorHandler & errorHandler;
+    Record lastLexeme;
 public:
 
     list<State> stateTransitions; //list of State objects that holds the state transitions a tokens undergo in the FSM
@@ -139,33 +101,38 @@ public:
     //Checks to see if the end of the file has been reached
     bool isFinished()
     {
-        return w.peek() == EOF;
+        return lastLexeme.token == "EOF";
     }
 
 protected:
 
     const int q0 = 1; //variable representing the initial state
 
-    const vector<int> FinalStates {3, 5, 7, 10, 11, 12, 14}; //vector of ints holding all the final states of the FSM
+    const vector<int> FinalStates {3, 5, 7, 10, 11, 14, 15, 16, 17, 18, 19}; //vector of ints holding all the final states of the FSM
 
     //2D Array of ints representing the FSM transitions.
     //column represents the input character, row represents the state 
-    const int ntable[14][10] = {
-       //a,  d,  _,  $,  .,   ,  !,  {}, +=, other
-        {2,  4,  13, 13, 9,  1,  8,  10, 12, 13},               // 1  starting state
-        {2,  2,  2,  2,  3,  3,  3,  3,  3,  3},                 // 2  in identifier
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 3  end identifier (final state)
-        {5,  4,  5,  5,  6,  5,  5,  5,  5,  5},                 // 4  in integer
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 5  end integer (final state)
-        {7,  6,  7,  7,  7,  7,  7,  7,  7,  7},                 // 6  in float
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 7  end float (final state)
-        {8,  8,  8,  8,  8,  8,  1,  8,  8,  8},                 // 8  in comment
-        {11, 6,  11, 11, 11, 11, 11, 11, 11, 11},        // 9  Found a . (decimal point or separator)
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},         // 10 separator, no backup * see note
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 11 separator, backup
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1},                 // 12 found operator (single operators only, no compounds) 
-        {13, 13, 13, 13, 13, 13, 14, 14, 14, 13},           // 13 Error state
-        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1}             // 14 error state end
+    const int ntable[19][14] = {
+       //a,  d,  _,  $,  .,   ,  !,  {}, +*, =,  <,  >,  /\, EOF
+        {2,  4,  13, 13, 9,  1,  8,  10, 12, 12, 18, 19, 13, 17},  // 1  starting state
+        {2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3},   // 2  in identifier
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 3  end identifier (final state)
+        {5,  4,  5,  5,  6,  5,  5,  5,  5,  5,  5,  5,  5,  5},   // 4  in integer
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 5  end integer (final state)
+        {7,  6,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7},   // 6  in float
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 7  end float (final state)
+        {8,  8,  8,  8,  8,  8,  1,  8,  8,  8,  8,  8,  8,  14},  // 8  in comment
+        {11, 6,  11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11},  // 9  Found a . (decimal point or separator)
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   //10 separator, no backup * see note
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   //11 separator, backup
+        {16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 13, 13, 16, 16},   // 12 found operator (single operators only, no compounds) 
+        {13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 13, 14},           // 13 Error state
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},             // 14 error state end
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 15 End Equals State (final)
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},  // 16 End operator state with backup
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},  // 17 EndOfFile state without backup
+        {16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 16, 19, 16, 16},  // 18 < operator state with backup
+        {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},  // 19 End <> state without backup
     };
 
         /*
@@ -194,7 +161,7 @@ protected:
     3. ; is read and then the operations are complete.
      */
 
-    const vector<int> backup {3, 5, 7, 11, 14}; //vector of ints holding the backup states
+    const vector<int> backup {3, 5, 7, 11, 14, 16}; //vector of ints holding the backup states
 
     //enumeration for the columns of the state table (starts at index 0)
     enum {
@@ -207,7 +174,11 @@ protected:
         COMMENT_MARKER,     //col 6
         SEPARATOR,          //col 7
         OPERATOR,           //col 8
-        OTHER               //col 9
+        EQUALS,             //col 9
+        LESS_THAN,          //col 10
+        GREATER_THAN,       //col 11
+        OTHER,              //col 12
+        ENDOFFILE           //col 13
     };
 
 
@@ -223,7 +194,7 @@ protected:
             return DECIMAL_PT;
 
         //checks to see if the character is a space OR if the end of the file has been reached and if true returns the column number for space
-        if (isspace(ch) || ch == EOF)
+        if (isspace(ch))
             return WHITE_SPACE;
 
 
@@ -243,13 +214,26 @@ protected:
         if (ch == '!')
             return COMMENT_MARKER;
 
+        if (ch == '=')
+            return EQUALS;
+
         //checks to see if the character is in the list of seperators recognized by the analyzer and if true return the column number for seperator
         if (isSeparator(ch))
             return SEPARATOR;
 
+        if (ch == '<')
+            return LESS_THAN;
+        
+        if (ch == '>')
+            return GREATER_THAN;
+
         //checks to see if the character is in the list of operators recognized by the analyzer and if true return the column number for operator
         if (isOperator(ch))
             return OPERATOR;
+
+        if (ch == EOF) {
+            return ENDOFFILE;
+        }
 
         //if the character does not match any of the cases above the character is invalid, and the function returns an int for an invalid character
         return OTHER;
@@ -274,7 +258,7 @@ protected:
 
     //a vector holding all the operators that the analyzer recognizes
     const vector<char> operators ={
-        '*', '+', '-', '=', '/', '<', '>', '%'
+        '*', '+', '-', '/', '<', '>', '%'
     };
 
     //function that accepts a string and checks to see if the string is in the list of keywords that the analyzer recognizes
@@ -329,9 +313,16 @@ protected:
     bool processEndSeparatorState(string & currentLexeme, char currChar, Record & record);
 
     bool processOperatorState(string & currentLexeme, char currChar, Record & record);
+    bool processEndOperatorState(string & currentLexeme, char currChar, Record & record);
+    bool processEndEqualsState(string & currentLexeme, char currChar, Record & record);
 
     bool processErrorState(string & currentLexeme, char currChar, Record & record);
     bool processEndErrorState(string & currentLexeme, char currChar, Record & record);
+
+    bool processEndOfFileState(string & currentLexeme, char currChar, Record & record);
+    
+    bool processLessThanState(string & currentLexeme, char currChar, Record & record);
+    bool processEndInequalityState(string & currentLexeme, char currChar, Record & record);
     
     int line = 1;
     int linePosition = 1;
@@ -434,6 +425,21 @@ public:
                 case 14: 
                     reachedFinal = processEndErrorState(currentLexeme, currChar, record);
                     break;
+                case 15:
+                    reachedFinal = processEndEqualsState(currentLexeme, currChar, record);
+                    break;
+                case 16:
+                    reachedFinal = processEndOperatorState(currentLexeme, currChar, record);
+                    break;
+                case 17:
+                    reachedFinal = processEndOfFileState(currentLexeme, currChar, record);
+                    break;
+                case 18:
+                    reachedFinal = processLessThanState(currentLexeme, currChar, record);
+                    break;
+                case 19:
+                    reachedFinal = processEndInequalityState(currentLexeme, currChar, record);
+                    break;                    
                 //invalid character - any character not recognized by the FSM
                 //this should not occur
                 default:
@@ -451,9 +457,12 @@ public:
                 linePosition++;
             }
 
+            lastLexeme = record;
             // if the end of file has been reached, then stop the while loop
-            if (currChar == EOF)
-                break; // trigger the end of the while loop.  Setting reachedFinal = true is not sufficent
+            //if (currChar == EOF) {
+
+            //    break; // trigger the end of the while loop.  Setting reachedFinal = true is not sufficent
+            //}
         }
 
         //check to see if the state is in a final state and write the result to the record

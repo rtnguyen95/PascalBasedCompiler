@@ -26,3 +26,4 @@ OPERATOR    = =
 IDENTIFIER  = num2$
 SEPARATOR   = ;
 SEPARATOR   = }
+EOF         = $

@@ -19,3 +19,4 @@ FLOAT       = 1.0
 IDENTIFIER  = letter
 SEPARATOR   = .
 IDENTIFIER  = uppercase
+EOF         = $
