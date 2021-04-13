@@ -1,0 +1,6 @@
+SYMBOL TABLE
+
+a: float
+upper: float
+fahr: float
+

@@ -1,0 +1,4 @@
+! this is not an error $# !
+int _invalid_name = 0;
+int $invalid_name = 0;
+#include <io>

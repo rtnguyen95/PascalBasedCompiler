@@ -1,0 +1,5 @@
+float fahr;
+float upper;
+upper = 1;
+fahr = 2;
+sum = upper + fahr;
