@@ -80,15 +80,14 @@ class LexicalScanner
 {
 private:
     istream & w; //input stream
-    const string & filename;
-    ErrorHandler & errorHandler;
+    const string & filename; //name of the file the output is written to
+    ErrorHandler & errorHandler; //error handler to pinpoint errors in the analyzer and display the errors to the user
     Record lastLexeme; //record of the last lexeme processed
 public:
 
     list<State> stateTransitions; //list of State objects that holds the state transitions a tokens undergo in the FSM
 
     
-    // EDIT This constructor takes a inputstream that will be used to scan for tokens
     LexicalScanner(istream & input, const string & filename, ErrorHandler & errorHandler): 
         w(input), filename(filename), errorHandler(errorHandler) {
 

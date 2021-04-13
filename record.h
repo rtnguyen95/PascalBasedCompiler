@@ -8,7 +8,7 @@ struct Record
     string token; //string variable to hold what token the input is (keyword, identifier, etc.)
     string lexeme;  //string variable to hold the raw input
     bool accepted; //boolean variable that returns true if the input has been accepted, false if otherwise
-    const string * filename;
+    const string * filename;  //string variable to hold the name of the file being written to
     int line;
     int linePosition;
     string errorMessage; //string for outputting an error message if the lexeme is not accepted

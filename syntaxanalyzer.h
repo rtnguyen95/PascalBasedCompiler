@@ -8,10 +8,11 @@
 
 using namespace std;
 
-class SyntaxAnalyzer {
+class SyntaxAnalyzer
+{
 protected:
     vector<Record> lexemes;
-    int currentLexeme;
+    int currentLexeme; 
     int previousLexeme;
     bool printProduction = true;
     string currentProduction = "";
@@ -26,10 +27,16 @@ public:
 
     }
 
-    Record * getNextToken() {
-        if (currentLexeme < lexemes.size()) {
+    //function to get the next token in the lexemes list
+    //returns a Record object of the next lexeme in the list
+    Record * getNextToken()
+    {
+        //check to see if the next token in the list exists. if so, retrieve it and return the Record
+        if (currentLexeme < lexemes.size())
+        {
             Record & token = lexemes[currentLexeme++];
             return &token;
+            //else process the next token
         } else {
             Record token = lexicalScanner.lexer();
 

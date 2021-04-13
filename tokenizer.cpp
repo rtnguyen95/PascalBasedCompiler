@@ -3,18 +3,18 @@
 #include "topdownsyntaxanalyzer.h"
 #include <filesystem>
 
-//function definition for parsing the input that takes no arguments and returns a list of Record objects
-// paramter = output location
+//function definition for parsing the input
+//takes a single parameter of a string of the name of the output file and returns a list of Record objects
 vector<Record> tokenizer::parse_input(string output_file_name)
 {
-  std::ifstream input_file_stream(filename_, std::ios::in); //declare an ifstream object for reading the input file
+    std::ifstream input_file_stream(filename_, std::ios::in); //declare an ifstream object for reading the input file
 
     //if the input file does not exist, display an error message to the user and return the empty list
-  if (!input_file_stream.is_open())
-  {
-    std::cerr << "No such file.\n";
-    return vector<Record>();
-  }
+    if (!input_file_stream.is_open())
+    {
+        std::cerr << "No such file.\n";
+        return vector<Record>();
+    }
 
   parser_ << input_file_stream.rdbuf(); //write the contents of the input file stream to the stringstream parser
 
@@ -37,7 +37,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
 
-  // now do the syntax analysis phase
+  //=====syntax analysis phase ======
   SymbolTable symbolTable;
   TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
 

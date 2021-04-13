@@ -31,9 +31,7 @@ public:
     string toString() const;
 };
 
-//
 // outputs the string representation of a record to an output stream
-//
 inline ostream & operator << (ostream & stream, const SymbolTable & table){
     stream << table.toString() << endl;
     return stream;
