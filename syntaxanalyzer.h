@@ -31,12 +31,10 @@ public:
     //returns a Record object of the next lexeme in the list
     Record * getNextToken()
     {
-        //check to see if the next token in the list exists. if so, retrieve it and return the Record
         if (currentLexeme < lexemes.size())
         {
             Record & token = lexemes[currentLexeme++];
             return &token;
-            //else process the next token
         } else {
             Record token = lexicalScanner.lexer();
 
@@ -50,12 +48,16 @@ public:
         }
     }
 
-        Record * lookAhead() {
+    //function to peek ahead at the next token in the list
+    //Returns the next token in the list
+    Record * lookAhead()
+    {
         Record * token = getNextToken();
-        backup();
+        backup(); //function to backup variables so that the peek does not affect processing
         return token;
     }
 
+    //function to get the current token being processed by the syntax analyzer
     Record * getCurrentToken() {
         if (currentLexeme > 0) {
             return &lexemes[currentLexeme-1];
@@ -64,12 +66,14 @@ public:
         }
     }
 
+    //function to backup currentLexeme
     void backup() {
         if (currentLexeme != 0) {
             currentLexeme--;
         }
     }
 
+    
     void print(const string & rule) {
         if (printProduction) {
             cout << "     " << rule << endl;

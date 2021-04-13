@@ -345,9 +345,8 @@ protected:
     //function for processing state 19: end of inequality operator
     bool processEndInequalityState(string & currentLexeme, char currChar, Record & record);
     
-    int line = 1;
-    int linePosition = 1;
-
+    int line = 1; //variable to hold the line number of the lexeme processed. it starts at one and increments every time the lexer encounters a newline character
+    int linePosition = 1; //holds the line position of the lexeme being processed. It starts at one and increases each time a new character is processed by the lexer. It resets to 1 each time a new line character is encountered.
 public:
 
     //Function to be called for each lexeme to be processed. Returns Record, which holds the token, lexeme, and a boolean flag representing whether the token has been accepted
@@ -484,7 +483,9 @@ public:
             // If the current state requires that the current input be processed again for the next token then rewind the input stream by one character
             if(isBackupState(state)) {
                 w.unget();
-            } else {
+            }
+            //else the input is done being processed and linePosition is incremented by one 
+            else {
                 linePosition++;
             }
 
