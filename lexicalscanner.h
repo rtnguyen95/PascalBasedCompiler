@@ -82,23 +82,20 @@ private:
     istream & w; //input stream
     const string & filename;
     ErrorHandler & errorHandler;
-    Record lastLexeme;
+    Record lastLexeme; //record of the last lexeme processed
 public:
 
     list<State> stateTransitions; //list of State objects that holds the state transitions a tokens undergo in the FSM
 
-
-    //
-    // This constructor takes a inputstream that will be used to scan for tokens
-    //
+    
+    // EDIT This constructor takes a inputstream that will be used to scan for tokens
     LexicalScanner(istream & input, const string & filename, ErrorHandler & errorHandler): 
         w(input), filename(filename), errorHandler(errorHandler) {
 
     }
 
-    //Function isFinished accepts no arguments and returns a bool
-    // returns true if the end of file has been reached, false if otherwise
-    //Checks to see if the end of the file has been reached
+    //Function isFinished checks to see if the end of the file has been reached
+    //returns true if the end of file has been reached, false if otherwise
     bool isFinished()
     {
         return lastLexeme.token == "EOF";
@@ -214,6 +211,7 @@ protected:
         if (ch == '!')
             return COMMENT_MARKER;
 
+        //checks to see if the character is the equals character and if true returns the column number for equals
         if (ch == '=')
             return EQUALS;
 
@@ -221,9 +219,11 @@ protected:
         if (isSeparator(ch))
             return SEPARATOR;
 
+        //checks to see if the character is the "less than" symbol and if true returns the column number for less than
         if (ch == '<')
             return LESS_THAN;
         
+        //checks to see if the character is the "greater than" symbol and if true returns the column number for greater than
         if (ch == '>')
             return GREATER_THAN;
 
@@ -231,6 +231,7 @@ protected:
         if (isOperator(ch))
             return OPERATOR;
 
+        //checks to see if the end of file has been reached and if true returns the column number for end of file
         if (ch == EOF) {
             return ENDOFFILE;
         }
@@ -293,39 +294,61 @@ protected:
     
     //==Function definitions for handling each state ==
 
+    //function for processing state 1: starting state
     bool processStartState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 2: in identifier
     bool processIdentifierOrKeywordState(string & currentLexeme, char currChar, Record & record);
+    //function for processing state 3: end of identifier
     bool processEndIdentiferOrKeywordState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 4: in integer
     bool processIntegerState(string & currentLexeme, char currChar, Record & record);
+    //function for processing state 5: end of integer
     bool processEndIntegerState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 6: in float
     bool processFloatState(string & currentLexeme, char currChar, Record & record);
+    //function for processing state 7: end of float
     bool processEndFloatState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 8: in comment
     bool processCommentState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 9: found '.' (decimal point)
     bool processDecimalPointState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 10: found separator
     bool processSeparatorState(string & currentLexeme, char currChar, Record & record);
     
+    //function for processing state 11: end of separator
     bool processEndSeparatorState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 12: found operator
     bool processOperatorState(string & currentLexeme, char currChar, Record & record);
+    //function for processing state 16: end of operator
     bool processEndOperatorState(string & currentLexeme, char currChar, Record & record);
+    
+    //function for processing state 15: end equals state
     bool processEndEqualsState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 13: error state
     bool processErrorState(string & currentLexeme, char currChar, Record & record);
+    //function for processing state 14: end of error state
     bool processEndErrorState(string & currentLexeme, char currChar, Record & record);
 
+    //function for processing state 17: end of file state
     bool processEndOfFileState(string & currentLexeme, char currChar, Record & record);
     
+    //function for processing state 18: '<' (less than) operator found
     bool processLessThanState(string & currentLexeme, char currChar, Record & record);
+    
+    //function for processing state 19: end of inequality operator
     bool processEndInequalityState(string & currentLexeme, char currChar, Record & record);
     
     int line = 1;
     int linePosition = 1;
+
 public:
 
     //Function to be called for each lexeme to be processed. Returns Record, which holds the token, lexeme, and a boolean flag representing whether the token has been accepted
@@ -349,94 +372,104 @@ public:
 
             int col = char_to_col(currChar); //create a variable to hold the column corresponding to the current character and initialize to the column of the first character
 
-            //get the next state from the ntable
+            //get the next state using the ntable
             state = ntable[state-1][col]; //the index of the row is state-1, since the initial state has been represented as 1 instead of 0 in the program
             
-            // else state = state
             //switch statement that executes based on which state the FSM has entered
             switch (state)
             {
-                //eats whitespace
+                //State 1 starting state
                 case 1:
                     reachedFinal = processStartState(currentLexeme, currChar, record);
                     break;
-                // inside an identifier or keyword
+                //State 2  inside an identifier or keyword
                 case 2:
                     reachedFinal = processIdentifierOrKeywordState(currentLexeme, currChar, record);
                     break;
                     
-                // end of an identifer or keyword - Final State
+                //State 3  end of an identifer or keyword - Final State
                 case 3:
                     reachedFinal = processEndIdentiferOrKeywordState(currentLexeme, currChar, record);
-                    //reachedFinal = true; //set the boolean flag for reaching a final state as true
                     break;
 
-                // inside an integer
+                //State 4 inside an integer
                 case 4:
                     reachedFinal = processIntegerState(currentLexeme, currChar, record);
                     break;
 
-                // at the end of an integer - Final State
+                //State 5 at the end of an integer - Final State
                 case 5:
                     reachedFinal = processEndIntegerState(currentLexeme, currChar, record);
                      break;
 
-                // inside a float
+                //State 6 inside a float
                 case 6:
                     reachedFinal = processFloatState(currentLexeme, currChar, record);
                     break;
 
-                // at the end of a float - Final State
+                //State 7 at the end of a float - Final State
                 case 7:
                     reachedFinal = processEndFloatState(currentLexeme, currChar, record);
 
                     break;
 
-                //in a comment - no processing
+                //State 8 in a comment - no processing
                 case 8:
                     reachedFinal = processCommentState(currentLexeme, currChar, record);
                     break;
 
-                //found .
+                //State 9 found '.' (decimal point)
+                //the character following the decimal determines if it is a separator or floating point number
                 case 9:
-                    // found a decimal point, the next character deterimines
-                    // if it is a separator or floating point number
                     reachedFinal = processDecimalPointState(currentLexeme, currChar, record);
                     break;
 
-                //found separator - Final state
+                //State 10 found separator - Final state
                 case 10: // separator
                     reachedFinal = processSeparatorState(currentLexeme, currChar, record);
                     break;
 
-                // end separator (such as .) - Final State
+                //State 11 end separator (such as .) - Final State
                 case 11: // separator was found in the previous state
                     reachedFinal = processEndSeparatorState(currentLexeme, currChar, record);
                     break;
 
-                //found operator - final state
+                //State 12 found operator - final state
                 case 12: // operators
                     reachedFinal = processOperatorState(currentLexeme, currChar, record);
                     break;
 
+                //State 13 error state
                 case 13: 
                     reachedFinal = processErrorState(currentLexeme, currChar, record);
                     break;
+                    
+                //State 14 end error state - final state
                 case 14: 
                     reachedFinal = processEndErrorState(currentLexeme, currChar, record);
                     break;
+                    
+                //State 15 end equals state - final state
                 case 15:
                     reachedFinal = processEndEqualsState(currentLexeme, currChar, record);
                     break;
+                    
+                //State 16 end operator state - final state
                 case 16:
                     reachedFinal = processEndOperatorState(currentLexeme, currChar, record);
                     break;
+                    
+                //State 17 end of file state - final state
                 case 17:
                     reachedFinal = processEndOfFileState(currentLexeme, currChar, record);
                     break;
+                    
+                //State 18 found < operator - final state
                 case 18:
                     reachedFinal = processLessThanState(currentLexeme, currChar, record);
                     break;
+                    
+                //State 19 end inequality state - final state
                 case 19:
                     reachedFinal = processEndInequalityState(currentLexeme, currChar, record);
                     break;                    
@@ -449,20 +482,14 @@ public:
                     break;
             }
 
-            // If the current state requires that the current input be processed again for the next token
-            // then rewind the inputstream by one character
+            // If the current state requires that the current input be processed again for the next token then rewind the input stream by one character
             if(isBackupState(state)) {
                 w.unget();
             } else {
                 linePosition++;
             }
 
-            lastLexeme = record;
-            // if the end of file has been reached, then stop the while loop
-            //if (currChar == EOF) {
-
-            //    break; // trigger the end of the while loop.  Setting reachedFinal = true is not sufficent
-            //}
+            lastLexeme = record; //set lastLexeme to the last record processed 
         }
 
         //check to see if the state is in a final state and write the result to the record
