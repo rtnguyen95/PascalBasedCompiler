@@ -3,31 +3,51 @@
 #include <iostream>
 using namespace std;
 
-ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
+/*
+ TopDownSyntaxAnalyzer class parses the parse tree starting at the root then proceeding to the leaves using predictive parsing
+ */
 
+//createParseTree() function creates and processes the parse tree
+ParseTree * TopDownSyntaxAnalyzer::createParseTree()
+{
+
+    //create a parse tree called parseTree
     parseTree = new ParseTree();
 
-    bool hasErrors = false;
-    while(!hasErrors) {
+    bool hasErrors = false; //boolean value that returns true if an error is found
+    
+    //loop that iterates until an error is found
+    while(!hasErrors)
+    {
         currentNode = parseTree->getRoot(); // always add statements to the root node
+        
+        //end the loop if the lexical scanner is finished
         if (lexicalScanner.isFinished())
             break;
 
+        //update the hasErrors variable from the isStatement function
         hasErrors = !isStatement();
+        
+        //if there are no errors in the statement, display to the console that the statement was processed successfully, else if there was an error in processing display that processing has failed to the console
         if (!hasErrors)
-            cout << "processed statement successfully" << endl;
-        else cout << "processing statement with failure" << endl;
+            cout << "Statement Processing Successful" << endl;
+        else cout << "Statement Processing Failure" << endl;
     }
 
+    //Print parse tree code
     cout << "-------Parse Tree Code------------------" << endl;
     parseTree->printNodes(false);
+    //print parse tree rules
     cout << "-------Parse Tree Rules------------------" << endl;
     parseTree->printRules();
+    //print parse tree
     cout << "-------Parse Tree -----------------------" << endl;
     parseTree->printTree();
     return parseTree;
 }
 
+
+//isStatement checks to see if the string being processed is a statement 
 bool TopDownSyntaxAnalyzer::isStatement() {
     Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration>");
     Record * nextToken = getNextToken();

@@ -40,37 +40,34 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   // now do the syntax analysis phase
   TopDownSyntaxAnalyzer syntaxAnalyzer(scanner);
 
+    //create the parse tree used in syntax analysis
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 
+    //free the memory of the parseTree after syntax analysis is complete
   delete parseTree;
 
   ostringstream output;             //create a output string stream for the lexemes and tokens
-  ofstream result_code;
-  result_code.open (output_file_name);
+  ofstream result_code; //create a read/write stream
+  result_code.open (output_file_name);  //set the read/write stream to the specified output file
   result_code <<  "TOKENS        Lexemes" << endl << endl;   //write the header to the output file
-  //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank.
-  //this variable is used to temporarily hold the data of the current lexeme being processed
+
+    //set record to
   Record record = {"", "", true, filename_, 1, 0, ""};
+    
+    //write the results of the syntax analyzer to the Record vector
   vector<Record> records = syntaxAnalyzer.getTokenList();
   output << "TOKENS        Lexemes" << endl << endl;
+    
+    //write the results of the syntax analyzer to the output file
   for (vector<Record>::iterator it = records.begin();
        it != records.end(); ++it) {
-    result_code << *it << endl; //add the record of the lexeme scanned to the end of recordsList
+    result_code << *it << endl;
   }
 
-
-  //loop that iterates until we reach the end of the file or we come across an invalid token that cannot reach a final state at the end of processing
-  /*while (!scanner.isFinished() && record.accepted) {
-          record = scanner.lexer();       //scan the next string in the input with the lexer and store the result in record
-          if (record.lexeme.length())     //the lexeme is blank when there is blank space at the end of a file
-          {
-            cout << record << endl;  //output the record of the lexeme scanned to the console
-            result_code << record << endl; //add the record of the lexeme scanned to the end of recordsList
-            records.push_back(record);
-          }
-  }*/
-  result_code.close();
+  result_code.close(); //close the output file
+    
   stringstream states;  //create an output string stream for the state transitions for each lexeme processed
+    
   states << endl << " State Transitions: " << endl;
     //write all the state transitions processed by the lexer to states
   for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s) {
@@ -86,6 +83,5 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   cout << endl;
 
-  //records.push_back(Record("ENDOFFILE", "$", true, filename_, 1000, 0));
   return records; //return the token and lexeme list to the caller
 }
