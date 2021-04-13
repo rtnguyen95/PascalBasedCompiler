@@ -47,16 +47,19 @@ public:
         return root;
     }
 
-    void printNodes(bool showNonTerminal = false) {
-        printNodes(root, showNonTerminal);
+    void printNodes(ostream & stream, bool showNonTerminal = false) {
+        stream << "-------Parse Tree Code-------------------" << endl;
+        printNodes(stream, root, showNonTerminal);
     }
 
-    void printRules() {
-        return printRules(root);
+    void printRules(ostream & stream) {
+        stream << "-------Parse Tree Productions -----------" << endl;
+        return printRules(stream, root);
     }
 
-    void printTree() {
-        return printTree(root);
+    void printTree(ostream & stream) {
+        stream << "-------Parse Tree -----------------------" << endl;
+        return printTree(stream, root);
     }
 
     void addToRoot(Node * child) {
@@ -83,49 +86,46 @@ protected:
         delete node;
     }
 
-    void printNodes(Node * node, bool showNonTerminal) {
+    void printNodes(ostream & stream, Node * node, bool showNonTerminal) {
         if (node->children.empty()) {
             if (node->token.lexeme != ";")
-                cout << " ";
-            cout << node->token.lexeme;
+                stream << " ";
+            stream << node->token.lexeme;
             if (node->token.lexeme == ";")
-                cout << endl;
+                stream << endl;
         } else {
             if (showNonTerminal) {
-                //if (!node->token.lexeme.empty()) {
-                //    cout << node->token << endl;
-                //}
-                cout << "     " << node->nonTerminal << endl;
+                stream << "     " << node->nonTerminal << endl;
             }
             for (Node * child: node->children) {
-                printNodes(child, showNonTerminal);
+                printNodes(stream, child, showNonTerminal);
             }
         }
     }
 
-    void printRules(Node * node, Record * currentRecord = nullptr) {
+    void printRules(ostream & stream, Node * node, Record * currentRecord = nullptr) {
         if (node->children.empty()) {
             // this is a terminal node
             if (node->nonTerminal.empty()) {
             
                 if (currentRecord != &node->token) {
-                    cout << node->token << endl;
+                    stream << node->token << endl;
                     currentRecord = &node->token;
                 }
             } else {
-                cout << "     " << node->nonTerminal << endl;
+                stream << "     " << node->nonTerminal << endl;
             }
 
         } else {
             
             Node * leftNode = getLeftmostNode(node);
             if (&leftNode->token != currentRecord)
-                cout << leftNode->token << endl;
-            cout << "     " << node->nonTerminal << endl;
+                stream << leftNode->token << endl;
+            stream << "     " << node->nonTerminal << endl;
             currentRecord = &leftNode->token;
             
             for (auto it = node->children.begin(); it != node->children.end(); ++it) {
-                printRules(*it, currentRecord);
+                printRules(stream, *it, currentRecord);
             }
         }
     }
@@ -137,18 +137,18 @@ protected:
         return getLeftmostNode(*node->children.begin());
     }
 
-    void printTree(Node * node, int indent = 0) {
+    void printTree(ostream & stream, Node * node, int indent = 0) {
         if (node->children.empty()) {
             if (node->nonTerminal.empty()) {
-                cout << string(indent * 2, ' ') << node->token.lexeme << endl;
+                stream << string(indent * 2, ' ') << node->token.lexeme << endl;
             } else {
-                cout << string(indent * 2, ' ') << node->nonTerminal << endl;
+                stream << string(indent * 2, ' ') << node->nonTerminal << endl;
             }
         } else {
-            cout << string(indent*2, ' ') << node->nonTerminal << endl;
+            stream << string(indent*2, ' ') << node->nonTerminal << endl;
             
             for (auto it = node->children.begin(); it != node->children.end(); ++it) {
-                printTree(*it, indent + 1);
+                printTree(stream, *it, indent + 1);
             }
         }
     }

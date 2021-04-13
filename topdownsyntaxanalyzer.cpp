@@ -18,39 +18,13 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         if (token != nullptr) {
             cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
             cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
-            errorMessage.append("this rule ").append(currentProduction).append(" could not be met with ").append(token->lexeme)
-              .append("\n").append(lastError);
+            errorMessage.append("this rule ").append(currentProduction).append(" could not be met with '").append(token->lexeme)
+              .append("'\n").append(lastError);
         }
         errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
     }
 
-    /*while(!hasErrors) {
-        currentNode = parseTree->getRoot(); // always add statements to the root node
-        if (lexicalScanner.isFinished())
-            break;
-
-        hasErrors = !isStatement();
-        if (!hasErrors)
-            cout << "processed statement successfully" << endl;
-        else {
-            Record * token = getCurrentToken();
-            cout << "processing statement with failure" << endl;
-            string errorMessage = "";
-            if (token != nullptr) {
-                cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
-                cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
-                errorMessage.append("this rule ").append(currentProduction).append(" could not be met with ").append(token->lexeme);
-            }
-            errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
-        }
-    }*/
-
-    cout << "-------Parse Tree Code------------------" << endl;
-    parseTree->printNodes(false);
-    cout << "-------Parse Tree Rules------------------" << endl;
-    parseTree->printRules();
-    cout << "-------Parse Tree -----------------------" << endl;
-    parseTree->printTree();
+    parseTree->printRules(cout);
     return parseTree;
 }
 
@@ -241,7 +215,6 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
 }
 bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
     Node * parent = startNonTerminal("<Conditional> -> <Expression> <operator> <Expression>");
-    //Record * record = getNextToken();
     if (isE()) {
         Record * token = getNextToken();
         if (token == nullptr) return false;
@@ -253,7 +226,6 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
             }
         }
     }
-    backup();
     cancelNonTerminal(parent);
     return false;
 }

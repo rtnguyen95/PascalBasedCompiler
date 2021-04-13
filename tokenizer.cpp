@@ -18,23 +18,6 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   parser_ << input_file_stream.rdbuf(); //write the contents of the input file stream to the stringstream parser
 
-  // TODO: here is where we need to parse this stringstream "parser"
-  // states:
-  // scanner must ignore whitespace except for end of token.  transition from
-  // our starting state back to what the starting state was when we last had whitespace
-  //
-  // cannot defer a decision until the end of the string. (end of source code)
-  //   looking for a multiplicity of possible tokens.  One accepting state for each token
-  // ^ so that each state tells us what token was found
-  //
-  // fourth, some strings are identifiers while others are keywords. we can have either
-  // =seperate state for each keywrod
-  // =accept the keyword as an identifier and make a final decision based on whether that
-  //   string is in a list of keywords
-  //
-  //- a problem from the book - rate*time we need to realize * ends rate but also re-read *
-  //   as multiply
-
   LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
 
   //=====syntax analysis phase ======
@@ -42,6 +25,18 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
 
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
+
+  ostringstream code_output;           
+  parseTree->printNodes(code_output, false);
+  output_string("code", code_output.str());
+
+  ostringstream production_output;
+  parseTree->printRules(production_output);           
+  output_string("productions", production_output.str());
+
+  ostringstream tree_output;
+  parseTree->printTree(tree_output);  
+  output_string("parse-tree", tree_output.str());
 
   delete parseTree;
 
@@ -60,7 +55,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   }
 
   // print the symbol table to a file
-  ofstream symbol_file(std::filesystem::path(filename_).stem().string() + "-symbols.txt");
+  ofstream symbol_file(get_output_file("symbols"));
   symbol_file << symbolTable;
   symbol_file.close();
 
@@ -76,12 +71,43 @@ vector<Record> tokenizer::parse_input(string output_file_name)
     }
 
     //create an output file called state.txt and write the contents of states to it
-  ofstream states_file(std::filesystem::path(filename_).stem().string() + "-states.txt");
-  states_file << states.str();
-  states_file.close();
+  //ofstream states_file(get_output_file("states"));
+  //states_file << states.str();
+  //states_file.close();
+
+  output_string("states", states.str());
 
   cout << endl;
 
   //records.push_back(Record("ENDOFFILE", "$", true, filename_, 1000, 0));
   return records; //return the token and lexeme list to the caller
+}
+
+string tokenizer::get_output_file(const string & type) {
+  string type_filename;
+
+  type_filename = std::filesystem::path(filename_).parent_path().string() + "/" +
+                  std::filesystem::path(filename_).stem().string() + 
+                  "-" + type + ".txt";
+  return type_filename; 
+}
+
+void tokenizer::output_string(const string & type, const string & output) {
+  ofstream file(get_output_file(type));
+  file << output;
+  file.close();
+}
+
+template <class T>
+void tokenizer::output_string(const string & type, T & o) {
+  ofstream file(get_output_file(type));
+  file << o;
+  file.close();
+}
+
+//template <class T>
+void tokenizer::output_string(const string & type, void (*fn)(ostream &)) {
+  ofstream file(get_output_file(type));
+  (*fn)(file);
+  file.close();
 }

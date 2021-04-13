@@ -28,4 +28,15 @@ public:
    const ErrorHandler & getErrorHandler() {
      return errorHandler;
    }
+
+protected:
+  string get_output_file(const string & type);
+
+  void output_string(const string & type, const string & output);
+  
+  template <class T>
+  void output_string(const string & type, T & o);
+
+  void output_string(const string & type, void (*fn)(ostream &));
+
 };
