@@ -35,7 +35,7 @@ struct Node {
 class ParseTree {
     Node * root;
 public:
-    ParseTree(): root(new Node("<Statement List>")) {
+    ParseTree(): root(new Node("<Program>")) {
 
     }
 

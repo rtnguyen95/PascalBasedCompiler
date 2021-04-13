@@ -38,36 +38,34 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   LexicalScanner scanner(parser_, filename_, errorHandler);  //pass the input file stream to the lexical scanner
 
   // now do the syntax analysis phase
-  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner);
+  SymbolTable symbolTable;
+  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
 
-    //create the parse tree used in syntax analysis
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 
-    //free the memory of the parseTree after syntax analysis is complete
   delete parseTree;
 
   ostringstream output;             //create a output string stream for the lexemes and tokens
-  ofstream result_code; //create a read/write stream
-  result_code.open (output_file_name);  //set the read/write stream to the specified output file
+  ofstream result_code;
+  result_code.open (output_file_name);
   result_code <<  "TOKENS        Lexemes" << endl << endl;   //write the header to the output file
-
-    //set record to
+  //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank.
+  //this variable is used to temporarily hold the data of the current lexeme being processed
   Record record = {"", "", true, filename_, 1, 0, ""};
-    
-    //write the results of the syntax analyzer to the Record vector
   vector<Record> records = syntaxAnalyzer.getTokenList();
   output << "TOKENS        Lexemes" << endl << endl;
-    
-    //write the results of the syntax analyzer to the output file
   for (vector<Record>::iterator it = records.begin();
        it != records.end(); ++it) {
-    result_code << *it << endl;
+    result_code << *it << endl; //add the record of the lexeme scanned to the end of recordsList
   }
 
-  result_code.close(); //close the output file
-    
+  // print the symbol table to a file
+  ofstream symbol_file(std::filesystem::path(filename_).stem().string() + "-symbols.txt");
+  symbol_file << symbolTable;
+  symbol_file.close();
+
+  result_code.close();
   stringstream states;  //create an output string stream for the state transitions for each lexeme processed
-    
   states << endl << " State Transitions: " << endl;
     //write all the state transitions processed by the lexer to states
   for (list<State>::iterator s = scanner.stateTransitions.begin(); s != scanner.stateTransitions.end(); ++s) {
@@ -80,8 +78,10 @@ vector<Record> tokenizer::parse_input(string output_file_name)
     //create an output file called state.txt and write the contents of states to it
   ofstream states_file(std::filesystem::path(filename_).stem().string() + "-states.txt");
   states_file << states.str();
+  states_file.close();
 
   cout << endl;
 
+  //records.push_back(Record("ENDOFFILE", "$", true, filename_, 1000, 0));
   return records; //return the token and lexeme list to the caller
 }
