@@ -60,7 +60,7 @@ public:
     //Returns a pointer to the token
     Record * getCurrentToken() {
         if (currentLexeme >= 0) {
-            return &lexemes[currentLexeme > 0 ? currentLexeme : 0];
+            return &lexemes[currentLexeme > 0 ? currentLexeme-1 : 0];
         } else {
             return nullptr;
         }
