@@ -39,10 +39,10 @@ public:
         //else getNextToken is being called for the first time, and the lexemes list is empty. it will call lexicalScanner.lexer() and add the token to the list and return a pointer to that token
         } else {
             Record token = lexicalScanner.lexer();
-
-            if (token.accepted && token.lexeme.length() > 0) {
-                cout << token << endl;
-                lexemes.push_back(token);
+            cout << token << endl;
+            lexemes.push_back(token);
+            if (/*!isError(token) &&*/ token.accepted && token.lexeme.length() > 0) {
+                
                 Record & token = lexemes[currentLexeme++];
                 return &token;
             }
@@ -62,8 +62,8 @@ public:
     //function to get the current token being processed by the syntax analyzer
     //Returns a pointer to the token
     Record * getCurrentToken() {
-        if (currentLexeme > 0) {
-            return &lexemes[currentLexeme-1];
+        if (currentLexeme >= 0) {
+            return &lexemes[currentLexeme > 0 ? currentLexeme : 0];
         } else {
             return nullptr;
         }
@@ -103,6 +103,7 @@ public:
     bool isSemiColon(const Record & lexeme);
     bool isOperator(const Record & lexeme);
     bool isRelativeOperator(const Record & lexeme);
+    bool isError(const Record & lexeme);
 
     const vector<string> relativeOperators = {"<", ">", "<=", ">=", "<=", "==", "<>"};
 

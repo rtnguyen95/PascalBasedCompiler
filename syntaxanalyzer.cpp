@@ -87,3 +87,7 @@ bool SyntaxAnalyzer::isRelativeOperator(const Record & lexeme) {
     return lexeme.token == "OPERATOR" && 
         find(relativeOperators.begin(), relativeOperators.end(), lexeme.lexeme) != relativeOperators.end();
 }
+
+bool SyntaxAnalyzer::isError(const Record & lexeme) {
+    return lexeme.token == "ERROR";
+}
