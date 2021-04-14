@@ -214,16 +214,20 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
   return false;
 }
 bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
-    Node * parent = startNonTerminal("<Conditional> -> <Expression> <operator> <Expression>");
+    Node * parent = startNonTerminal("<Conditional> -> <Expression> <RelativeOperator> <Expression>");
     if (isE()) {
         Record * token = getNextToken();
         if (token == nullptr) return false;
-        if (isOperator(*token)) {
+        if (isRelativeOperator(*token)) {
             currentNode->add(new Node(token));
             if (isE()) {
                 finishNonTerminal(parent);
                 return true;
             }
+        } else if(inFollowSet(expressionFollowSet, token->lexeme)) {
+            backup();
+            finishNonTerminal(parent);
+            return true;
         }
     }
     cancelNonTerminal(parent);
@@ -384,7 +388,8 @@ bool TopDownSyntaxAnalyzer::isR() {
                 return true;
             }
         }
-    } else if (record->lexeme == "whileend" || record->lexeme == "do" || record->lexeme == "<" || record->lexeme == "+" || record->lexeme == "-" || record->lexeme == ")" || record->lexeme == ";") {
+    } else if (inFollowSet(termPrimeFollowSet, record->lexeme)) {
+        //record->lexeme == "whileend" || record->lexeme == "do" || record->lexeme == "<" || record->lexeme == "+" || record->lexeme == "-" || record->lexeme == ")" || record->lexeme == ";") {
         //cout << *record << endl;
         print("<TermPrime> -> epsilon");
         backup();

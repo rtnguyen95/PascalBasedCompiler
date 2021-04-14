@@ -102,6 +102,9 @@ public:
     bool isEndElse(const Record & lexeme);
     bool isSemiColon(const Record & lexeme);
     bool isOperator(const Record & lexeme);
+    bool isRelativeOperator(const Record & lexeme);
+
+    const vector<string> relativeOperators = {"<", ">", "<=", ">=", "<=", "==", "<>"};
 
     //function to return the vector of lexemes 
     vector<Record> & getTokenList() {

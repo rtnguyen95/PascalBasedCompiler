@@ -82,3 +82,8 @@ bool SyntaxAnalyzer::isSemiColon(const Record & lexeme) {
 bool SyntaxAnalyzer::isOperator(const Record & lexeme) {
     return lexeme.token == "OPERATOR";
 }
+
+bool SyntaxAnalyzer::isRelativeOperator(const Record & lexeme) {
+    return lexeme.token == "OPERATOR" && 
+        find(relativeOperators.begin(), relativeOperators.end(), lexeme.lexeme) != relativeOperators.end();
+}
