@@ -431,7 +431,7 @@ bool TopDownSyntaxAnalyzer::isF() {
     if (record == nullptr)
         return false;
     backup();
-    Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID> | <NUM>");
+    Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID> | <NUM> | <Expression> <RelationalOperator> <Expression>");
     //print(" <Factor> -> <Identifier>");
     if (isId(*record) && isIdentifier(true)) {
         //cout << *record << endl;
@@ -462,7 +462,15 @@ bool TopDownSyntaxAnalyzer::isF() {
                 }
             }
     }
-
+    else if (inFollowSet(expressionPrimeFollowSet, record->lexeme)) {
+       currentNode->add (new Node(*record));
+       //cout << " Q -> epsilon" << endl;
+       if (isE()) {
+         print("<Factor> -> <Expression> <RelationalOperator> <Expression>");
+         finishNonTerminal(parent);
+         return true;
+       }
+   }
     cancelNonTerminal(parent);
     return false;
 }
