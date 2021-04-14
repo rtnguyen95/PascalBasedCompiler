@@ -14,6 +14,7 @@ protected:
     vector<Record> lexemes;
     int currentLexeme; 
     int previousLexeme;
+    Record currentToken;
     bool printProduction = true;
     string currentProduction = "";
     string lastError = "";
@@ -34,19 +35,15 @@ public:
         //check to see if there is a token after currentLexeme. If there is, return a pointer to it
         if (currentLexeme < lexemes.size())
         {
-            Record & token = lexemes[currentLexeme++];
-            return &token;
+            currentToken = lexemes[currentLexeme++];
+            return &currentToken;
         //else getNextToken is being called for the first time, and the lexemes list is empty. it will call lexicalScanner.lexer() and add the token to the list and return a pointer to that token
         } else {
             Record token = lexicalScanner.lexer();
             cout << token << endl;
             lexemes.push_back(token);
-            if (/*!isError(token) &&*/ token.accepted && token.lexeme.length() > 0) {
-                
-                Record & token = lexemes[currentLexeme++];
-                return &token;
-            }
-            return NULL; // maybe this should throw an exception instead?
+            currentToken = lexemes[currentLexeme++];
+            return &currentToken;
         }
     }
 
