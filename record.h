@@ -9,8 +9,8 @@ struct Record
     string lexeme;  //string variable to hold the raw input
     bool accepted; //boolean variable that returns true if the input has been accepted, false if otherwise
     const string * filename;  //string variable to hold the name of the file being written to
-    int line;
-    int linePosition;
+    int line; //holds the line number where the token is in the input file
+    int linePosition; //holds the numerical position in the line where the token is in the input file
     string errorMessage; //string for outputting an error message if the lexeme is not accepted
 
     Record() : token(""), lexeme(""), accepted(false), filename(NULL), line(1), linePosition(0), errorMessage("") {

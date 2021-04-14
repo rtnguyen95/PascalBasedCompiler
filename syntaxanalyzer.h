@@ -27,14 +27,16 @@ public:
 
     }
 
-    //function to get the next token in the lexemes list
-    //returns a Record object of the next lexeme in the list
+    //function to get the next token in the lexemes list. This function is used to support backtracking. When the syntax analyzer attempts to find a rule by trying all the rules on a token one by one, aka a brute force approach (as opposed to a predictive approach), backtracking is needed when a rule fails and a token needs to be tested from the beginning for the next rule.
+    //returns a pointer to the Record object of the next lexeme in the list
     Record * getNextToken()
     {
+        //check to see if there is a token after currentLexeme. If there is, return a pointer to it
         if (currentLexeme < lexemes.size())
         {
             Record & token = lexemes[currentLexeme++];
             return &token;
+        //else getNextToken is being called for the first time, and the lexemes list is empty. it will call lexicalScanner.lexer() and add the token to the list and return a pointer to that token
         } else {
             Record token = lexicalScanner.lexer();
 
@@ -58,6 +60,7 @@ public:
     }
 
     //function to get the current token being processed by the syntax analyzer
+    //Returns a pointer to the token
     Record * getCurrentToken() {
         if (currentLexeme > 0) {
             return &lexemes[currentLexeme-1];
@@ -81,6 +84,8 @@ public:
     }
 
     virtual ParseTree * createParseTree() = 0;
+    
+    //Functions that determine the lexemes and tokens
     bool isIf(const Record & lexeme);
     bool isWhile(const Record & lexeme);
     bool isType(const Record & lexeme);
@@ -98,6 +103,7 @@ public:
     bool isSemiColon(const Record & lexeme);
     bool isOperator(const Record & lexeme);
 
+    //function to return the vector of lexemes 
     vector<Record> & getTokenList() {
         return lexemes;
     }

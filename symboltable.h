@@ -6,6 +6,19 @@
 /*
  The symbol table class manages a list of identifiers (or symbols) found by the Syntax analyzer.
  The table keeps track of the list of symbols with their types.  Both are represented as Records.
+ 
+Example of what is stored in SymbolTable after being run on source code
+ 
+ Source code:
+ float a
+ int b
+ bool c
+ 
+ SymbolTable:
+ (Type)            (Identifier)                     (Line Number)
+ float                  a                              (1)
+ int                    b                              (2)
+ bool                   c                              (3)
  */
 
 struct Symbol {
