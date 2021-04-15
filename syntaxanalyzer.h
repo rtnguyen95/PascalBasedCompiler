@@ -12,8 +12,9 @@ class SyntaxAnalyzer
 {
 protected:
     vector<Record> lexemes;
-    int currentLexeme; 
+    int currentLexeme;
     int previousLexeme;
+    Record currentToken;
     bool printProduction = true;
     string currentProduction = "";
     string lastError = "";
@@ -22,7 +23,7 @@ protected:
     SymbolTable & symbolTable;
 public:
 
-    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
     : lexicalScanner(lexicalScanner), symbolTable(symbolTable), lexemes(), currentLexeme(0), errorHandler(errorHandler) {
 
     }
@@ -34,19 +35,15 @@ public:
         //check to see if there is a token after currentLexeme. If there is, return a pointer to it
         if (currentLexeme < lexemes.size())
         {
-            Record & token = lexemes[currentLexeme++];
-            return &token;
+            currentToken = lexemes[currentLexeme++];
+            return &currentToken;
         //else getNextToken is being called for the first time, and the lexemes list is empty. it will call lexicalScanner.lexer() and add the token to the list and return a pointer to that token
         } else {
             Record token = lexicalScanner.lexer();
-
-            if (token.accepted && token.lexeme.length() > 0) {
-                cout << token << endl;
-                lexemes.push_back(token);
-                Record & token = lexemes[currentLexeme++];
-                return &token;
-            }
-            return NULL; // maybe this should throw an exception instead?
+            cout << token << endl;
+            lexemes.push_back(token);
+            currentToken = lexemes[currentLexeme++];
+            return &currentToken;
         }
     }
 
@@ -62,8 +59,8 @@ public:
     //function to get the current token being processed by the syntax analyzer
     //Returns a pointer to the token
     Record * getCurrentToken() {
-        if (currentLexeme > 0) {
-            return &lexemes[currentLexeme-1];
+        if (currentLexeme >= 0) {
+            return &lexemes[currentLexeme > 0 ? currentLexeme-1 : 0];
         } else {
             return nullptr;
         }
@@ -76,7 +73,7 @@ public:
         }
     }
 
-    
+
     void print(const string & rule) {
         if (printProduction) {
             cout << "     " << rule << endl;
@@ -84,7 +81,7 @@ public:
     }
 
     virtual ParseTree * createParseTree() = 0;
-    
+
     //Functions that determine the lexemes and tokens
     bool isIf(const Record & lexeme);
     bool isWhile(const Record & lexeme);
@@ -102,8 +99,13 @@ public:
     bool isEndElse(const Record & lexeme);
     bool isSemiColon(const Record & lexeme);
     bool isOperator(const Record & lexeme);
+    bool isRelativeOperator(const Record & lexeme);
+    bool isError(const Record & lexeme);
+    bool isBoolValue(const Record & lexeme);
 
-    //function to return the vector of lexemes 
+    const vector<string> relativeOperators = {"<", ">", "<=", ">=", "<=", "==", "<>"};
+
+    //function to return the vector of lexemes
     vector<Record> & getTokenList() {
         return lexemes;
     }

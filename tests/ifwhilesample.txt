@@ -1,0 +1,21 @@
+bool a;
+a = True;
+float x;
+int y;
+int z;
+x = 3.4;
+y = 7;
+if (x < y) {
+   x = y/z;
+   y = z/x;
+};
+while (x == y) do
+   z = x/y;
+enddo;
+else if (x >= y) then
+  x = z/y;
+endelse;
+else while (x < y) do
+   x = y/z;
+   a = False;
+whileend;

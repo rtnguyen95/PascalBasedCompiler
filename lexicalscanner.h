@@ -110,7 +110,7 @@ protected:
     //column represents the input character, row represents the state 
     const int ntable[19][14] = {
        //a,  d,  _,  $,  .,   ,  !,  {}, +*, =,  <,  >,  /\, EOF
-        {2,  4,  13, 13, 9,  1,  8,  10, 12, 12, 18, 19, 13, 17},  // 1  starting state
+        {2,  4,  13, 13, 9,  1,  8,  10, 12, 12, 18, 12, 13, 17},  // 1  starting state
         {2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3},   // 2  in identifier
         {1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1},   // 3  end identifier (final state)
         {5,  4,  5,  5,  6,  5,  5,  5,  5,  5,  5,  5,  5,  5},   // 4  in integer

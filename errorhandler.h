@@ -40,7 +40,7 @@ struct Error {
         }
         
         //return the error type, file name, line number, position number, and error message to the user
-        return typeString + file + ":" + to_string(line) + ":" + to_string(position) + " - " + message;
+        return string("Error: ") + typeString + file + ":" + to_string(line) + ":" + to_string(position) + " - " + message;
     }
 };
 

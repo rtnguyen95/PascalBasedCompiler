@@ -1,8 +1,11 @@
 *.o
 *.out
 .vscode
-*-states.txt
-*_output.txt
+tests/*-states.txt
+tests/*_output.txt
 tokenizer
 .DS_Store
-*-symbols.txt
+tests/*-symbols.txt
+tests/*-code.txt
+tests/*-parse-tree.txt
+tests/*-productions.txt

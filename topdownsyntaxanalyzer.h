@@ -7,21 +7,24 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     Node * currentNode;
     ParseTree * parseTree;
     FollowSets followSets;
-
+    set<string> conditionalFollowSet;
+    set<string> executionFollowSet;
     set<string> statementFollowSet;
     set<string> expressionFollowSet;
     set<string> expressionPrimeFollowSet;
     set<string> termPrimeFollowSet;
 public:
-    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
-    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {        
-        statementFollowSet = { ";", "$", "whileend", "enddo", "endif", "endfor", "endelse"};
-        expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do"};
+    TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
+    : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {
+        statementFollowSet = { ";", "$"};
+        expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do", "{", "then"};
+        conditionalFollowSet = {"do", "{", "then"};
+        executionFollowSet = {"whileend", "enddo", "endif", "endfor", "endelse", "}"};
         expressionFollowSet.insert(statementFollowSet.begin(), statementFollowSet.end());
         expressionPrimeFollowSet = expressionFollowSet;
         termPrimeFollowSet = {"+", "-"};
         termPrimeFollowSet.insert(expressionPrimeFollowSet.begin(), expressionPrimeFollowSet.end());
-        //set<string> expressionPrimeFollowSet = 
+        //set<string> expressionPrimeFollowSet =
     }
 
     virtual ParseTree * createParseTree();
@@ -44,7 +47,8 @@ public:
     bool isConditionalTopDown();
     bool isStatementList();
     bool isMoreStatements();
-    
+    bool isElseTopDown();
+    bool isBoolValueTopDown();
     Node * startNonTerminal(const string & name);
     void finishNonTerminal(Node * parent);
     void cancelNonTerminal(Node * parent);
