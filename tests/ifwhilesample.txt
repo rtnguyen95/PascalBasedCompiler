@@ -1,0 +1,12 @@
+int x;
+int y;
+int z;
+while x > y {
+    z = x/y;
+};
+if x > y do
+    z = y/x;
+endif;
+while (x > y) do
+    z = y/x;
+enddo;

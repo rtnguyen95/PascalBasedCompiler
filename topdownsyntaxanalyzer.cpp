@@ -225,7 +225,8 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
   //   finishNonTerminal(parent);
   //   return true;
   // }
-} else if (record->lexeme == "whileend"|| record->lexeme == "}" || record->lexeme == "endif" || record->lexeme == "$") {
+} else if(inFollowSet(statementFollowSet, record->lexeme)) {
+//} else if (record->lexeme == "whileend"|| record->lexeme == "}" || record->lexeme == "enddo" || record->lexeme == "endif" || record->lexeme == "$") {
       //ERIC: the check the follow set to satisfy epsilon
       print("<MoreStatements> -> epsilon");
       backup();
@@ -239,6 +240,25 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
 bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
     Node * parent = startNonTerminal("<Conditional> -> <Expression> <RelativeOperator> <Expression>");
     print ("Contidional -> Expression");
+    Record * record = getNextToken();
+    if (record->lexeme == "(") {
+
+            currentNode->add(new Node(*record));
+            if (isE()) {
+              Record * token = getNextToken();
+              if (token == nullptr) return false;
+               if (isRelativeOperator(*token)) {
+                  currentNode->add(new Node(token));
+                  if (isE()) {
+                      Record * record = getNextToken();
+                      if (record->lexeme == ")") {
+                        finishNonTerminal(parent);
+                        return true;
+                      }
+                  }
+              }
+            }
+    }else {backup();}
     if (isE()) {
         Record * token = getNextToken();
         if (token == nullptr) return false;
@@ -254,6 +274,7 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
         //    return true;
       //  }
     }
+
     cancelNonTerminal(parent);
     return false;
 }
