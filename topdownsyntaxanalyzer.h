@@ -48,6 +48,7 @@ public:
     bool isStatementList();
     bool isMoreStatements();
     bool isElseTopDown();
+    bool isBoolValueTopDown();
     Node * startNonTerminal(const string & name);
     void finishNonTerminal(Node * parent);
     void cancelNonTerminal(Node * parent);

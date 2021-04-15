@@ -12,7 +12,7 @@ class SyntaxAnalyzer
 {
 protected:
     vector<Record> lexemes;
-    int currentLexeme; 
+    int currentLexeme;
     int previousLexeme;
     Record currentToken;
     bool printProduction = true;
@@ -23,7 +23,7 @@ protected:
     SymbolTable & symbolTable;
 public:
 
-    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
+    SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
     : lexicalScanner(lexicalScanner), symbolTable(symbolTable), lexemes(), currentLexeme(0), errorHandler(errorHandler) {
 
     }
@@ -73,7 +73,7 @@ public:
         }
     }
 
-    
+
     void print(const string & rule) {
         if (printProduction) {
             cout << "     " << rule << endl;
@@ -81,7 +81,7 @@ public:
     }
 
     virtual ParseTree * createParseTree() = 0;
-    
+
     //Functions that determine the lexemes and tokens
     bool isIf(const Record & lexeme);
     bool isWhile(const Record & lexeme);
@@ -101,10 +101,11 @@ public:
     bool isOperator(const Record & lexeme);
     bool isRelativeOperator(const Record & lexeme);
     bool isError(const Record & lexeme);
+    bool isBoolValue(const Record & lexeme);
 
     const vector<string> relativeOperators = {"<", ">", "<=", ">=", "<=", "==", "<>"};
 
-    //function to return the vector of lexemes 
+    //function to return the vector of lexemes
     vector<Record> & getTokenList() {
         return lexemes;
     }

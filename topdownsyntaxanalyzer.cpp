@@ -71,6 +71,19 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     cancelNonTerminal(parent);
     return false;
 }
+bool TopDownSyntaxAnalyzer::isBoolValueTopDown() {
+  Record * record = getNextToken();
+  Node * parent = startNonTerminal("<Boolean Value> -> <True> || <False>");
+  if (record == nullptr)
+    return false;
+  if (isBoolValue(*record)) {
+    currentNode->add(new Node(*record));
+    finishNonTerminal(parent);
+    return true;
+  }
+  cancelNonTerminal(parent);
+  return false;
+}
 bool TopDownSyntaxAnalyzer::isNumberTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<NUM> -> number");
@@ -571,7 +584,7 @@ bool TopDownSyntaxAnalyzer::isF() {
 bool TopDownSyntaxAnalyzer::isE() {
     //print(" <Expression> -> <Term><ExpressionPrime>");
     //cout << *currentLexeme << endl;
-    Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime>");
+    Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime> || <Boolean Value>");
     if (isT()) {
         if (isQ()) {
             /*Record * record = getNextToken();
@@ -587,6 +600,11 @@ bool TopDownSyntaxAnalyzer::isE() {
             finishNonTerminal(parent);
             return true;
         }
+    }
+    if (isBoolValueTopDown()) {
+      print("<Expression> -> <Boolean Value>");
+      finishNonTerminal(parent);
+      return true;
     }
     cancelNonTerminal(parent);
     return false;
