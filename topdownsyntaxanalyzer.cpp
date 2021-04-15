@@ -426,7 +426,13 @@ bool TopDownSyntaxAnalyzer::isF() {
 }
 
 bool TopDownSyntaxAnalyzer::isE() {
+    Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime> || <BooleanValue>");
+    Record * token = lookAhead();
+    if (isBoolValue(*token) && isBoolValueTopDown()) {
+      print("<Expression> -> <Boolean Value>");
       finishNonTerminal(parent);
+      return true;
+    } else if (isT()) {
         if (isQ()) {
             print("<Expression> -> <Term><ExpressionPrime>");
             finishNonTerminal(parent);
