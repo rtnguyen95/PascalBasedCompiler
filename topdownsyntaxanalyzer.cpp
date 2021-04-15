@@ -52,12 +52,19 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     }
 
     // check for epsilon
-    if (inFollowSet(statementFollowSet, nextToken->lexeme)) {
+    if (inFollowSet(executionFollowSet, nextToken->lexeme)) {
     //if (nextToken->lexeme == "$" || nextToken->lexeme == ";" || nextToken->lexeme == "}") {
         finishNonTerminal(parent);
         return true;
     }
-
+    else if(inFollowSet(statementFollowSet, nextToken->lexeme)) {
+    //} else if (record->lexeme == "whileend"|| record->lexeme == "}" || record->lexeme == "enddo" || record->lexeme == "endif" || record->lexeme == "$") {
+          //ERIC: the check the follow set to satisfy epsilon
+          print("<MoreStatements> -> epsilon");
+          //backup();
+          finishNonTerminal(parent);
+          return true; //just ; is accepted
+      }
     cancelNonTerminal(parent);
     return false;
 }
@@ -84,12 +91,12 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
     if (isConditionalTopDown()) {
       Record * record = getNextToken();
 
-      if (inFollowSet(expressionPrimeFollowSet, record->lexeme)) {
+      if (inFollowSet(conditionalFollowSet, record->lexeme)) {
         currentNode->add(new Node(*record));
         //make sure we implement isStatementList using getNextToken
         if (isStatementList()) {
           Record * record = getNextToken();
-          if (inFollowSet(statementFollowSet, record->lexeme)) {
+          if (inFollowSet(executionFollowSet, record->lexeme)) {
           // if (isEndDo(*record) || isWhileEnd(*record)) {
             currentNode->add(new Node(*record));
             print("<while statement> -> <WHILE>  <Conditional> <Do|{> <StatementList> <WhileEnd|EndDo|}>");
@@ -137,7 +144,7 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
      //currentNode->add(new Node(*record));
     }
   }
-  backup();
+//  backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -151,12 +158,12 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
     if (isConditionalTopDown()) {
       Record * record = getNextToken();
 
-      if (inFollowSet(expressionPrimeFollowSet, record->lexeme)) {
+      if (inFollowSet(conditionalFollowSet, record->lexeme)) {
         currentNode->add(new Node(*record));
         //make sure we implement isStatementList using getNextToken
         if (isStatementList()) {
           Record * record = getNextToken();
-          if (inFollowSet(statementFollowSet, record->lexeme)) {
+          if (inFollowSet(executionFollowSet, record->lexeme)) {
           // if (isEndDo(*record) || isWhileEnd(*record)) {
             currentNode->add(new Node(*record));
             print("<while statement> -> <IF>  <Conditional> <Do|{> <StatementList> <EndIf|EndDo|}>");
@@ -169,7 +176,7 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
 
     }
   }
-  backup();
+  //backup();
   cancelNonTerminal(parent);
   return false;
 }
@@ -232,6 +239,12 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
       backup();
       finishNonTerminal(parent);
       return true; //just ; is accepted
+  }
+  if (inFollowSet(executionFollowSet, record->lexeme)) {
+  //if (nextToken->lexeme == "$" || nextToken->lexeme == ";" || nextToken->lexeme == "}") {
+      backup();
+      finishNonTerminal(parent);
+      return true;
   }
   backup();
   cancelNonTerminal(parent);

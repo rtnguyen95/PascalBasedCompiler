@@ -1,12 +1,14 @@
 int x;
 int y;
 int z;
-while x > y {
-    z = x/y;
+x = 3.4;
+if (x < y) {
+   x = y/z;
+   y = z/x;
 };
-if x > y do
-    z = y/x;
-endif;
-while (x > y) do
-    z = y/x;
-enddo;
+while (x > y) {
+   z = x/y;
+};
+if (x >= y) do
+  x = z/y;
+};

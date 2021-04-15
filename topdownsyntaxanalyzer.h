@@ -7,7 +7,8 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
     Node * currentNode;
     ParseTree * parseTree;
     FollowSets followSets;
-
+    set<string> conditionalFollowSet;
+    set<string> executionFollowSet;
     set<string> statementFollowSet;
     set<string> expressionFollowSet;
     set<string> expressionPrimeFollowSet;
@@ -15,8 +16,10 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
 public:
     TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
     : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {
-        statementFollowSet = { ";", "$", "whileend", "enddo", "endif", "endfor", "endelse", "}"};
+        statementFollowSet = { ";", "$"};
         expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do", "{"};
+        conditionalFollowSet = {"do", "{"};
+        executionFollowSet = {"whileend", "enddo", "endif", "endfor", "endelse", "}"};
         expressionFollowSet.insert(statementFollowSet.begin(), statementFollowSet.end());
         expressionPrimeFollowSet = expressionFollowSet;
         termPrimeFollowSet = {"+", "-"};
