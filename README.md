@@ -44,6 +44,13 @@ This shows that the syntax analyzer can handle statements that involve declarati
 ./tokenizer tests/declarations.txt
 ```
 
+or a comprehensive test can be run with: 
+
+```
+sh tests2.sh
+```
+This command will run several tests and only report the errors to the screen.  Some source files should have errors to demonstrate error handling.
+
 ## While Loop
 This example has a while loop inside of a while loop.
 ```
@@ -80,13 +87,3 @@ In this case the error refers to `while` and a production is not satisfied, thou
 Syntactic:  tests/syntaxerror.txt:4:6 - this rule <TermPrime> -> *<Factor><TermPrime> | /<Factor><TermPrime> | epsilon could not be met with 'while'
 ```
 
-
-The console output will be show the processing of the input file with tokens and 
-rules as they are found to match.  After each statement it will print:
-1. processing statement with success - if there are no errors in the statement
-2. processing statement with failure - if there is an error or the end of the source file is reached.
-
-Then it prints to the console the parse tree in three different ways
-1. Prints the only the terminals (leaves), which will look like the source code
-2. Prints a list of lexemes (in order they are encountered), followed by the productions used
-3. Prints the tree starting with the root node, where children are indented under their parents
