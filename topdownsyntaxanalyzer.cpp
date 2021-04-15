@@ -30,7 +30,6 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
 
 bool TopDownSyntaxAnalyzer::isStatement() {
     Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration> | <While> | <If>");
-    Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration>");
     Record * nextToken = getNextToken();
     if (nextToken == nullptr) return false;
     backup();
@@ -282,11 +281,11 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
                 finishNonTerminal(parent);
                 return true;
             }
-        }// else if(inFollowSet(expressionFollowSet, token->lexeme)) {
-        //    backup();
-        //    finishNonTerminal(parent);
-        //    return true;
-      //  }
+        } else if(inFollowSet(expressionFollowSet, token->lexeme)) {
+            backup();
+            finishNonTerminal(parent);
+            return true;
+        }
     }
 
     cancelNonTerminal(parent);
