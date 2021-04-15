@@ -13,7 +13,7 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
         cout << "processed program successfully" << endl;
     else {
         Record * token = getCurrentToken();
-        cout << "processing program with failure" << endl;
+        cout << "Error: processing program with failure" << endl;
         string errorMessage = "";
         if (token != nullptr) {
             cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
@@ -29,6 +29,7 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
 }
 
 bool TopDownSyntaxAnalyzer::isStatement() {
+    Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration> | <While> | <If>");
     Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration>");
     Record * nextToken = getNextToken();
     if (nextToken == nullptr) return false;
@@ -352,6 +353,7 @@ bool TopDownSyntaxAnalyzer::isIdentifier(bool check) {
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
     Node * parent = currentNode;
     currentProduction = name;
+    print(name);
     currentNode = new Node(name);
     return parent;
 }
@@ -362,6 +364,9 @@ void TopDownSyntaxAnalyzer::finishNonTerminal(Node * parent) {
 }
 
 void TopDownSyntaxAnalyzer::cancelNonTerminal(Node * parent) {
+    //cout << "Error: " << currentToken.filename->c_str() << ":" << currentToken.line << ":" << currentToken.linePosition 
+    //     << currentProduction << " was not met" << endl;
+         
     delete currentNode;
     currentNode = parent;
 }
