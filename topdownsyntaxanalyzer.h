@@ -17,8 +17,8 @@ public:
     TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
     : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {
         statementFollowSet = { ";", "$"};
-        expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do", "{"};
-        conditionalFollowSet = {"do", "{"};
+        expressionFollowSet = { ")", ">", "<", "<=", ">=", "==", "<>", "do", "{", "then"};
+        conditionalFollowSet = {"do", "{", "then"};
         executionFollowSet = {"whileend", "enddo", "endif", "endfor", "endelse", "}"};
         expressionFollowSet.insert(statementFollowSet.begin(), statementFollowSet.end());
         expressionPrimeFollowSet = expressionFollowSet;
@@ -47,7 +47,7 @@ public:
     bool isConditionalTopDown();
     bool isStatementList();
     bool isMoreStatements();
-
+    bool isElseTopDown();
     Node * startNonTerminal(const string & name);
     void finishNonTerminal(Node * parent);
     void cancelNonTerminal(Node * parent);

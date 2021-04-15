@@ -1,14 +1,19 @@
-int x;
+bool a;
+float x;
 int y;
 int z;
 x = 3.4;
+y = 7;
 if (x < y) {
    x = y/z;
    y = z/x;
 };
-while (x > y) {
+while (x == y) do
    z = x/y;
-};
-if (x >= y) do
+enddo;
+else if (x >= y) then
   x = z/y;
-};
+endelse;
+else while (x < y) do
+   x = y/z;
+whileend;
