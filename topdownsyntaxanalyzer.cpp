@@ -226,6 +226,7 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
                   if (isE()) {
                       Record * record = getNextToken();
                       if (record->lexeme == ")") {
+                        currentNode->add(new Node(token));
                         print("<Conditional> -> (<Expression> <Relational Operator> <Expression>) || <Expression> <Relational Operator> <Expression>");
                         finishNonTerminal(parent);
                         return true;
@@ -416,7 +417,6 @@ bool TopDownSyntaxAnalyzer::isF() {
                     return false;
                 if (record->lexeme == ")") {
                     currentNode->add(new Node(*record));
-                    //cout << " F -> (E)" << endl;
                     print("<Factor> -> (<Expression>)");
                     finishNonTerminal(parent);
                     return true;
@@ -428,19 +428,20 @@ bool TopDownSyntaxAnalyzer::isF() {
 }
 
 bool TopDownSyntaxAnalyzer::isE() {
-    Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime> || <Boolean Value>");
-    if (isT()) {
+    Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime> || <BooleanValue>");
+    Record * token = lookAhead();
+    if (isBoolValue(*token) && isBoolValueTopDown()) {
+      print("<Expression> -> <Boolean Value>");
+      finishNonTerminal(parent);
+      return true;
+    } else if (isT()) {
         if (isQ()) {
             print("<Expression> -> <Term><ExpressionPrime>");
             finishNonTerminal(parent);
             return true;
         }
     }
-    if (isBoolValueTopDown()) {
-      print("<Expression> -> <Boolean Value>");
-      finishNonTerminal(parent);
-      return true;
-    }
+    
     cancelNonTerminal(parent);
     return false;
 }

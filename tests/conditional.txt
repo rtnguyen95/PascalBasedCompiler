@@ -3,12 +3,12 @@ int b;
 int c;
 ! <Expression> <RelativeOperator> <Expression>!
 while a + b * c > a * b + (c * a) do
-    a = b + c                          ! ; is not required if it is the last statement in a block !
+    a = b + c;                          ! ; is not required if it is the last statement in a block !
 whileend;                              ! ; is required if there are more statements !
 
 ! <Expression> !
 while a + b * c * ( a + b + c ) do 
-    a = 7 * c
+    a = 7 * c;
 whileend;
 
 while a <= b do
@@ -18,7 +18,7 @@ while a <= b do
                 while a > c do
                     while c < a do
                         while c do 
-                            a = b + c
+                            a = b + c;
                         whileend
                     whileend
                 whileend

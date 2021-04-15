@@ -4,6 +4,6 @@ float a;
 while fahr < upper do 
     a = 23.00;
     while upper < a do 
-        upper = upper - 1
+        upper = upper - 1;
     whileend 
 whileend
