@@ -3,7 +3,8 @@
 #include "syntaxanalyzer.h"
 #include "parsetree.h"
 #include "followsets.h"
-class TopDownSyntaxAnalyzer : public SyntaxAnalyzer {
+class TopDownSyntaxAnalyzer : public SyntaxAnalyzer
+{
     Node * currentNode;
     ParseTree * parseTree;
     FollowSets followSets;

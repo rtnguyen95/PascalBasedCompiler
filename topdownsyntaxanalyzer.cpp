@@ -3,15 +3,17 @@
 #include <iostream>
 using namespace std;
 
-ParseTree * TopDownSyntaxAnalyzer::createParseTree() {
-    parseTree = new ParseTree();
+//Function to create parse tree
+ParseTree * TopDownSyntaxAnalyzer::createParseTree()
+{
+    parseTree = new ParseTree(); //initialize the parse tree
     currentNode = parseTree->getRoot(); // always add statements to the root node
     bool result = isStatementList();
     if (result)
-        cout << "processed program successfully" << endl;
+        cout << "Program Processing Successful" << endl;
     else {
         Record * token = getCurrentToken();
-        cout << "Error: processing program with failure" << endl;
+        cout << "Error: Program Processing Failure" << endl;
         string errorMessage = "";
         if (token != nullptr) {
             cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
