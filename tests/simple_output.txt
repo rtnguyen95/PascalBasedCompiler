@@ -1,13 +1,24 @@
 TOKENS        Lexemes
 
+KEYWORD     = float
+IDENTIFIER  = fahr
+SEPARATOR   = ;
+KEYWORD     = float
+IDENTIFIER  = upper
+SEPARATOR   = ;
+KEYWORD     = float
+IDENTIFIER  = a
+SEPARATOR   = ;
 KEYWORD     = while
 SEPARATOR   = (
 IDENTIFIER  = fahr
 OPERATOR    = <
 IDENTIFIER  = upper
 SEPARATOR   = )
+KEYWORD     = do
 IDENTIFIER  = a
 OPERATOR    = =
 FLOAT       = 23.00
 KEYWORD     = whileend
+EOF         = $
 EOF         = $
