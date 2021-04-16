@@ -1,10 +1,13 @@
-# Assignment 2 Extra Credit
+# Assignment 2
 Robert Nguyen
+
 Sean Javiya
+
 Allison Atienza
+
 Eric Britten
 
-Follow the instructions below on building and running tests
+Follow the instructions below on building and running tests:
 
 # Build
 sh ./build.sh
