@@ -8,12 +8,12 @@ class TopDownSyntaxAnalyzer : public SyntaxAnalyzer
     Node * currentNode;
     ParseTree * parseTree;
     FollowSets followSets;
-    set<string> conditionalFollowSet;
-    set<string> executionFollowSet;
-    set<string> statementFollowSet;
-    set<string> expressionFollowSet;
-    set<string> expressionPrimeFollowSet;
-    set<string> termPrimeFollowSet;
+    set<string> conditionalFollowSet; //Follow set for <Conditional> 
+    set<string> executionFollowSet; //Follow set for block executions 
+    set<string> statementFollowSet; //Follow set for <Statement>
+    set<string> expressionFollowSet; //Follow set for <Expression>
+    set<string> expressionPrimeFollowSet; //Follow set for <Expression Prime>
+    set<string> termPrimeFollowSet; //Follow set for <Term Prime>
 public:
     TopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
     : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {

@@ -8,51 +8,104 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree()
 {
     parseTree = new ParseTree(); //initialize the parse tree
     currentNode = parseTree->getRoot(); // always add statements to the root node
+    
+    //create a boolean variable called result and assign it to the outcome of isStatementList. result will return true if processing is successful and false if processing fails
     bool result = isStatementList();
+    
+    //if processing is successful output a confirmation to the console
     if (result)
         cout << "Program Processing Successful" << endl;
+   
+    //else if processing fails
     else {
+        //get the token that has failed processing
         Record * token = getCurrentToken();
+        
+        //output an error message to the console
         cout << "Error: Program Processing Failure" << endl;
+        
+        //create a string variable errorMessage that will hold information about the error
         string errorMessage = "";
-        if (token != nullptr) {
+        
+        //check to see if token is not null
+        if (token != nullptr)
+        {
+            //output the name of the file, line number, and line position number where the error was found to the console
             cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
+            
+            //output the rule and the lexeme that mismatched to the console
             cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
+            
+            //add information about the rule and the lexeme that mismatched to errorMessage
             errorMessage.append("this rule ").append(currentProduction).append(" could not be met with '").append(token->lexeme)
               .append("'\n").append(lastError);
         }
+        
+        //pass the file name, line number, line position number, error message string, and syntax_error information to errorHandler.addError so it can be recorded
         errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
     }
-    parseTree->printRules(cout);
-    return parseTree;
+    
+    parseTree->printRules(cout); //print the rules of the parseTree
+    return parseTree; //return parseTree to the caller
 }
+
+/*
+ <Statement> -> <Assign> | <Declaration> | <While> | <If> | <Else> function
+ Checks to see if a token satisfies the <Statement> rule.
+ This function uses a predictive approach using FIRST sets.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isStatement() {
-    Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration> | <While> | <If>");
+    //create a node for the parse tree for this rule
+    Node * parent = startNonTerminal("<Statement> -> <Assign> | <Declaration> | <While> | <If> | <Else>");
+    
+    //get the Record object for the next token and point to it with a variable called nextToken
     Record * nextToken = getNextToken();
+    
+    //if nextToken is null return the function as false
     if (nextToken == nullptr) return false;
+    
+    //undo the "peek" so it does not affect the variables in future processing
     backup();
+    
+    //check to see if the non-terminal satisfies <Statement> -> <Declarative> using FIRST(Declarative) = Type
     if(isType(*nextToken) && isDeclaration()) {
+        //if true add the node to the parse tree and return the function as true
         finishNonTerminal(parent);
         return true;
     }
+    
+    //check to see if the non-terminal satisfies <Statement> -> <Assign> using FIRST(Assign) = ID
     if(isId(*nextToken) && isAssignment()) {
+        //if true add the node to the parse tree and return the function as true
         finishNonTerminal(parent);
         return true;
     }
+    
+    //check to see if the non-terminal satisfies <Statement> -> <While> using FIRST(While) = while
     if(isWhile(*nextToken) && isWhileTopDown()) {
+        //if true add the node to the parse tree and return the function as true
         finishNonTerminal(parent);
         return true;
     }
+    
+    //check to see if the non-terminal satisfies <Statement> -> <If> using FIRST(If) = if
     if(isIf(*nextToken) && isIfTopDown()) {
+        //if true add the node to the parse tree and return the function as true
         finishNonTerminal(parent);
         return true;
     }
+    
+    //check to see if the non-terminal satisfies <Statement> -> <Else> using FIRST(Else) = else
     if(isElse(*nextToken) && isElseTopDown()) {
+        //if true add the node to the parse tree and return the function as true
       finishNonTerminal(parent);
       return true;
     }
+    
     // check for epsilon
     if (inFollowSet(executionFollowSet, nextToken->lexeme)) {
+        //if true add the node to the parse tree and return the function as true
         finishNonTerminal(parent);
         return true;
     }
@@ -64,19 +117,41 @@ bool TopDownSyntaxAnalyzer::isStatement() {
     cancelNonTerminal(parent);
     return false;
 }
+
+/*<Boolean Value> -> <True> || <False> function
+Checks to see if a token satisfies the <Boolean Value> rule.
+Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isBoolValueTopDown() {
-  Record * record = getNextToken();
-  Node * parent = startNonTerminal("<BooleanValue> -> True | False");
-  if (record == nullptr)
+  //get the Record object that holds the information for the next token to be processed and point to the record with a pointer called record
+    Record * record = getNextToken();
+    
+    //creates a node for the parse tree for this rule
+    Node * parent = startNonTerminal("<Boolean Value> -> <True> || <False>");
+    
+    //if record is nullptr then the function returns false
+    if (record == nullptr)
+        return false;
+    
+    //check to see if the lexeme is true or false
+    if (isBoolValue(*record))
+    {
+        //if true the rule is satisfied. Add the Record to the token to the parse tree and return true to the caller
+        currentNode->add(new Node(*record));
+        finishNonTerminal(parent);
+        return true;
+    }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
+    cancelNonTerminal(parent);
     return false;
-  if (isBoolValue(*record)) {
-    currentNode->add(new Node(*record));
-    finishNonTerminal(parent);
-    return true;
-  }
-  cancelNonTerminal(parent);
-  return false;
 }
+
+/*
+ <NUM> -> number function
+ Checks to see if a token satisfies the <NUM> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isNumberTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<NUM> -> number");
@@ -90,10 +165,19 @@ bool TopDownSyntaxAnalyzer::isNumberTopDown() {
   cancelNonTerminal(parent);
   return false;
 }
+
+/*
+ <while statement> -> <WHILE>  <Conditional> <Do|Then> <StatementList> <WhileEnd|EndDo> || <While> <Conditional> { <StatementList> } function
+ Checks to see if a token satisfies the <while> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isWhileTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<While> -> while <Conditional> do|then|{ <StatementList> whileend|whiledo|}");
   if (record == nullptr) {return false;}
+
+  //  check for non-terminals: <While>, <Conditional>, FOLLOW(Conditional), <StatementList>, FOLLOW(StatementList), consecutively
+    //if all return true then the node is added to the tree and the function returns true
   if (isWhile(*record)) {
     currentNode->add(new Node(*record));
     if (isConditionalTopDown()) {
@@ -112,13 +196,25 @@ bool TopDownSyntaxAnalyzer::isWhileTopDown() {
       }
     }
   }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
   cancelNonTerminal(parent);
   return false;
 }
+
+
+/*
+ <if statement> -> <IF> <Conditional> <Do|Then> <StatementList> <EndDo|EndIf> || <IF> <Conditional> { <StatementList> }
+ Checks to see if a token satisfies the <if statement> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isIfTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<If> -> if <Conditional> do|then|{ <StatementList> enddo|endif|}");
   if (record == nullptr) {return false;}
+    
+    //  check for non-terminals: <IF>, <Conditional>, FOLLOW(Conditional), <StatementList>, FOLLOW(StatementList), consecutively
+    //if all return true then the node is added to the tree and the function returns true
   if (isIf(*record)) {
     currentNode->add(new Node(*record));
     if (isConditionalTopDown()) {
@@ -137,11 +233,22 @@ bool TopDownSyntaxAnalyzer::isIfTopDown() {
       }
     }
   }
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
   cancelNonTerminal(parent);
   return false;
 }
+
+
+/*
+ <StatementList> -> <Statement> <MoreStatements>
+ Checks to see if a token satisfies the <StatementList> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isStatementList() {
   Node * parent = startNonTerminal("<StatementList> -> <Statement> <MoreStatements>");
+    
+    //check for non-terminals: <Statement>, <MoreStatements>, consecutively
+    //if all return true then the node is added to the tree and the function returns true
   if(isStatement()) {
     if(isMoreStatements()){
       print("<StatementList> -> <Statement> <MoreStatements>");
@@ -149,12 +256,23 @@ bool TopDownSyntaxAnalyzer::isStatementList() {
       return true;
     }
   }
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
   cancelNonTerminal(parent);
   return false;
 }
+
+
+/*
+ <MoreStatements> -> ; <Statement> <MoreStatements> | epsilon
+ Checks to see if a token satisfies the <MoreStatements> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isMoreStatements() {
   Node * parent = startNonTerminal("<MoreStatements> -> ; <Statement> <MoreStatements> | epsilon");
   Record * record = getNextToken();
+    
+    //check for non-terminals: ; <Statement>, <MoreStatements>, consecutively
+    //if all return true then the node is added to the tree and the function returns true
   if(isSemiColon(*record)) {
     currentNode->add(new Node(*record));
     if (isStatement()) {
@@ -164,25 +282,41 @@ bool TopDownSyntaxAnalyzer::isMoreStatements() {
         return true;
       }
     }
+      
+      //else if check for epsilon
+      //if all true then the node is added to the tree and the function returns true
   } else if(inFollowSet(statementFollowSet, record->lexeme)) {
       print("<MoreStatements> -> epsilon");
       backup();
       finishNonTerminal(parent);
       return true;
   }
+    
+    //check for execution Follow set and if true then the node is added to the tree and the function returns true
   if (inFollowSet(executionFollowSet, record->lexeme)) {
     backup();
     finishNonTerminal(parent);
     return true;
   }
+    
+//if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
   backup();
   cancelNonTerminal(parent);
   return false;
 }
+
+/*
+ <else statement> -> <else> <If|While> <Conditional> <Do|Then> <StatementList> <EndDo|EndElse> || <Else> <Conditional> { <StatementList> }
+ Checks to see if a token satisfies the <else statement> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isElseTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<Else> -> else if|while <Conditional> do|then|{ <StatementList> enddo|endelse|}");
   if (record == nullptr) {return false;}
+    
+    //checks for <else>, <if> or <while>, <conditional>, Follow(conditional), <StatementList>, Follow(StatementList), consecutively
+    //if all return true then the node is added to the tree and the function returns true
   if (isElse(*record)) {
     currentNode->add(new Node(*record));
     Record * record = getNextToken();
@@ -205,13 +339,24 @@ bool TopDownSyntaxAnalyzer::isElseTopDown() {
         }
     }
   }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
   cancelNonTerminal(parent);
   return false;
 }
 
+
+/*
+ <Conditional> -> (<Expression> <Relational Operator> <Expression>) || <Expression> <Relational Operator> <Expression> function
+ Checks to see if a token satisfies the <Conditional> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
     Node * parent = startNonTerminal("<Conditional> -> (<Expression> <Relational Operator> <Expression>) | <Expression> <Relational Operator> <Expression>");
     Record * record = getNextToken();
+    
+    //checks for (, <Expression>, <Relational Operator>, <Expression>, ), consecutively
+    //if all return true the node is added to the tree and the function returns true
     if (record->lexeme == "(") {
             currentNode->add(new Node(*record));
             if (isE()) {
@@ -231,6 +376,9 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
               }
             }
     }else {backup();}
+    //else backup is called and the function checks again for:
+    //<Expression>, <Relational Operator>, <Expression>, consecutively
+    //if all return true the node is added to the tree and the function returns true
     if (isE()) {
         Record * token = getNextToken();
         if (token == nullptr) return false;
@@ -240,7 +388,9 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
                 finishNonTerminal(parent);
                 return true;
             }
-        } else if(inFollowSet(expressionFollowSet, token->lexeme)) {
+        }
+        //else if the function checks Follow(Expression) and if truethe node is added to the tree and the function returns true
+         else if(inFollowSet(expressionFollowSet, token->lexeme)) {
             backup();
             finishNonTerminal(parent);
             return true;
@@ -249,48 +399,87 @@ bool TopDownSyntaxAnalyzer::isConditionalTopDown() {
     cancelNonTerminal(parent);
     return false;
 }
+
+/* <Declaration> -> <Type><ID> function
+ Checks to see if a token satisfies the <Declaration> rule.
+Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isDeclaration() {
+    
+    //print the rules associated with Declaration
+    print("<Declaration> -> <Type><ID>");
+    print("<Type> -> float | int | bool");
+    print("<ID> -> identifier");
+    
+    //creates a node for the parse tree for this rule
     Node * parent = startNonTerminal("<Declaration> -> <Type><ID>");
+    
+    //check for two non-terminals: <Type> and <ID>, consecutively
     if (isTypeTopDown()) {
         if (isIdentifier()) {
+            //if both Type and Id are found add both lexemes to the symbol table, print the rule, finish adding the node for the rule to the parse tree, and return the function as true to the caller
             symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(parent);
                 return true;
         }
     }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
+
+/* <Type> -> float | int | bool function
+ Checks to see if a token satisfies the <Type> rule.
+Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isTypeTopDown() {
   Record * record = getNextToken();
   Node * parent = startNonTerminal("<Type> -> float | int | bool");
   if (record == nullptr)
     return false;
+    //checks for float, int, or bool and if true adds the node to the tree and the function returns true
   if (isType(*record)) {
     currentNode->add(new Node(*record));
     finishNonTerminal(parent);
     return true;
   }
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
   cancelNonTerminal(parent);
   return false;
 }
+
+/* <ID> -> identifier function
+ Checks to see if a token satisfies the <ID> rule.
+Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isIdentifier(bool check) {
     Record * record = getNextToken();
     Node * parent = startNonTerminal("<ID> -> identifier");
     if (record == nullptr) {return false;}
+    //checks for an identifier
     if(isId(*record)) {
+        //checks the symbol table to see if the identifier was defined the program. If true, the node is added to the tree and the function returns true
         if (!check || symbolTable.exists(record->lexeme)) {
             currentNode->add(new Node(*record));
             finishNonTerminal(parent);
             return true;
-        } else {
+        }
+        //else an error is recorded because the identifier was not previously defined before being used in the program
+        else {
             errorHandler.addError(Error(*record, record->lexeme + " was not previously defined", syntax_error));
         }
     }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
+
+//creates a node for the parse tree
+//accepts an argument of a string called name that represents the rule the node is supposed to follow
+//This node will be later verified to see if it satisfies the rule given in name, and will be added to the tree if it satisfies the rule or deleted if it does not satisy the rule using other functions
 Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
     Node * parent = currentNode;
     currentProduction = name;
@@ -299,21 +488,33 @@ Node * TopDownSyntaxAnalyzer::startNonTerminal(const string & name) {
     return parent;
 }
 
+//Adds a node to the parse tree
+//This function is used once it is verified that a token satisfies a rule
 void TopDownSyntaxAnalyzer::finishNonTerminal(Node * parent) {
     parent->add(currentNode);
     currentNode = parent;
 }
 
+//Deletes a node
+//This function is used when a token fails to satisfy a rule and the node is not added to the parse tree
 void TopDownSyntaxAnalyzer::cancelNonTerminal(Node * parent) {
     delete currentNode;
     currentNode = parent;
 }
 
+/*
+ <ExpressionPrime> -> +<Term><ExpressionPrime> | -<Term><ExpressionPrime> | epsilon function
+ Checks to see if a token satisfies the <ExpressionPrime> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isQ(){
     Record * record = getNextToken();
     if (record == nullptr)
         return false;
     Node * parent = startNonTerminal("<ExpressionPrime> -> +<Term><ExpressionPrime> | -<Term><ExpressionPrime> | epsilon");
+    
+    //checks for +, <Term>, <ExpressionPrime> consecutively
+    //if true the corresponding rule is added to the parse tree and the function returns true
     if (record->lexeme == "+") {
         currentNode->add(new Node(*record));
         if (isT()) {
@@ -323,7 +524,10 @@ bool TopDownSyntaxAnalyzer::isQ(){
                 return true;
             }
         }
-    } else if (record->lexeme == "-") {
+    }
+    //else is the program checks for -, <Term>, <ExpressionPrime> consecutively
+    //if true the corresponding rule is added to the parse tree and the function returns true
+    else if (record->lexeme == "-") {
         currentNode->add(new Node(*record));
         if (isT()) {
             if (isQ()) {
@@ -332,17 +536,32 @@ bool TopDownSyntaxAnalyzer::isQ(){
                 return true;
             }
         }
-    } else if(inFollowSet(expressionPrimeFollowSet, record->lexeme)) {
+    }
+    //else if the program checks for epsilon
+    //if true the corresponding rule is added to the parse tree and the function returns true
+    else if(inFollowSet(expressionPrimeFollowSet, record->lexeme)) {
         print("<ExpressionPrime> -> epsilon");
         backup();
         finishNonTerminal(parent);
         return true;
     }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
+
+
+/*
+ <Term> -> <Factor><TermPrime> function
+ Checks to see if a token satisfies the <Term> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isT() {
     Node * parent = startNonTerminal("<Term> -> <Factor><TermPrime>");
+    
+    //checks for <Factor>, <TermPrime> consecutively
+    //if true the node is added to the parse tree and the function returns true
     if (isF()) {
         if (isR()) {
             print("<Term> -> <Factor><TermPrime>");
@@ -350,14 +569,24 @@ bool TopDownSyntaxAnalyzer::isT() {
             return true;
         }
     }
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
+
+/*
+ <TermPrime> -> *<Factor><TermPrime> | /<Factor><TermPrime> | epsilon function
+ Checks to see if a token satisfies the <TermPrime> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isR() {
     Record * record = getNextToken();
     if (record == nullptr)
         return false;
     Node * parent = startNonTerminal("<TermPrime> -> *<Factor><TermPrime> | /<Factor><TermPrime> | epsilon");
+    
+    //checks for *, <Factor>, <TermPrime> consecutively
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
     if (record->lexeme == "*") {
         currentNode->add(new Node(*record));
         if (isF()) {
@@ -367,7 +596,10 @@ bool TopDownSyntaxAnalyzer::isR() {
                 return true;
             }
         }
-    } else if(record->lexeme == "/") {
+    }
+    //else if the function checks the second rule for /, <Factor>, <TermPrime> consecutively
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
+    else if(record->lexeme == "/") {
         currentNode->add(new Node(*record));
         if (isF()) {
             if (isR()) {
@@ -376,31 +608,52 @@ bool TopDownSyntaxAnalyzer::isR() {
                 return true;
             }
         }
-    } else if (inFollowSet(termPrimeFollowSet, record->lexeme)) {
+    }
+    //else if the function checks the third rule for epsilon
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
+    else if (inFollowSet(termPrimeFollowSet, record->lexeme)) {
         print("<TermPrime> -> epsilon");
         backup();
         finishNonTerminal(parent);
         return true;
     }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
+
+/*
+ <Factor> -> (<Expression>) | <ID> | <NUM> function
+ Checks to see if a token satisfies the <Factor> rule.
+ This function uses a predictive approach using FIRST sets
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isF() {
     Record * record = getNextToken();
     if (record == nullptr)
         return false;
     backup();
     Node * parent = startNonTerminal("<Factor> -> (<Expression>) | <ID> | <NUM>");
+   
+    //checks for <ID> and FIRST(ID)
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
     if (isId(*record) && isIdentifier(true)) {
         print("<Factor> -> <Identifier>");
         finishNonTerminal(parent);
         return true;
     }
+    
+    //checks for <Number> and FIRST(Number)
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
     if (isNumber(*record) && isNumberTopDown()) {
       print("<Factor> -> <NUM>");
       finishNonTerminal(parent);
       return true;
     }
+    
+    //checks for (, <Expression>, ), consecutively
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
     if (record->lexeme == "(") {
             getNextToken();
             currentNode->add(new Node(*record));
@@ -416,18 +669,30 @@ bool TopDownSyntaxAnalyzer::isF() {
                 }
             }
     }
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
 
+/*
+ <Expression> -> <Term><ExpressionPrime> || <BooleanValue> function
+ Checks to see if a token satisfies the <Expression> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isE() {
     Node * parent = startNonTerminal("<Expression> -> <Term><ExpressionPrime> || <BooleanValue>");
     Record * token = lookAhead();
+    
+    //checks for <BooleanValue> and FIRST(BooleanValue)
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
     if (isBoolValue(*token) && isBoolValueTopDown()) {
       print("<Expression> -> <Boolean Value>");
       finishNonTerminal(parent);
       return true;
-    } else if (isT()) {
+    }
+    //else if checks for <Term>, <ExpressionPrime> consecutively
+    //if true the corresponding rule is added as a node to the parse tree and the function returns true
+    else if (isT()) {
         if (isQ()) {
             print("<Expression> -> <Term><ExpressionPrime>");
             finishNonTerminal(parent);
@@ -435,11 +700,21 @@ bool TopDownSyntaxAnalyzer::isE() {
         }
     }
     
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
+
+/*
+ <Assign> -> <ID> = <Expression> function
+ Checks to see if a token satisfies the <Assign> rule.
+ Returns true if the token satisfies the rule and false if the token does not satisfy the rule
+ */
 bool TopDownSyntaxAnalyzer::isAssignment() {
     Node * parent = startNonTerminal("<Assign> -> <ID> = <Expression>");
+    
+    //checks for <ID>, =, <Expression> consecutively
+    //if true the node is added to the parse tree and the function returns true
     if (isIdentifier(true)) {
         Record * record = getNextToken();
         if (record == nullptr)
@@ -452,6 +727,8 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
             }
         }
     }
+    
+    //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
 }
