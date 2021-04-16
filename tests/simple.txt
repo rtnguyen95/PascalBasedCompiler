@@ -1,4 +1,4 @@
 float fahr;
 float upper;
 float a;
-while (fahr < upper) do a = 23.00 whileend
+while (fahr < upper) do a = 23.00; whileend
