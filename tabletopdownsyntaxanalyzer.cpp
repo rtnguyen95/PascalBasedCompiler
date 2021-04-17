@@ -111,6 +111,8 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
             if (x == columnFromToken(currentToken)) {
                 currentNode->token = currentToken;
                 currentNode->nonTerminal = "";
+                
+                cout << "pop " << to_string(productionStack.top()) << endl;
                 productionStack.pop();
                 parseTreeStack.pop();
                 
@@ -132,6 +134,7 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
                     auto cell = row[(Terminals)a];
 
                     // pop the current production rule
+                    cout << "pop " << to_string(productionStack.top()) << endl;
                     productionStack.pop();
                     currentNode = parseTreeStack.top();
                     parseTreeStack.pop();
