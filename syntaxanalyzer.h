@@ -21,6 +21,8 @@ protected:
     LexicalScanner & lexicalScanner;
     ErrorHandler & errorHandler;
     SymbolTable & symbolTable;
+    Node * currentNode;
+    ParseTree * parseTree;
 public:
 
     SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
@@ -104,6 +106,34 @@ public:
     bool isBoolValue(const Record & lexeme);
 
     const vector<string> relativeOperators = {"<", ">", "<=", ">=", "<=", "==", "<>"};
+
+    bool isPlus(const Record & lexeme) {
+        return lexeme.token == "OPERATOR" && lexeme.lexeme == "+";
+    }
+
+    bool isMinus(const Record & lexeme) {
+        return lexeme.token == "OPERATOR" && lexeme.lexeme == "-";
+    }
+
+    bool isMultiply(const Record & lexeme) {
+        return lexeme.token == "OPERATOR" && lexeme.lexeme == "*";
+    }
+
+    bool isDivideBy(const Record & lexeme) {
+        return lexeme.token == "OPERATOR" && lexeme.lexeme == "/";
+    }
+
+    bool isLeftParen(const Record & lexeme) {
+        return lexeme.token == "SEPARATOR" && lexeme.lexeme == "(";
+    }
+
+    bool isRightParan(const Record & lexeme) {
+        return lexeme.token == "SEPARATOR" && lexeme.lexeme == ")";
+    }
+
+    bool isEOF(const Record & lexeme) {
+        return lexeme.token == "EOF" && lexeme.lexeme == "$";
+    }
 
     //function to return the vector of lexemes
     vector<Record> & getTokenList() {

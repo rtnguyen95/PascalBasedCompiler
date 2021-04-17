@@ -26,9 +26,16 @@ struct Node {
 
     }
 
-    void add(Node * child) {
+    Node * add(Node * child) {
         child->parent = this;
         children.push_back(child);
+        return child;
+    }
+
+    Node * addFirst(Node * child) {
+        child->parent = this;
+        children.push_front(child);
+        return child;
     }
 };
 

@@ -1,6 +1,7 @@
 #include "tokenizer.h"
 #include "lexicalscanner.h"
 #include "topdownsyntaxanalyzer.h"
+#include "tabletopdownsyntaxanalyzer.h"
 #include <filesystem>
 
 //function definition for parsing the input
@@ -22,8 +23,8 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   //=====syntax analysis phase ======
   SymbolTable symbolTable;
-  TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
-
+  //TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
+  TableTopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
   ParseTree* parseTree = syntaxAnalyzer.createParseTree();
 
   ostringstream code_output;           
