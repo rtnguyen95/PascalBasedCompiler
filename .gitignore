@@ -1,6 +1,6 @@
 *.o
 *.out
-.vscode
+.vscode/
 tests/*-states.txt
 tests/*_output.txt
 tokenizer
@@ -9,3 +9,4 @@ tests/*-symbols.txt
 tests/*-code.txt
 tests/*-parse-tree.txt
 tests/*-productions.txt
+cmake*/
