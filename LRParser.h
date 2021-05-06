@@ -80,12 +80,12 @@ class LRParser : public SyntaxAnalyzer {
     enum Terminals {
         Identifier = 0,
         Addition = 1,
-        Subtraction = 1,
-        Multiply = 2,
-        Divide = 2,
-        LeftParen = 3,
-        RightParen = 4,
-        EndOfFile = 5,
+        Subtraction = 2,
+        Multiply = 3,
+        Divide = 4,
+        LeftParen = 5,
+        RightParen = 6,
+        EndOfFile = 7,
     };
 
     map<string, int> productionNames = {
@@ -96,7 +96,7 @@ class LRParser : public SyntaxAnalyzer {
 
     list<LREntry> productionStack;
     stack<Node *> parseTreeStack;
-    static LREntry table[12][9];
+    static LREntry table[16][11];
     static list<pair<LREntry, string>> productions;
 public:
     LRParser(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler);
