@@ -69,6 +69,11 @@ public:
         return printTree(stream, root);
     }
 
+    void printASTTree(ostream & stream) {
+        stream << "-------Parse AST Tree -----------------------" << endl;
+        return printASTTree(stream, root);
+    }
+
     void addToRoot(Node * child) {
         add(root, child);
     }
@@ -160,5 +165,15 @@ protected:
         }
     }
 
+    void printASTTree(ostream & stream, Node * node, int indent = 0) {
+        if (node->nonTerminal.empty()) {
+            stream << string(indent * 2, ' ') << node->token.lexeme << endl;
+        } else {
+            stream << string(indent * 2, ' ') << node->nonTerminal << endl;
+        }
+        for (auto it = node->children.begin(); it != node->children.end(); ++it) {
+            printASTTree(stream, *it, indent + 1);
+        }
+    }
 
 };
