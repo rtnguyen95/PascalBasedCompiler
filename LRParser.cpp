@@ -134,6 +134,7 @@ bool LRParser::stackProcess() {
 
 
     while (!productionStack.empty()) {
+        cout << "--------------------------------------------------" << endl;
         cout << "stack: ";
         for (auto i : productionStack) {
             cout << to_string(i);
@@ -141,16 +142,17 @@ bool LRParser::stackProcess() {
         cout << endl;
         auto qm = productionStack.back();
         //currentNode = parseTreeStack.top();
-        cout << "top of stack: " << to_string(qm) << endl;
+        cout << "top of stack: " << to_string(qm) << " and current token: " << currentToken.lexeme << endl;
         //cout << "top of nodes: " << currentNode->nonTerminal << endl;
 
         int row = rowFromRecord(qm);
         int column = columnFromToken(currentToken);
+        cout << "T[" << to_string(qm) << ", " << to_string(LREntry(currentToken)) << "] = ";
         LREntry x = table[row][column];
-
+        cout << to_string(x) << "; Action -> ";
         switch(x.operation) {
             case LREntry::Shift:
-                cout << "Shift: " << "push(" << to_string(LREntry(currentToken)) << "); push (" << to_string(GotoEntry(x.value)) << ")" << endl;
+                cout << "Shift( " << x.value << "); push(" << to_string(LREntry(currentToken)) << "); push (" << to_string(GotoEntry(x.value)) << ")" << endl;
                 productionStack.push_back(LREntry(currentToken));
                 productionStack.push_back(GotoEntry(x.value));
                 if (isId(currentToken)) {
@@ -161,7 +163,7 @@ bool LRParser::stackProcess() {
                 currentToken = *getNextToken();
                 break;
             case LREntry::Reduce: {
-                cout << "Reduce: " << x.value << " ";
+                cout << "Reduce(" << x.value << "): ";
                 // pop 2x RHS symbols
                 int n = getProductionTerminalCount(x.value) * 2;
                 while (n--) {
@@ -183,6 +185,7 @@ bool LRParser::stackProcess() {
                 auto qj = productionStack.back();
                 // push LHS onto the stack
                 auto lhs = getProduction(x.value);
+                cout << " Production: " << to_string(lhs) << " -> " << getProductionRHS(x.value) << "; ";
                 productionStack.push_back(lhs);
                 int row = rowFromRecord(qj);
                 int column = columnFromRecord(lhs);
@@ -275,4 +278,13 @@ LREntry LRParser::getProduction(int rule) {
         }
     }
     throw bad_exception();
+}
+
+string LRParser::getProductionRHS(int rule) {
+    for (auto i : productions) {
+        if (i.first.value == rule) {
+            return i.second;
+        }
+    }
+    return 0;
 }

@@ -138,6 +138,7 @@ public:
     LREntry getTopMostTerminal();
     int getProductionTerminalCount(int rule);
     LREntry getProduction(int rule);
+    string getProductionRHS(int rule);
 };
 
 
