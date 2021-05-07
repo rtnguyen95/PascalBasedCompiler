@@ -25,11 +25,18 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   //=====syntax analysis phase ======
   SymbolTable symbolTable;
-  //TopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
-  //TableTopDownSyntaxAnalyzer syntaxAnalyzer(scanner, symbolTable, errorHandler);
-  //OperatorPrecedenceParser syntaxAnalyzer(scanner, symbolTable, errorHandler);
-  LRParser syntaxAnalyzer(scanner, symbolTable, errorHandler);
-  ParseTree* parseTree = syntaxAnalyzer.createParseTree();
+  SyntaxAnalyzer * syntaxAnalyzer = nullptr;
+  if (parser_type == "lr") {
+      syntaxAnalyzer = new LRParser(scanner, symbolTable, errorHandler);
+  } else if (parser_type == "op") {
+      syntaxAnalyzer = new OperatorPrecedenceParser(scanner, symbolTable, errorHandler);
+  } else if (parser_type == "table") {
+      syntaxAnalyzer = new TableTopDownSyntaxAnalyzer(scanner, symbolTable, errorHandler);
+  } else {
+      syntaxAnalyzer = new TopDownSyntaxAnalyzer(scanner, symbolTable, errorHandler);
+  }
+
+  ParseTree* parseTree = syntaxAnalyzer->createParseTree();
 
   ostringstream code_output;           
   parseTree->printNodes(code_output, false);
@@ -52,7 +59,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   //create a record object and initialize token to blank,  lexeme to blank, final state/acceptance to true, and the error message to blank.
   //this variable is used to temporarily hold the data of the current lexeme being processed
   Record record = {"", "", true, filename_, 1, 0, ""};
-  vector<Record> records = syntaxAnalyzer.getTokenList();
+  vector<Record> records = syntaxAnalyzer->getTokenList();
   output << "TOKENS        Lexemes" << endl << endl;
   for (vector<Record>::iterator it = records.begin();
        it != records.end(); ++it) {
@@ -84,7 +91,7 @@ vector<Record> tokenizer::parse_input(string output_file_name)
 
   cout << endl;
 
-  //records.push_back(Record("ENDOFFILE", "$", true, filename_, 1000, 0));
+  delete syntaxAnalyzer;
   return records; //return the token and lexeme list to the caller
 }
 

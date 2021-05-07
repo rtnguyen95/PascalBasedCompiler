@@ -10,6 +10,7 @@ class tokenizer
 private:
   std::string filename_; //holds the name of the input file
   std::stringstream parser_; //holds the contents of the input file that will be parsed
+  std::string parser_type;
   ErrorHandler errorHandler;
 
 public:
@@ -18,8 +19,9 @@ public:
   tokenizer() {filename_ = " ";} //default constructor - sets fileame to blank
 
 //overloaded constructor - accepts a single argument string representing the input file name
-  tokenizer(std::string filename) {
+  tokenizer(std::string filename, std::string parser) {
     filename_ = filename;
+    parser_type = parser;
   }
 
   vector<Record> parse_input(string output_file_name);// paramter = output location

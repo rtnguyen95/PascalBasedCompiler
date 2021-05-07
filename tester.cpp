@@ -17,9 +17,17 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
+  string parser_type = "rdp";
+
+  for (int i = 2; i < argc; i++) {
+      if (argv[i][0] == '-') {
+          parser_type = string(argv[i]).substr(1);
+      }
+  }
+
   cout << "Processing file: " << argv[1] << endl << endl;
   string input_file_stream = argv[1];
-  tokenizer tester(input_file_stream);
+  tokenizer tester(input_file_stream, parser_type);
   string dot = ".";
   string file_handle = input_file_stream.substr(0, input_file_stream.find(dot));
   string extension = "_output.txt";
@@ -29,7 +37,7 @@ int main(int argc, char* argv[]) {
   vector<Record> records = tester.parse_input(file_handle);
 
   // output locatin is passed to parse_input
-  if (argc > 2) {
+  if (argc > 2 && argv[2][0] != '-') {
     cout << "comparing results to expected file: " << argv[2] << endl << endl;
 
     string expected_output_file = argv[2];
