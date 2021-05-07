@@ -58,15 +58,15 @@ struct LREntry {
 };
 
 struct ReduceEntry : public LREntry {
-    ReduceEntry(int state) : LREntry(Reduce, state) {}
+    explicit ReduceEntry(int rule) : LREntry(Reduce, rule) {}
 };
 
 struct ShiftEntry : public LREntry {
-    ShiftEntry(int state) : LREntry(Shift, state) {}
+    explicit ShiftEntry(int state) : LREntry(Shift, state) {}
 };
 
 struct GotoEntry : public LREntry {
-    GotoEntry(int state) : LREntry(Goto, state) {}
+    explicit GotoEntry(int state) : LREntry(Goto, state) {}
 };
 
 class LRParser : public SyntaxAnalyzer {

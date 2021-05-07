@@ -112,7 +112,8 @@ ParseTree * LRParser::createParseTree()
         errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
     }
 
-    parseTree->printRules(cout); //print the rules of the parseTree
+    //parseTree->printRules(cout); //print the rules of the parseTree
+    parseTree->printASTTree(cout);
     return parseTree; //return parseTree to the caller
 }
 
@@ -128,12 +129,12 @@ bool LRParser::stackProcess() {
 
     currentNode = parseTree->getRoot();
     parseTreeStack.push(currentNode);
-    Node * child = currentNode->add(new Node(to_string(productionStack.back())));
-    parseTreeStack.push(child);
+    //Node * child = currentNode->add(new Node(to_string(productionStack.back())));
+    //parseTreeStack.push(child);
 
 
     while (!productionStack.empty()) {
-        cout << "stack: ";// << to_string(productionStack.back()) << endl;
+        cout << "stack: ";
         for (auto i : productionStack) {
             cout << to_string(i);
         }
@@ -152,7 +153,12 @@ bool LRParser::stackProcess() {
                 cout << "Shift: " << "push(" << to_string(LREntry(currentToken)) << "); push (" << to_string(GotoEntry(x.value)) << ")" << endl;
                 productionStack.push_back(LREntry(currentToken));
                 productionStack.push_back(GotoEntry(x.value));
-                currentToken = lexicalScanner.lexer();
+                if (isId(currentToken)) {
+                    parseTreeStack.push(new Node(currentToken));
+                    if(symbolTable.exists(currentToken.lexeme))
+                        symbolTable.add(Record(string("KEYWORD"), string("int"), true, *currentToken.filename, currentToken.line, currentToken.linePosition), currentToken);
+                }
+                currentToken = *getNextToken();
                 break;
             case LREntry::Reduce: {
                 cout << "Reduce: " << x.value << " ";
@@ -160,9 +166,19 @@ bool LRParser::stackProcess() {
                 int n = getProductionTerminalCount(x.value) * 2;
                 while (n--) {
                     cout << "pop("<<to_string(productionStack.back())<<");";
+                    auto top = productionStack.back();
+                    if (isOperator(top.token)) {
+                        Node * op2 = parseTreeStack.top();
+                        parseTreeStack.pop();
+                        Node * op1 = parseTreeStack.top();
+                        parseTreeStack.pop();
+                        currentNode = new Node(top.token);
+                        currentNode->add(op1);
+                        currentNode->add(op2);
+                        parseTreeStack.push(currentNode);
+                    }
                     productionStack.pop_back();
                 }
-                //cout << endl;
                 // let qj be the TOS
                 auto qj = productionStack.back();
                 // push LHS onto the stack
@@ -170,13 +186,15 @@ bool LRParser::stackProcess() {
                 productionStack.push_back(lhs);
                 int row = rowFromRecord(qj);
                 int column = columnFromRecord(lhs);
-                cout << "T[" << to_string(qj) << ", " << to_string(lhs) << "]; ";
+
+                cout << " T[" << to_string(qj) << ", " << to_string(lhs) << "]; ";
                 auto qk = table[row][column];
                 cout << "push(" << to_string(qk) << ")" << endl;
                 productionStack.push_back(qk);
                 break;
             }
             case LREntry::Accept:
+                parseTree->getRoot()->add(parseTreeStack.top());
                 return true;
             default:
                 return false;
