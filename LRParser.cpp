@@ -3,6 +3,7 @@
 //
 
 #include "LRParser.h"
+#include "astparsetree.h"
 LREntry StateZero(LREntry::Goto, 0);
 // Error/Empty
 LREntry _E(LREntry::Error);
@@ -73,7 +74,7 @@ LRParser::LRParser(LexicalScanner &lexicalScanner, SymbolTable &symbolTable,
 //Function to create parse tree
 ParseTree * LRParser::createParseTree()
 {
-    parseTree = new ParseTree(); //initialize the parse tree
+    parseTree = new ASTParseTree(); //initialize the parse tree
     currentNode = parseTree->getRoot(); // always add statements to the root node
 
     //create a boolean variable called result and assign it to the outcome of isStatementList. result will return true if processing is successful and false if processing fails
@@ -101,10 +102,10 @@ ParseTree * LRParser::createParseTree()
             cout << token->filename->c_str() << ":" << token->line << ":" << token->linePosition << " - ";
 
             //output the rule and the lexeme that mismatched to the console
-            cout << "this rule " << currentProduction << " could not be met with " << token->lexeme << endl;
+            cout << "the stack " << currentProduction << " could not be reduced with " << token->lexeme << endl;
 
             //add information about the rule and the lexeme that mismatched to errorMessage
-            errorMessage.append("this rule ").append(currentProduction).append(" could not be met with '").append(token->lexeme)
+            errorMessage.append("this stack ").append(currentProduction).append(" could not be reduced with '").append(token->lexeme)
                     .append("'\n").append(lastError);
         }
 
@@ -113,8 +114,15 @@ ParseTree * LRParser::createParseTree()
     }
 
     //parseTree->printRules(cout); //print the rules of the parseTree
-    parseTree->printASTTree(cout);
+    parseTree->printTree(cout);
     return parseTree; //return parseTree to the caller
+}
+string LRParser::getStackAsString() {
+    string result;
+    for (auto i : productionStack) {
+        result.append(to_string(i));
+    }
+    return result;
 }
 
 bool LRParser::stackProcess() {
@@ -136,9 +144,7 @@ bool LRParser::stackProcess() {
     while (!productionStack.empty()) {
         cout << "--------------------------------------------------" << endl;
         cout << "stack: ";
-        for (auto i : productionStack) {
-            cout << to_string(i);
-        }
+        cout << getStackAsString();
         cout << endl;
         auto qm = productionStack.back();
         //currentNode = parseTreeStack.top();
@@ -147,6 +153,9 @@ bool LRParser::stackProcess() {
 
         int row = rowFromRecord(qm);
         int column = columnFromToken(currentToken);
+        if (column == Unknown) {
+            errorHandler.addError(Error(currentToken, "unknown token", syntax_error));
+        }
         cout << "T[" << to_string(qm) << ", " << to_string(LREntry(currentToken)) << "] = ";
         LREntry x = table[row][column];
         cout << to_string(x) << "; Action -> ";
@@ -157,7 +166,7 @@ bool LRParser::stackProcess() {
                 productionStack.push_back(GotoEntry(x.value));
                 if (isId(currentToken)) {
                     parseTreeStack.push(new Node(currentToken));
-                    if(symbolTable.exists(currentToken.lexeme))
+                    if(!symbolTable.exists(currentToken.lexeme))
                         symbolTable.add(Record(string("KEYWORD"), string("int"), true, *currentToken.filename, currentToken.line, currentToken.linePosition), currentToken);
                 }
                 currentToken = *getNextToken();
@@ -175,6 +184,7 @@ bool LRParser::stackProcess() {
                         Node * op1 = parseTreeStack.top();
                         parseTreeStack.pop();
                         currentNode = new Node(top.token);
+                        currentNode->nonTerminal = getProduction(x.value).production + " -> " + getProductionRHS(x.value);
                         currentNode->add(op1);
                         currentNode->add(op2);
                         parseTreeStack.push(currentNode);
@@ -200,6 +210,11 @@ bool LRParser::stackProcess() {
                 parseTree->getRoot()->add(parseTreeStack.top());
                 return true;
             default:
+                currentProduction = getStackAsString();
+                errorHandler.addError(Error(currentToken,
+                                            string("LR stack[").append(getStackAsString()).append("] gives invalid action for ")
+                                            .append("T[").append(to_string(qm)).append(", ").append(to_string(LREntry(currentToken))).append("]"),
+                                            syntax_error));
                 return false;
         }
     }
@@ -259,7 +274,7 @@ int LRParser::columnFromToken(Record & token) {
         return EndOfFile;
     }
 
-    throw bad_exception();
+    return Unknown;
 }
 
 int LRParser::getProductionTerminalCount(int rule) {

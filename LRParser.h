@@ -86,6 +86,7 @@ class LRParser : public SyntaxAnalyzer {
         LeftParen = 5,
         RightParen = 6,
         EndOfFile = 7,
+        Unknown = 8
     };
 
     map<string, int> productionNames = {
@@ -139,6 +140,8 @@ public:
     int getProductionTerminalCount(int rule);
     LREntry getProduction(int rule);
     string getProductionRHS(int rule);
+
+    string getStackAsString();
 };
 
 

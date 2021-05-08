@@ -1,16 +1,21 @@
 # Assignment 2
-Robert Nguyen
+* Robert Nguyen
 
-Sean Javiya
+* Sean Javiya
 
-Allison Atienza
+* Allison Atienza
 
-Eric Britten
+* Eric Britten
 
 Follow the instructions below on building and running tests:
 
 # Build
 sh ./build.sh
+
+# test with the Bottom up LR parser
+./tokenizer tests/lr-table.txt -lr
+./tokenizer tests/lr-error.txt -lr
+
 
 # Run with a test file as the first argument
 ./tokenizer tests/declarations.txt

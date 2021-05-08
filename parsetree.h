@@ -54,24 +54,19 @@ public:
         return root;
     }
 
-    void printNodes(ostream & stream, bool showNonTerminal = false) {
+    virtual void printNodes(ostream & stream, bool showNonTerminal = false) {
         stream << "-------Parse Tree Code-------------------" << endl;
         printNodes(stream, root, showNonTerminal);
     }
 
-    void printRules(ostream & stream) {
+    virtual void printRules(ostream & stream) {
         stream << "-------Parse Tree Productions -----------" << endl;
         return printRules(stream, root);
     }
 
-    void printTree(ostream & stream) {
+    virtual void printTree(ostream & stream) {
         stream << "-------Parse Tree -----------------------" << endl;
         return printTree(stream, root);
-    }
-
-    void printASTTree(ostream & stream) {
-        stream << "-------Parse AST Tree -----------------------" << endl;
-        return printASTTree(stream, root);
     }
 
     void addToRoot(Node * child) {
@@ -98,7 +93,7 @@ protected:
         delete node;
     }
 
-    void printNodes(ostream & stream, Node * node, bool showNonTerminal) {
+    virtual void printNodes(ostream & stream, Node * node, bool showNonTerminal) {
         if (node->children.empty()) {
             if (node->token.lexeme != ";")
                 stream << " ";
@@ -115,7 +110,7 @@ protected:
         }
     }
 
-    void printRules(ostream & stream, Node * node, Record * currentRecord = nullptr) {
+    virtual void printRules(ostream & stream, Node * node, Record * currentRecord = nullptr) {
         if (node->children.empty()) {
             // this is a terminal node
             if (node->nonTerminal.empty()) {
@@ -149,7 +144,7 @@ protected:
         return getLeftmostNode(*node->children.begin());
     }
 
-    void printTree(ostream & stream, Node * node, int indent = 0) {
+    virtual void printTree(ostream & stream, Node * node, int indent = 0) {
         if (node->children.empty()) {
             if (node->nonTerminal.empty()) {
                 stream << string(indent * 2, ' ') << node->token.lexeme << endl;
@@ -164,16 +159,4 @@ protected:
             }
         }
     }
-
-    void printASTTree(ostream & stream, Node * node, int indent = 0) {
-        if (node->nonTerminal.empty()) {
-            stream << string(indent * 2, ' ') << node->token.lexeme << endl;
-        } else {
-            stream << string(indent * 2, ' ') << node->nonTerminal << endl;
-        }
-        for (auto it = node->children.begin(); it != node->children.end(); ++it) {
-            printASTTree(stream, *it, indent + 1);
-        }
-    }
-
 };
