@@ -22,6 +22,8 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         StatementList,
         MoreStatements,
         Conditional,
+        StatementBlock,
+        If,
         ErrorState = -2
     };
 
@@ -41,6 +43,9 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         Equals = '=',
         Type = 't',
         Semicolon = ';',
+        IfKeyword = 'f',
+        BeginBlock = '{',
+        EndBlock = '}'
     };
 
     map<int, const char *> productions = {
@@ -55,7 +60,9 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         RULE(Statement),
         RULE(StatementList),
         RULE(MoreStatements),
-        RULE(Conditional)
+        RULE(Conditional),
+        RULE(If),
+        RULE(StatementBlock)
     };
 
     stack<int> productionStack;

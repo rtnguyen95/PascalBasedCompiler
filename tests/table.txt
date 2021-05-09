@@ -2,4 +2,12 @@ int x;
 int a;
 int b;
 x = a + b;
-a = (b - c)/b
+a = (b - c)/b;
+
+if (a > b)
+    b = a;
+
+if (a > b) {
+    b = a - x;
+    s = a - b
+}

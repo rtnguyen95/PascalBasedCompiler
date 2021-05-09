@@ -139,6 +139,14 @@ public:
         return lexeme.token == "OPERATOR" && lexeme.lexeme == "=";
     }
 
+    bool isBeginBlock(const Record & lexeme) {
+        return lexeme.token == "SEPARATOR" && lexeme.lexeme == "{";
+    }
+
+    bool isEndBlock(const Record & lexeme) {
+        return lexeme.token == "SEPARATOR" && lexeme.lexeme == "}";
+    }
+
     //function to return the vector of lexemes
     vector<Record> & getTokenList() {
         return lexemes;

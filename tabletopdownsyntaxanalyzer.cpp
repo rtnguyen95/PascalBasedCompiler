@@ -14,6 +14,8 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
         {RightParenthesis, {Epsilon}},
         {EndofFile, {Epsilon}},
         {Semicolon, {Epsilon}},
+        { RelativeOperator, {Epsilon}},
+        { EndBlock, {Epsilon}},
     };
 
     table[Term] = {
@@ -29,6 +31,9 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
         {RightParenthesis, {Epsilon}},
         {EndofFile, {Epsilon}},
         {Semicolon, {Epsilon}},
+        { RelativeOperator, {Epsilon}},
+        { EndBlock, {Epsilon}},
+
     };
 
     table[Factor] = {
@@ -45,20 +50,34 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
     };
     table[Statement] = {
             { Identifier, {Assignment}},
-            { Type, {Declarative}}
+            { Type, {Declarative}},
+            { IfKeyword, {If}}
     };
     table[StatementList] = {
             { Identifier, {Statement, MoreStatements}},
-            { Type, {Statement, MoreStatements}}
+            { Type, {Statement, MoreStatements}},
+            { IfKeyword, {Statement, MoreStatements}}
     };
     table[MoreStatements] = {
             {Semicolon, { Semicolon, Statement, MoreStatements}},
-            {EndofFile, { Epsilon }}
+            {EndofFile, { Epsilon }},
+            { EndBlock, { Epsilon }}
     };
 
     table[Conditional] = {
             {Identifier, {Expression, RelativeOperator, Expression}},
             {LeftParenthesis, {Expression}}
+    };
+
+    table[If] = {
+            {IfKeyword, {IfKeyword, LeftParenthesis, Conditional, RightParenthesis, StatementBlock}}
+    };
+
+    table[StatementBlock] = {
+            {BeginBlock, {BeginBlock, StatementList, EndBlock}},
+            { Identifier, {Statement}},
+            { Type, {Statement}},
+            { IfKeyword, {Statement}}
     };
 }
 
@@ -146,6 +165,11 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
                     } else {
                         Node * typeNode = currentNode->parent->children.front();
                         symbolTable.add(typeNode->token, currentToken);
+                    }
+                } else if (isId(currentToken)) {
+                    if (!symbolTable.exists(currentToken.lexeme)) {
+
+                        errorHandler.addError(Error(currentToken, string("symbol was not declared."), syntax_error));
                     }
                 }
                 
@@ -247,6 +271,18 @@ int TableTopDownSyntaxAnalyzer::columnFromToken(Record & token) {
 
     if(isSemiColon(token)) {
         return Semicolon;
+    }
+
+    if (isIf(token)) {
+        return IfKeyword;
+    }
+
+    if (isBeginBlock(token)) {
+        return BeginBlock;
+    }
+
+    if (isEndBlock(token)) {
+        return EndBlock;
     }
 
     return ErrorState;
