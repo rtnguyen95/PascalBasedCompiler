@@ -3,9 +3,6 @@
 TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler) 
 : SyntaxAnalyzer(lexicalScanner, symbolTable, errorHandler) {
     
-    //map<Terminals, Productions> expressionTable;
-    //expressionTable[] = ;
-    
     table[Expression] = {
         {Identifier, {Term, ExpressionPrime}},
         {LeftParenthesis, {Term, ExpressionPrime}}
@@ -13,9 +10,10 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
 
     table[ExpressionPrime] = {
         {Addition, {Addition, Term, ExpressionPrime}},
-        {Subtraction, {Addition, Term, ExpressionPrime}},
+        {Subtraction, {Subtraction, Term, ExpressionPrime}},
         {RightParenthesis, {Epsilon}},
-        {EndofFile, {Epsilon}}
+        {EndofFile, {Epsilon}},
+        {Semicolon, {Epsilon}},
     };
 
     table[Term] = {
@@ -27,9 +25,10 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
         {Addition, {Epsilon}},
         {Subtraction, {Epsilon}},
         {Multiplication, {Multiplication, Factor, TermPrime}},
-        {Subtraction, {Subtraction, Factor, TermPrime}},
+        {Division, {Division, Factor, TermPrime}},
         {RightParenthesis, {Epsilon}},
         {EndofFile, {Epsilon}},
+        {Semicolon, {Epsilon}},
     };
 
     table[Factor] = {
@@ -48,13 +47,19 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
             { Identifier, {Assignment}},
             { Type, {Declarative}}
     };
-    /*table[StatementList] = {
+    table[StatementList] = {
             { Identifier, {Statement, MoreStatements}},
             { Type, {Statement, MoreStatements}}
     };
     table[MoreStatements] = {
-            {}
-    };*/
+            {Semicolon, { Semicolon, Statement, MoreStatements}},
+            {EndofFile, { Epsilon }}
+    };
+
+    table[Conditional] = {
+            {Identifier, {Expression, RelativeOperator, Expression}},
+            {LeftParenthesis, {Expression}}
+    };
 }
 
 
@@ -97,7 +102,7 @@ ParseTree * TableTopDownSyntaxAnalyzer::createParseTree()
         }
         
         //pass the file name, line number, line position number, error message string, and syntax_error information to errorHandler.addError so it can be recorded
-        errorHandler.addError({token->filename->c_str(), token->line, token->linePosition, errorMessage, syntax_error});
+        errorHandler.addError({*token->filename, token->line, token->linePosition, errorMessage, syntax_error});
     }
     
     parseTree->printRules(cout); //print the rules of the parseTree
@@ -108,10 +113,10 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
     cout << "push " << to_string(EndofFile) << endl;
     productionStack.push(EndofFile);  // end of file
     
-    cout << "push " << to_string(Assignment) << endl;
-    productionStack.push(Assignment); // first symbol
+    cout << "push " << to_string(StatementList) << endl;
+    productionStack.push(StatementList); // first symbol
     
-    Record currentToken = lexicalScanner.lexer(); //get first token
+    Record currentToken = * getNextToken(); //get first token
     cout << currentToken << endl;
 
     currentNode = parseTree->getRoot();
@@ -124,7 +129,7 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
         auto x = productionStack.top();
         currentNode = parseTreeStack.top();
         cout << "top of stack: " << to_string(x) << endl;
-        cout << "top of nodes: " << currentNode->nonTerminal << endl;
+        //cout << "top of nodes: " << currentNode->nonTerminal << endl;
 
         if (isTerminal(x)) {
             if (x == columnFromToken(currentToken)) {
@@ -134,9 +139,18 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
                 cout << "pop " << to_string(productionStack.top()) << endl;
                 productionStack.pop();
                 parseTreeStack.pop();
+
+                if (isId(currentToken) && currentNode->parent->nonTerminal == productions[Declarative]) {
+                    if (symbolTable.exists(currentToken.lexeme)) {
+                        errorHandler.addError(Error(currentToken, string("identifier was already declared."), syntax_error));
+                    } else {
+                        Node * typeNode = currentNode->parent->children.front();
+                        symbolTable.add(typeNode->token, currentToken);
+                    }
+                }
                 
                 // obtain the next token
-                currentToken = lexicalScanner.lexer();
+                currentToken = *getNextToken();
                 cout << currentToken << endl;
             } else {
                 cout << "Terminal not found by columnFromToken" << endl;
@@ -157,10 +171,11 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
                     productionStack.pop();
                     currentNode = parseTreeStack.top();
                     parseTreeStack.pop();
-                    
+                    currentProduction = productions[x];
+
                     // push the cell onto the stack in reverse order
                     // also create nodes in the parse tree
-                    for (list<int>::reverse_iterator it = cell.rbegin(); it != cell.rend(); it++) {
+                    for (auto it = cell.rbegin(); it != cell.rend(); it++) {
                         // if this production is not epsilon
                         if (*it != Epsilon) {
                             productionStack.push(*it);
@@ -175,6 +190,8 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
                             }
                         }
                     }
+                } else {
+                    return false;
                 }
             } else {
                 return false;
@@ -223,6 +240,14 @@ int TableTopDownSyntaxAnalyzer::columnFromToken(Record & token) {
     if(isEquals(token)) {
         return Equals;
     }
-    
-    return Error;
+
+    if (isType(token)) {
+        return Type;
+    }
+
+    if(isSemiColon(token)) {
+        return Semicolon;
+    }
+
+    return ErrorState;
 }

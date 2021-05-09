@@ -21,7 +21,8 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         Statement,
         StatementList,
         MoreStatements,
-        Error = -2
+        Conditional,
+        ErrorState = -2
     };
 
     enum Terminals {
@@ -38,7 +39,8 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         Multiplication = '*',
         Division = '/',
         Equals = '=',
-        Type = 't'
+        Type = 't',
+        Semicolon = ';',
     };
 
     map<int, const char *> productions = {
@@ -52,7 +54,8 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         RULE(Declarative),
         RULE(Statement),
         RULE(StatementList),
-        RULE(MoreStatements)
+        RULE(MoreStatements),
+        RULE(Conditional)
     };
 
     stack<int> productionStack;
