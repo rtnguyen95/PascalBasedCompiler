@@ -36,6 +36,25 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
         {Identifier, {Identifier}},
         {LeftParenthesis, {LeftParenthesis, Expression, RightParenthesis}}
     };
+
+    table[Assignment] = {
+            {Identifier, {Identifier, Equals, Expression}}
+    };
+
+    table[Declarative] = {
+            { Type, {Type, Identifier}}
+    };
+    table[Statement] = {
+            { Identifier, {Assignment}},
+            { Type, {Declarative}}
+    };
+    /*table[StatementList] = {
+            { Identifier, {Statement, MoreStatements}},
+            { Type, {Statement, MoreStatements}}
+    };
+    table[MoreStatements] = {
+            {}
+    };*/
 }
 
 
@@ -89,8 +108,8 @@ bool TableTopDownSyntaxAnalyzer::stackProcess() {
     cout << "push " << to_string(EndofFile) << endl;
     productionStack.push(EndofFile);  // end of file
     
-    cout << "push " << to_string(Expression) << endl;
-    productionStack.push(Expression); // first symbol
+    cout << "push " << to_string(Assignment) << endl;
+    productionStack.push(Assignment); // first symbol
     
     Record currentToken = lexicalScanner.lexer(); //get first token
     cout << currentToken << endl;
@@ -199,6 +218,10 @@ int TableTopDownSyntaxAnalyzer::columnFromToken(Record & token) {
 
     if(isEOF(token)) {
         return EndofFile;
+    }
+
+    if(isEquals(token)) {
+        return Equals;
     }
     
     return Error;

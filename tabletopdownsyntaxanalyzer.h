@@ -9,13 +9,18 @@ using namespace::std;
 class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
 
     enum Productions {
-        Expression = 128, 
+        Expression = 128,
         ExpressionPrime,
         Term,
         TermPrime,
         Factor,
         Epsilon,
         Terminal,
+        Assignment,
+        Declarative,
+        Statement,
+        StatementList,
+        MoreStatements,
         Error = -2
     };
 
@@ -31,7 +36,9 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         Addition = '+',
         Subtraction = '-',
         Multiplication = '*',
-        Division = '/'
+        Division = '/',
+        Equals = '=',
+        Type = 't'
     };
 
     map<int, const char *> productions = {
@@ -40,7 +47,12 @@ class TableTopDownSyntaxAnalyzer : public SyntaxAnalyzer {
         RULE(Term),
         RULE(TermPrime),
         RULE(Factor),
-        RULE(Terminal)
+        RULE(Terminal),
+        RULE(Assignment),
+        RULE(Declarative),
+        RULE(Statement),
+        RULE(StatementList),
+        RULE(MoreStatements)
     };
 
     stack<int> productionStack;

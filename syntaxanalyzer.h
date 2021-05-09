@@ -135,6 +135,10 @@ public:
         return lexeme.token == "EOF" && lexeme.lexeme == "$";
     }
 
+    bool isEquals(const Record & lexeme) {
+        return lexeme.token == "OPERATOR" && lexeme.lexeme == "=";
+    }
+
     //function to return the vector of lexemes
     vector<Record> & getTokenList() {
         return lexemes;
