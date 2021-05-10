@@ -74,7 +74,7 @@ TableTopDownSyntaxAnalyzer::TableTopDownSyntaxAnalyzer(LexicalScanner & lexicalS
     };
 
     table[StatementBlock] = {
-            {BeginBlock, {BeginBlock, StatementList, EndBlock}},
+            { BeginBlock, {BeginBlock, StatementList, EndBlock}},
             { Identifier, {Statement}},
             { Type, {Statement}},
             { IfKeyword, {Statement}}

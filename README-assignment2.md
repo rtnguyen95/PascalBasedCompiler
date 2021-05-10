@@ -1,4 +1,4 @@
-# Assignment 3 Extra Credit
+# Assignment 2
 * Robert Nguyen
 
 * Sean Javiya
@@ -12,38 +12,7 @@ Follow the instructions below on building and running tests:
 # Build
 sh ./build.sh
 
-## test with the Bottom up LR parser
-./tokenizer tests/lr-table.txt -lr
-
-The output on the screen will show what is happening with the stack and table, for instance:
-```
---------------------------------------------------
-stack: $0T2*8c5
-top of stack: 5 and current token: $
-T[5, $] = R8; Action -> Reduce(8): pop(5);pop(c); Production: F -> i;  T[8, F]; push(13)
---------------------------------------------------
-```
-
-And after that a parse tree that shows what rule was used to reduce expressions with operators:
-```
-<Program>
-  * : T -> T*F
-    + : E -> E+T
-      a
-      b
-    c
-```
-
-Additionally, the `tests/` folder will contain newly generated files that show
-the parse tree in several formats (code, tree, productions).
-
-## test with the Bottom up LR parser to show syntax error
-./tokenizer tests/lr-error.txt -lr
-
-
-#Previous Documentation from Assignment 2
-
-## Run with a test file as the first argument
+# Run with a test file as the first argument
 ./tokenizer tests/declarations.txt
 
 The output to the screen will be the tokens and productions as they are being processed followed by a represenation of the parse tree that shows a token, followed by the productions that were used.
