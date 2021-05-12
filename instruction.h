@@ -13,5 +13,5 @@ struct Instruction
         oprnd = temp_oprnd;
     }
 
-}
+};
 

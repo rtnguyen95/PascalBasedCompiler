@@ -89,9 +89,9 @@ public:
 
     virtual ParseTree * createParseTree() = 0;
     
-    void gen_instr(String op, String oprnd)
+    void gen_instr(string op, string oprnd)
     {
-        instruction = Instruction(op, oprnd);
+        Instruction instruction = Instruction(op, oprnd);
         instr_table[instr_address] = instruction;
         instr_address++;
     }
