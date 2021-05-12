@@ -5,8 +5,11 @@
 #include "lexicalscanner.h"
 #include "parsetree.h"
 #include "symboltable.h"
+#include "instruction.h"
 
 using namespace std;
+
+int instr_address = 0; //global variable for intermediate code generation
 
 class SyntaxAnalyzer
 {
@@ -23,6 +26,8 @@ protected:
     SymbolTable & symbolTable;
     Node * currentNode;
     ParseTree * parseTree;
+    vector <Instruction> instr_table;
+    
 public:
 
     SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
@@ -83,6 +88,13 @@ public:
     }
 
     virtual ParseTree * createParseTree() = 0;
+    
+    void gen_instr(String op, String oprnd)
+    {
+        instruction = Instruction(op, oprnd);
+        instr_table[instr_address] = instruction;
+        instr_address++;
+    }
 
     //Functions that determine the lexemes and tokens
     bool isIf(const Record & lexeme);
