@@ -51,6 +51,10 @@ public:
         return table.find(identifier) != table.end();
     }
 
+    string getType(const string & identifier) const {
+        return exists(identifier) ? table.find(identifier)->second.type.lexeme : "";
+    }
+
     string toString() const;
 };
 

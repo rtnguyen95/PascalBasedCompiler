@@ -57,4 +57,8 @@ public:
     bool inFollowSet(set<string> & followSet, const string & token) {
         return followSet.find(token) != followSet.end();
     }
+
+    bool checkExpressionTypes(Node * node);
+    bool checkAssignmentType(Node * node);
+    bool checkTypes(Node * node, string & type);
 };

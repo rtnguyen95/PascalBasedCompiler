@@ -520,8 +520,10 @@ bool TopDownSyntaxAnalyzer::isQ(){
         if (isT()) {
             if (isQ()) {
                 print("<ExpressionPrime> -> +<Term><ExpressionPrime>");
-                finishNonTerminal(parent);
-                return true;
+                if (checkExpressionTypes(currentNode)) {
+                    finishNonTerminal(parent);
+                    return true;
+                }
             }
         }
     }
@@ -565,8 +567,10 @@ bool TopDownSyntaxAnalyzer::isT() {
     if (isF()) {
         if (isR()) {
             print("<Term> -> <Factor><TermPrime>");
-            finishNonTerminal(parent);
-            return true;
+            if (checkExpressionTypes(currentNode)) {
+                finishNonTerminal(parent);
+                return true;
+            }
         }
     }
     //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
@@ -695,8 +699,12 @@ bool TopDownSyntaxAnalyzer::isE() {
     else if (isT()) {
         if (isQ()) {
             print("<Expression> -> <Term><ExpressionPrime>");
-            finishNonTerminal(parent);
-            return true;
+            if (checkExpressionTypes(currentNode)) {
+                finishNonTerminal(parent);
+                return true;
+            }
+            //finishNonTerminal(parent);
+            //return true;
         }
     }
     
@@ -722,8 +730,10 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
         if (record->lexeme == "=") {
             currentNode->add(new Node(*record));
             if(isE()) {
-                finishNonTerminal(parent);
-                return true;
+                if(checkAssignmentType(currentNode)) {
+                    finishNonTerminal(parent);
+                    return true;
+                }
             }
         }
     }
@@ -731,4 +741,75 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
     //if the function reaches this point the token does not satisfy the rule. The node is deleted using cancelNonTerminal and the function returns false to the caller
     cancelNonTerminal(parent);
     return false;
+}
+
+bool TopDownSyntaxAnalyzer::checkExpressionTypes(Node * expressionNode) {
+    string expressionType;
+    if (checkTypes(expressionNode, expressionType)) {
+        return true;
+    }
+
+    Record token = parseTree->getLeftmostNode(expressionNode)->token;
+    errorHandler.addError(Error(token, string(token.lexeme).append(" type does match the type found in other variables in this expression"), syntax_error));
+    return false;
+}
+
+bool TopDownSyntaxAnalyzer::checkAssignmentType(Node *node) {
+    Node * id = node->children.front()->children.front();
+    Node * expression = node->children.back();
+    string expressionType;
+    if (checkTypes(expression, expressionType)) {
+        if (symbolTable.exists(id->token.lexeme)) {
+            string type = symbolTable.getType(id->token.lexeme);
+            bool match = type == expressionType;
+            if (!match) {
+                errorHandler.addError(Error(id->token, string(id->token.lexeme).append(" type doesn't match LHS type of ").append(expressionType), syntax_error));
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+    errorHandler.addError(Error(id->token, string(id->token.lexeme).append(" type doesn't match LHS type of undefined"), syntax_error));
+    return false;
+}
+
+bool TopDownSyntaxAnalyzer::checkTypes(Node * node, string & type) {
+    if (node->children.empty()) {
+        if (node->nonTerminal.empty()) {
+            if (node->token.token == "IDENTIFIER") {
+                if (type.empty()) {
+                    type = symbolTable.getType(node->token.lexeme);
+                } else {
+                    return type == symbolTable.getType(node->token.lexeme);
+                }
+            } else if (node->token.token == "INTEGER") {
+                if (type.empty()) {
+                    type = "int";
+                } else {
+                    return type == "int";
+                }
+            } else if (node->token.token == "FLOAT") {
+                if (type.empty()) {
+                    type = "float";
+                } else {
+                    return type == "float";
+                }
+            } else if (isBoolValue(node->token)) {
+                if (type.empty()) {
+                    type = "bool";
+                } else {
+                    return type == "bool";
+                }
+            }
+        }
+        return true;
+    } else {
+        for (auto it = node->children.begin(); it != node->children.end(); ++it) {
+            if(!checkTypes(*it, type)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }

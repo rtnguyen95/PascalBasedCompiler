@@ -1,0 +1,9 @@
+int a;
+float f;
+bool b;
+int c;
+a = 1;
+f = 1.0;
+b = True;
+a = c + 12 * a;
+a = f + a;

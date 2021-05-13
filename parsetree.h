@@ -81,6 +81,8 @@ public:
     //    return getLeftmostNode(root);
     //}
 
+
+
 protected:
     void deleteAllNodes() {
         deleteAllNodes(root);
@@ -136,14 +138,14 @@ protected:
             }
         }
     }
-
+public:
     Node * getLeftmostNode(Node * node) {
         if (node->children.empty()) {
             return node;
         }
         return getLeftmostNode(*node->children.begin());
     }
-
+protected:
     virtual void printTree(ostream & stream, Node * node, int indent = 0) {
         if (node->children.empty()) {
             if (node->nonTerminal.empty()) {
@@ -159,4 +161,6 @@ protected:
             }
         }
     }
+
+
 };
