@@ -9,7 +9,6 @@
 
 using namespace std;
 
-int instr_address = 0; //global variable for intermediate code generation
 
 class SyntaxAnalyzer
 {
@@ -27,7 +26,8 @@ protected:
     Node * currentNode;
     ParseTree * parseTree;
     vector <Instruction> instr_table;
-    
+    int instr_address = 0; //global variable for intermediate code generation
+
 public:
 
     SyntaxAnalyzer(LexicalScanner & lexicalScanner, SymbolTable & symbolTable, ErrorHandler & errorHandler)
