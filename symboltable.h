@@ -24,12 +24,15 @@ Example of what is stored in SymbolTable after being run on source code
 struct Symbol {
     Record type;
     Record id;
+    int memory_address;
 };
 
 class SymbolTable
 {
 private:
     unordered_map<string, Symbol> table; //unordered map for holding the identifier and its corresponding Symbol data
+    const int starting_address = 5000;
+    int current_address_incrementer = 0;
 public:
     SymbolTable(); //default constructor
 
@@ -40,8 +43,10 @@ public:
             return false;
             //else the symbol is created as a Symbol, added to table, and the function returns true to indicate the success of the add
         } else {
-            Symbol symbol = {type, identifier};
+            int memory_address = starting_address + current_address_incrementer;
+            Symbol symbol = {type, identifier, memory_address};
             table.insert(make_pair(identifier.lexeme, symbol));
+            current_address_incrementer++;
             return true;
         }
     }
