@@ -35,7 +35,7 @@ private:
     int current_address_incrementer = 0;
 public:
     SymbolTable(); //default constructor
-
+    
     //The add function will add the symbol to the table. It accepts two arguments, a Record object with the data of the type and a Record object with the data of the identifier. It returns a boolean, true if the add was successful, false if otherwise
     bool add(const Record & type, const Record & identifier) {
         //checks to see if the symbol was previously added to the symbol table. If true, the symbol is not added to the table and the function returns false
@@ -59,7 +59,12 @@ public:
     string getType(const string & identifier) const {
         return exists(identifier) ? table.find(identifier)->second.type.lexeme : "";
     }
-
+    int getAddress(const string & identifier) const {
+        if (this->exists(identifier)) {
+            Symbol symbol = table.find(identifier)->second;
+            return symbol.memory_address;
+        } else { return -1; }
+    }
     string toString() const;
 };
 
