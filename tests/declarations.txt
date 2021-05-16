@@ -9,9 +9,8 @@ float shipping;
 
 total = apples * cost;
 tax = total * 0.0875;
-shipping = (total - 50) / 2;
+shipping = (total - 50.0) / 2.0;
 total = apples * cost + tax + shipping;
-apples = i;
 int x;
 x = 8;
 

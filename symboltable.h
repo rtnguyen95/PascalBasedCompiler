@@ -65,6 +65,17 @@ public:
             return symbol.memory_address;
         } else { return -1; }
     }
+    
+    Symbol * getSymbol(const string & identifier) {
+        auto it = table.find(identifier);
+
+        if (it != table.end()) {
+            return &it->second;
+        } else {
+            return nullptr;
+        }
+    }
+    
     string toString() const;
 };
 
