@@ -137,8 +137,6 @@ bool LRParser::stackProcess() {
 
     currentNode = parseTree->getRoot();
     parseTreeStack.push(currentNode);
-    //Node * child = currentNode->add(new Node(to_string(productionStack.back())));
-    //parseTreeStack.push(child);
 
 
     while (!productionStack.empty()) {
