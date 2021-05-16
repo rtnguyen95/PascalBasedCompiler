@@ -605,8 +605,10 @@ bool TopDownSyntaxAnalyzer::isR() {
         if (isF()) {
             if (isR()) {
                 print("<TermPrime> -> *<Factor><TermPrime>");
-                finishNonTerminal(parent);
-                return true;
+                if (checkExpressionTypes(currentNode)) {
+                    finishNonTerminal(parent);
+                    return true;
+                }
             }
         }
     }
