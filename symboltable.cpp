@@ -9,7 +9,7 @@ string SymbolTable::toString() const {
     for (auto s: table) {
         result.append(s.first).append(": ").append(s.second.type.lexeme).append("\t")
             .append(*s.second.id.filename).append(":").append(to_string(s.second.id.line))
-            .append(":").append(to_string(s.second.id.linePosition)).append(to_string(s.second.memory_address))
+            .append(":").append(to_string(s.second.id.linePosition)).append(":").append(to_string(s.second.memory_address))
             .append("\n");
     }
     return result;
