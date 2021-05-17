@@ -421,6 +421,7 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
             symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(parent);
+                gen_instr("POPM", to_string(symbolTable.getAddress(lexemes[currentLexeme-1].lexeme)));
                 return true;
         }
     }
@@ -656,7 +657,7 @@ bool TopDownSyntaxAnalyzer::isF() {
     if (isId(*record) && isIdentifier(true)) {
         print("<Factor> -> <Identifier>");
         finishNonTerminal(parent);
-       // gen_instr("PUSHM", address);
+        gen_instr("PUSHM", to_string(symbolTable.getAddress(record->lexeme)));
         return true;
     }
     
