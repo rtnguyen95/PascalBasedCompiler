@@ -50,6 +50,10 @@ vector<Record> tokenizer::parse_input(string output_file_name)
   parseTree->printTree(tree_output);  
   output_string("parse-tree", tree_output.str());
 
+  ostringstream ic_output;
+  syntaxAnalyzer->printIC(ic_output);
+  output_string("intermediate-code", ic_output.str());
+
   delete parseTree;
 
   ostringstream output;             //create a output string stream for the lexemes and tokens

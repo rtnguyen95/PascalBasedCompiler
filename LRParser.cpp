@@ -115,6 +115,7 @@ ParseTree * LRParser::createParseTree()
 
     //parseTree->printRules(cout); //print the rules of the parseTree
     parseTree->printTree(cout);
+    printIntermediateCode(cout);
     return parseTree; //return parseTree to the caller
 }
 string LRParser::getStackAsString() {
@@ -132,7 +133,7 @@ bool LRParser::stackProcess() {
     cout << "push " << to_string(StateZero) << endl;
     productionStack.push_back(StateZero);  // end of file
 
-    Record currentToken = lexicalScanner.lexer(); //get first token
+    Record currentToken = *getNextToken(); //get first token
     cout << currentToken << endl;
 
     currentNode = parseTree->getRoot();
@@ -176,6 +177,7 @@ bool LRParser::stackProcess() {
                 while (n--) {
                     cout << "pop("<<to_string(productionStack.back())<<");";
                     auto top = productionStack.back();
+                    //add to the parse tree
                     if (isOperator(top.token)) {
                         Node * op2 = parseTreeStack.top();
                         parseTreeStack.pop();
@@ -300,4 +302,34 @@ string LRParser::getProductionRHS(int rule) {
         }
     }
     return 0;
+}
+
+
+// use LRV
+void LRParser::printIntermediateCode(ostream & stream) {
+    stream << "---------------Intermediate Code -------------------" << endl;
+    printIntermediateCode(stream, parseTree->getRoot());
+    for (int i = 0; i < instr_table.size(); ++i) {
+        auto it = instr_table[i];
+        stream << it.op << " " << it.oprnd << endl;
+    }
+}
+
+void LRParser::printIntermediateCode(ostream & stream, Node * node) {
+    for (auto & it : node->children) {
+        printIntermediateCode(stream, it);
+    }
+    if (node->token.lexeme.empty()) {
+        //print nothing for the root node
+    } else if(node->token.token == "IDENTIFIER") {
+        gen_instr("PUSHM", ::to_string(symbolTable.getAddress(node->token.lexeme)));
+    } else if(isPlus(node->token)) {
+        gen_instr("ADD", "");
+    } else if(isMultiply(node->token)) {
+        gen_instr("MUL", "");
+    } else if(isDivideBy(node->token)) {
+        gen_instr("DIV", "");
+    } else if(isMinus(node->token)) {
+        gen_instr("SUB", "");
+    }
 }

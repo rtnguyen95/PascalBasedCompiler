@@ -9,16 +9,6 @@ public:
 
     }
 
-    //static Node * makeLeaf(Record & token) {
-    //    Node * leaf = new Node(token);
-    //    return leaf;
-    //}
-
-    //static Node * makeTree(Record & op, Node * left, Node * right) {
-    //    Node * root = new Node(op, left, right);
-    //    return root;
-    //}
-
     void printNodes(ostream & stream, bool showNonTerminal = false) {
         stream << "-------Parse Tree Code-------------------" << endl;
         printNodes(stream, getRoot()->children.front(), showNonTerminal);
