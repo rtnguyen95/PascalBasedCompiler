@@ -422,6 +422,7 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
                 symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(parent);
+                gen_instr("POPM", to_string(symbolTable.getAddress(lexemes[currentLexeme-1].lexeme)));
                 return true;
             } else {
                 auto symbol = symbolTable.getSymbol(lexemes[currentLexeme-1].lexeme);
@@ -513,6 +514,8 @@ void TopDownSyntaxAnalyzer::cancelNonTerminal(Node * parent) {
 
 /*
  <ExpressionPrime> -> +<Term><ExpressionPrime> | -<Term><ExpressionPrime> | epsilon function
+ A3) E' -> +TE'
+ A4) E' -> epsilon
  Checks to see if a token satisfies the <ExpressionPrime> rule.
  Returns true if the token satisfies the rule and false if the token does not satisfy the rule
  */
@@ -522,6 +525,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
         return false;
     Node * parent = startNonTerminal("<ExpressionPrime> -> +<Term><ExpressionPrime> | -<Term><ExpressionPrime> | epsilon");
     
+    //A3) E' -> +TE'
     //checks for +, <Term>, <ExpressionPrime> consecutively
     //if true the corresponding rule is added to the parse tree and the function returns true
     if (record->lexeme == "+") {
@@ -530,12 +534,14 @@ bool TopDownSyntaxAnalyzer::isQ(){
             if (isQ()) {
                 print("<ExpressionPrime> -> +<Term><ExpressionPrime>");
                 if (checkExpressionTypes(currentNode)) {
+                    gen_instr("ADD", "nil");
                     finishNonTerminal(parent);
                     return true;
                 }
             }
         }
     }
+    
     //else is the program checks for -, <Term>, <ExpressionPrime> consecutively
     //if true the corresponding rule is added to the parse tree and the function returns true
     else if (record->lexeme == "-") {
@@ -543,6 +549,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
         if (isT()) {
             if (isQ()) {
                 print("<ExpressionPrime> -> -<Term><ExpressionPrime>");
+                gen_instr("SUB", "nil")
                 finishNonTerminal(parent);
                 return true;
             }
@@ -565,6 +572,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
 
 /*
  <Term> -> <Factor><TermPrime> function
+ A5) T-> FT'
  Checks to see if a token satisfies the <Term> rule.
  Returns true if the token satisfies the rule and false if the token does not satisfy the rule
  */
@@ -572,6 +580,7 @@ bool TopDownSyntaxAnalyzer::isT() {
     Node * parent = startNonTerminal("<Term> -> <Factor><TermPrime>");
     
     //checks for <Factor>, <TermPrime> consecutively
+    //A5) T-> FT'
     //if true the node is added to the parse tree and the function returns true
     if (isF()) {
         if (isR()) {
@@ -600,12 +609,14 @@ bool TopDownSyntaxAnalyzer::isR() {
     
     //checks for *, <Factor>, <TermPrime> consecutively
     //if true the corresponding rule is added as a node to the parse tree and the function returns true
+    //A6) T' -> *FT'
     if (record->lexeme == "*") {
         currentNode->add(new Node(*record));
         if (isF()) {
             if (isR()) {
                 print("<TermPrime> -> *<Factor><TermPrime>");
                 if (checkExpressionTypes(currentNode)) {
+                    gen_instr("MUL", "nil");
                     finishNonTerminal(parent);
                     return true;
                 }
@@ -619,6 +630,7 @@ bool TopDownSyntaxAnalyzer::isR() {
         if (isF()) {
             if (isR()) {
                 print("<TermPrime> -> /<Factor><TermPrime>");
+                gen_instr("DIV", "nil");
                 finishNonTerminal(parent);
                 return true;
             }
@@ -656,6 +668,7 @@ bool TopDownSyntaxAnalyzer::isF() {
     if (isId(*record) && isIdentifier(true)) {
         print("<Factor> -> <Identifier>");
         finishNonTerminal(parent);
+        gen_instr("PUSHM", to_string(symbolTable.getAddress(record->lexeme)));
         return true;
     }
     
