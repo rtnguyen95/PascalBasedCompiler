@@ -1,6 +1,8 @@
 int x;
 int a;
 int b;
+int c;
+int s;
 x = a + b;
 a = (b - c)/b;
 

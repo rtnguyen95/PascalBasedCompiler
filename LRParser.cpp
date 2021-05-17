@@ -115,8 +115,11 @@ ParseTree * LRParser::createParseTree()
 
     //parseTree->printRules(cout); //print the rules of the parseTree
     parseTree->printTree(cout);
+    printIntermediateCode(cout);
     return parseTree; //return parseTree to the caller
 }
+
+//function to return the stack in the LR parser as a string
 string LRParser::getStackAsString() {
     string result;
     for (auto i : productionStack) {
@@ -125,6 +128,8 @@ string LRParser::getStackAsString() {
     return result;
 }
 
+
+
 bool LRParser::stackProcess() {
     cout << "push " << to_string(EndOfFileEntry) << endl;
     productionStack.push_back(EndOfFileEntry);  // end of file
@@ -132,13 +137,11 @@ bool LRParser::stackProcess() {
     cout << "push " << to_string(StateZero) << endl;
     productionStack.push_back(StateZero);  // end of file
 
-    Record currentToken = lexicalScanner.lexer(); //get first token
+    Record currentToken = *getNextToken(); //get first token
     cout << currentToken << endl;
 
     currentNode = parseTree->getRoot();
     parseTreeStack.push(currentNode);
-    //Node * child = currentNode->add(new Node(to_string(productionStack.back())));
-    //parseTreeStack.push(child);
 
 
     while (!productionStack.empty()) {
@@ -178,6 +181,7 @@ bool LRParser::stackProcess() {
                 while (n--) {
                     cout << "pop("<<to_string(productionStack.back())<<");";
                     auto top = productionStack.back();
+                    //add to the parse tree
                     if (isOperator(top.token)) {
                         Node * op2 = parseTreeStack.top();
                         parseTreeStack.pop();
@@ -302,4 +306,34 @@ string LRParser::getProductionRHS(int rule) {
         }
     }
     return 0;
+}
+
+
+// use LRV
+void LRParser::printIntermediateCode(ostream & stream) {
+    stream << "---------------Intermediate Code -------------------" << endl;
+    printIntermediateCode(stream, parseTree->getRoot());
+    for (int i = 0; i < instr_table.size(); ++i) {
+        auto it = instr_table[i];
+        stream << it.op << " " << it.oprnd << endl;
+    }
+}
+
+void LRParser::printIntermediateCode(ostream & stream, Node * node) {
+    for (auto & it : node->children) {
+        printIntermediateCode(stream, it);
+    }
+    if (node->token.lexeme.empty()) {
+        //print nothing for the root node
+    } else if(node->token.token == "IDENTIFIER") {
+        gen_instr("PUSHM", ::to_string(symbolTable.getAddress(node->token.lexeme)));
+    } else if(isPlus(node->token)) {
+        gen_instr("ADD", "");
+    } else if(isMultiply(node->token)) {
+        gen_instr("MUL", "");
+    } else if(isDivideBy(node->token)) {
+        gen_instr("DIV", "");
+    } else if(isMinus(node->token)) {
+        gen_instr("SUB", "");
+    }
 }

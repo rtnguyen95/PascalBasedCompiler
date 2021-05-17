@@ -163,12 +163,6 @@ OperatorTableRecord OperatorPrecedenceParser::getTopMostTerminal() {
         productionStack.pop_back();
     }
     return productionStack.back();
-    /*list<OperatorTableRecord>::reverse_iterator rit = productionStack.rend();
-    while (rit != productionStack.rbegin()) {
-        rit--;
-        if (isTerminal(*rit))
-            return *rit;
-    }*/
 }
 
 int OperatorPrecedenceParser::columnFromRecord(OperatorTableRecord & record) {

@@ -418,11 +418,20 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
     if (isTypeTopDown()) {
         if (isIdentifier()) {
             //if both Type and Id are found add both lexemes to the symbol table, print the rule, finish adding the node for the rule to the parse tree, and return the function as true to the caller
-            symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
+            if (!symbolTable.exists(lexemes[currentLexeme-1].lexeme)) {
+                symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(parent);
                 gen_instr("POPM", to_string(symbolTable.getAddress(lexemes[currentLexeme-1].lexeme)));
                 return true;
+            } else {
+                auto symbol = symbolTable.getSymbol(lexemes[currentLexeme-1].lexeme);
+                errorHandler.addError(Error(lexemes[currentLexeme-1], 
+                  string(lexemes[currentLexeme-1].lexeme).append(" was previously defined here: ")
+                    .append(symbol->id.filename->c_str())
+                    .append(to_string(symbol->id.line)).append(":").append(to_string(symbol->id.linePosition)),
+                  syntax_error));
+            }
         }
     }
     
@@ -606,9 +615,11 @@ bool TopDownSyntaxAnalyzer::isR() {
         if (isF()) {
             if (isR()) {
                 print("<TermPrime> -> *<Factor><TermPrime>");
-                finishNonTerminal(parent);
-                gen_instr("MUL", "nil");
-                return true;
+                if (checkExpressionTypes(currentNode)) {
+                    gen_instr("MUL", "nil");
+                    finishNonTerminal(parent);
+                    return true;
+                }
             }
         }
     }
