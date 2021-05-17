@@ -1,0 +1,33 @@
+float a;	! a should be at address 5000 !
+float b;	! b should be at address 5001 !
+float c;	! c should be at address 5002 !
+float e;	! e should be at address 5003 !
+
+bool x;		! x should be at address 5004 !
+bool y;		! y should be at address 5005 !
+
+int integer1;	! integer1 should be at address 5006 !
+int integer2;	! integer2 should be at address 5007 !
+
+
+c = (a * a) + b; ! precedence test , order of isntruction between this statement and the next statement should be different !
+c = a * (a + b); ! precedence test !
+
+e = c;
+e = a;
+b = e;
+
+
+x = y;
+!y = (y / y) / x - 1;! ! This shouldn't work because x, y are bools and 1 is an int !
+
+y = (y / y) / x;
+
+a = b - c - e;
+
+
+
+integer1 = integer1 * (integer1 - integer1 * (integer2 / integer1));
+
+
+! Note to self: Each pop represent the end of an assignment so you are essentially at a new line of coode after a pop!

@@ -167,7 +167,7 @@ public:
     void printIC(ostream & stream) {
         for (int i = 0; i < instr_table.size(); ++i) {
             auto it = instr_table[i];
-            stream << it.op << " " << it.oprnd << endl;
+            stream << it.op << " " << ((it.oprnd != "nil") ?it.oprnd:"") << endl;
         }
     }
 };

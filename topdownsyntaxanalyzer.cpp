@@ -46,6 +46,8 @@ ParseTree * TopDownSyntaxAnalyzer::createParseTree()
     }
     
     parseTree->printRules(cout); //print the rules of the parseTree
+    cout << "-------------- Intermediate Code --------------" << endl;
+    printIC(cout);
     return parseTree; //return parseTree to the caller
 }
 
