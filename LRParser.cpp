@@ -117,6 +117,8 @@ ParseTree * LRParser::createParseTree()
     parseTree->printTree(cout);
     return parseTree; //return parseTree to the caller
 }
+
+//function to return the stack in the LR parser as a string
 string LRParser::getStackAsString() {
     string result;
     for (auto i : productionStack) {
@@ -124,6 +126,8 @@ string LRParser::getStackAsString() {
     }
     return result;
 }
+
+
 
 bool LRParser::stackProcess() {
     cout << "push " << to_string(EndOfFileEntry) << endl;
