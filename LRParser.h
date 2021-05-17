@@ -142,6 +142,9 @@ public:
     string getProductionRHS(int rule);
 
     string getStackAsString();
+
+    void printIntermediateCode(ostream & stream);
+    void printIntermediateCode(ostream & stream, Node * node);
 };
 
 

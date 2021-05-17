@@ -92,7 +92,7 @@ public:
     void gen_instr(string op, string oprnd)
     {
         Instruction instruction = Instruction(op, oprnd);
-        instr_table[instr_address] = instruction;
+        instr_table.push_back(instruction);
         instr_address++;
     }
 
@@ -162,5 +162,12 @@ public:
     //function to return the vector of lexemes
     vector<Record> & getTokenList() {
         return lexemes;
+    }
+
+    void printIC(ostream & stream) {
+        for (int i = 0; i < instr_table.size(); ++i) {
+            auto it = instr_table[i];
+            stream << it.op << " " << it.oprnd << endl;
+        }
     }
 };
