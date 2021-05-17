@@ -422,7 +422,6 @@ bool TopDownSyntaxAnalyzer::isDeclaration() {
                 symbolTable.add(lexemes[currentLexeme-2], lexemes[currentLexeme-1]);
                 print("<Declaration> -> <Type><ID>");
                 finishNonTerminal(parent);
-                gen_instr("POPM", to_string(symbolTable.getAddress(lexemes[currentLexeme-1].lexeme)));
                 return true;
             } else {
                 auto symbol = symbolTable.getSymbol(lexemes[currentLexeme-1].lexeme);
@@ -549,7 +548,7 @@ bool TopDownSyntaxAnalyzer::isQ(){
         if (isT()) {
             if (isQ()) {
                 print("<ExpressionPrime> -> -<Term><ExpressionPrime>");
-                gen_instr("SUB", "nil")
+                gen_instr("SUB", "nil");
                 finishNonTerminal(parent);
                 return true;
             }
@@ -747,14 +746,17 @@ bool TopDownSyntaxAnalyzer::isAssignment() {
     
     //checks for <ID>, =, <Expression> consecutively
     //if true the node is added to the parse tree and the function returns true
+    Record id = *lookAhead();
     if (isIdentifier(true)) {
         Record * record = getNextToken();
+
         if (record == nullptr)
             return false;
         if (record->lexeme == "=") {
             currentNode->add(new Node(*record));
             if(isE()) {
                 if(checkAssignmentType(currentNode)) {
+                    gen_instr("POPM", to_string(symbolTable.getAddress(id.lexeme)));
                     finishNonTerminal(parent);
                     return true;
                 }
